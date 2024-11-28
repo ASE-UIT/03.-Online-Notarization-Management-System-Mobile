@@ -9,6 +9,7 @@ import { colors } from '@theme';
 import Home from '@views/Home';
 import Details from '@views/Details';
 import Profile from '@views/Profile';
+import { SignIn, SignUp } from '@views/Auth';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -17,6 +18,34 @@ const navigationProps = {
   headerStyle: { backgroundColor: colors.darkPurple },
   headerTitleStyle: { fontSize: 18 },
 };
+
+export function AuthStackNavigator() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        component={SignIn}
+        name="SignInStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={SignUp}
+        name="SignUpStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Home}
+        name="HomeStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
 
 export function HomeStackNavigator({ navigation }: DrawerProps) {
   return (

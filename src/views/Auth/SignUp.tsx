@@ -9,29 +9,30 @@ import Checkbox from 'expo-checkbox';
 import { StackProps } from '@navigator';
 import { InputFieldProps } from 'src/types';
 
-const SignIn = ({ navigation }: StackProps) => {
+const SignUp = ({ navigation }: StackProps) => {
   const { dispatch, setLoggedIn, setUser } = useAppSlice();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
 
-  const handleLogin = () => {
-    const user = { name: 'random', email };
-    dispatch(setUser(user));
-    dispatch(setLoggedIn(true));
-    navigation.navigate('HomeStack');
+  const handleSignUp = () => {};
+  const moveToSignIn = () => {
+    navigation.navigate('SignInStack');
   };
 
-  const moveToSignUp = () => {
-    navigation.navigate('SignUpStack');
-  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
         <Image source={images.logo_lg} style={styles.logo} />
-        <Text style={styles.title}>Đăng nhập</Text>
-
+        <Text style={styles.title}>Đăng ký</Text>
+        <InputField
+          label="Họ và tên"
+          icon="user"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Họ và tên"
+        />
         <InputField
           label="Email"
           icon="mail"
@@ -51,28 +52,23 @@ const SignIn = ({ navigation }: StackProps) => {
           showPassword={showPassword}
         />
 
-        <View style={styles.rememberContainer}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Checkbox value={isRemember} onValueChange={setIsRemember} />
-            <Text style={styles.rememberText}>Ghi nhớ đăng nhập</Text>
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-          </TouchableOpacity>
+        <View style={styles.emailNotiWrapper}>
+          <Checkbox value={isRemember} onValueChange={setIsRemember} />
+          <Text style={styles.emailNotiText}>Tôi muốn nhận thông báo qua email</Text>
         </View>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Đăng nhập</Text>
+        <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
+          <Text style={styles.signupButtonText}>Đăng ký</Text>
         </TouchableOpacity>
 
-        <View style={styles.signupContainer}>
-          <Text style={styles.signupText}>Chưa có tài khoản? </Text>
-          <TouchableOpacity onPress={moveToSignUp}>
-            <Text style={styles.signupLink}>Đăng ký</Text>
+        <View style={styles.signinContainer}>
+          <Text style={styles.signinText}>Đã có tài khoản? </Text>
+          <TouchableOpacity onPress={moveToSignIn}>
+            <Text style={styles.signinLink}>Đăng nhập</Text>
           </TouchableOpacity>
         </View>
         <Divider text="hoặc" />
-        <SocialLoginButton iconSource={images.google} text="Đăng nhập bằng Google" />
+        <SocialsignupButton iconSource={images.google} text="Đăng nhập bằng Google" />
       </ScrollView>
     </SafeAreaView>
   );
@@ -116,7 +112,7 @@ const Divider = ({ text }: { text: string }) => (
   </View>
 );
 
-const SocialLoginButton = ({ iconSource, text }: { iconSource: any; text: string }) => (
+const SocialsignupButton = ({ iconSource, text }: { iconSource: any; text: string }) => (
   <TouchableOpacity style={styles.socialButton}>
     <Image source={iconSource} style={styles.socialIcon} />
     <Text style={styles.socialButtonText}>{text}</Text>
@@ -150,14 +146,13 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   input: { flex: 1, marginLeft: 8 },
-  rememberContainer: {
+  emailNotiWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 24,
     alignItems: 'center',
   },
-  rememberText: {
-    marginLeft: 8,
+  emailNotiText: {
+    marginLeft: 16,
     color: colors.gray[800],
     fontSize: 16,
     fontFamily: fonts.beVietnamPro.regular,
@@ -168,21 +163,21 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontFamily: fonts.beVietnamPro.bold,
   },
-  loginButton: {
+  signupButton: {
     backgroundColor: colors.primary[500],
     padding: 12,
     borderRadius: 10,
     alignItems: 'center',
     marginBottom: 24,
   },
-  loginButtonText: {
+  signupButtonText: {
     color: colors.white[50],
     fontSize: 20,
     fontFamily: fonts.beVietnamPro.bold,
   },
-  signupContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 40 },
-  signupText: { fontSize: 18, fontFamily: fonts.beVietnamPro.regular },
-  signupLink: {
+  signinContainer: { flexDirection: 'row', justifyContent: 'center', marginBottom: 24 },
+  signinText: { fontSize: 18, fontFamily: fonts.beVietnamPro.regular },
+  signinLink: {
     fontSize: 18,
     color: colors.blue[500],
     textDecorationLine: 'underline',
@@ -191,7 +186,7 @@ const styles = StyleSheet.create({
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 48,
+    marginBottom: 24,
     justifyContent: 'center',
   },
   line: { backgroundColor: colors.gray[100], height: 1, flex: 1, marginHorizontal: 16 },
@@ -214,4 +209,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SignIn;
+export default SignUp;

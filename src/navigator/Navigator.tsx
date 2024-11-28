@@ -9,6 +9,7 @@ import DrawerNavigator from './drawer';
 import { loadImages, loadFonts } from '@theme';
 import { useDataPersist, DataPersistKeys } from '@hooks';
 import { isWeb } from '@utils/deviceInfo';
+import { AuthStackNavigator } from './stack';
 
 // keep the splash screen visible while complete fetching resources
 SplashScreen.preventAutoHideAsync();
@@ -33,7 +34,7 @@ function Navigator() {
 
       // store user data to redux
       dispatch(setUser(user));
-      dispatch(setLoggedIn(!!user));
+      dispatch(setLoggedIn(!user));
 
       // store user data to persistent storage (async storage)
       if (user) setPersistData<IUser>(DataPersistKeys.USER, user);
@@ -77,7 +78,9 @@ function Navigator() {
       )}
     </>
   ) : (
-    <View />
+    <NavigationContainer>
+      <AuthStackNavigator />
+    </NavigationContainer>
   );
 }
 

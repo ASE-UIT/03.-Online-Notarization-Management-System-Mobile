@@ -5,6 +5,9 @@ export type StackParamList = {
   DetailsStack: { from: string };
   ProfileStack: undefined;
   // add more screen props...
+
+  SignInStack: undefined;
+  SignUpStack: undefined;
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;

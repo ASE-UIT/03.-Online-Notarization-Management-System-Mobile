@@ -2,10 +2,10 @@ import { Provider } from 'react-redux';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Navigator from '@navigator';
 import store from '@utils/store';
-import SignIn from '@views/Auth/SignIn';
 import { useEffect, useState } from 'react';
 import { loadFonts } from '@theme';
 import * as SplashScreen from 'expo-splash-screen';
+import { SignUp } from '@views/Auth';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +27,7 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
-        <SignIn />
+        <Navigator />
       </Provider>
     </GestureHandlerRootView>
   );
