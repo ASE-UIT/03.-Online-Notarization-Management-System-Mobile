@@ -8,6 +8,11 @@ export type StackParamList = {
 
   SignInStack: undefined;
   SignUpStack: undefined;
+
+  SearchStack: undefined;
+  SessionStack: undefined;
+  OtherStack: undefined;
+  QRScanStack: undefined;
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;

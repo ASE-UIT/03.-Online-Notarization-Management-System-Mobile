@@ -10,6 +10,10 @@ import Home from '@views/Home';
 import Details from '@views/Details';
 import Profile from '@views/Profile';
 import { SignIn, SignUp } from '@views/Auth';
+import Search from '@views/Search';
+import Session from '@views/Session';
+import Other from '@views/Other';
+import QRScan from '@views/QRScan';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -47,52 +51,70 @@ export function AuthStackNavigator() {
   );
 }
 
-export function HomeStackNavigator({ navigation }: DrawerProps) {
+export function HomeStackNavigator() {
   return (
     <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
         component={Home}
         name="HomeStack"
         options={{
-          title: 'Home',
-          headerTitle: () => <StackHeaderTitle />,
-          headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
-          headerTitleAlign: 'center',
-        }}
-      />
-      <Stack.Screen
-        component={Details}
-        name="DetailsStack"
-        options={{
-          title: 'Details',
-          headerTitle: () => <StackHeaderTitle />,
-          headerTitleAlign: 'center',
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
   );
 }
 
-export function ProfileStackNavigator({ navigation }: DrawerProps) {
+export function SearchStackNavigator() {
   return (
     <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
-        component={Profile}
-        name="ProfileStack"
+        component={Search}
+        name="SearchStack"
         options={{
-          title: 'Profile',
-          headerTitle: () => <StackHeaderTitle />,
-          headerLeft: () => <StackHeaderLeft onPress={() => navigation.toggleDrawer()} />,
-          headerTitleAlign: 'center',
+          headerShown: false,
         }}
       />
+    </Stack.Navigator>
+  );
+}
+
+export function SessionStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
-        component={Details}
-        name="DetailsStack"
+        component={Session}
+        name="SessionStack"
         options={{
-          title: 'Details',
-          headerTitle: () => <StackHeaderTitle />,
-          headerTitleAlign: 'center',
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export function OtherStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={navigationProps}>
+      <Stack.Screen
+        component={Other}
+        name="OtherStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export function QRScanStackNavigator() {
+  return (
+    <Stack.Navigator screenOptions={navigationProps}>
+      <Stack.Screen
+        component={QRScan}
+        name="QRScanStack"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

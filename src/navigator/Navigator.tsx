@@ -10,6 +10,7 @@ import { loadImages, loadFonts } from '@theme';
 import { useDataPersist, DataPersistKeys } from '@hooks';
 import { isWeb } from '@utils/deviceInfo';
 import { AuthStackNavigator } from './stack';
+import TabNavigator from './tab';
 
 // keep the splash screen visible while complete fetching resources
 SplashScreen.preventAutoHideAsync();
@@ -69,7 +70,7 @@ function Navigator() {
   return checked && loggedIn ? (
     <>
       <NavigationContainer>
-        <DrawerNavigator />
+        <TabNavigator />
       </NavigationContainer>
       {!isWeb && (
         <BottomSheet isOpen={isOpen} initialOpen>
