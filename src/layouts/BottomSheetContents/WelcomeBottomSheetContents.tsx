@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontFamily: fonts.openSan.bold,
+    fontFamily: fonts.beVietnamPro.bold,
     color: colors.black,
     marginTop: 16,
     marginBottom: 32,
@@ -26,12 +26,12 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    fontFamily: fonts.openSan.regular,
+    fontFamily: fonts.beVietnamPro.regular,
     width: '100%',
   },
   buttonTitle: {
     fontSize: 16,
-    color: colors.white,
+    color: colors.white[50],
     textAlign: 'center',
   },
   button: {
@@ -53,12 +53,12 @@ const styles = StyleSheet.create({
   },
   envTitle: {
     fontSize: 14,
-    fontFamily: fonts.openSan.bold,
+    fontFamily: fonts.beVietnamPro.bold,
     color: colors.black,
   },
   envValue: {
     fontSize: 14,
-    fontFamily: fonts.openSan.regular,
+    fontFamily: fonts.beVietnamPro.regular,
     color: colors.black,
   },
 });
@@ -73,7 +73,8 @@ export function WelcomeBottomSheetContents({ onClose }: WelcomeBottomSheetConten
       <Text style={styles.title}>🎉 Congratulations! </Text>
       <Text style={[styles.subtitle, { marginBottom: 32 }]}>
         Chó tài Chó Tánh Chó Bảo Chó Thắng
-        <Text style={{ fontFamily: fonts.openSan.bold }}>{` ${config.ENV} `}</Text>environment 🚀
+        <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>{` ${config.ENV} `}</Text>environment
+        🚀
       </Text>
       <Text style={[styles.subtitle, { marginBottom: 8 }]}>Injected Environmental Variables:</Text>
       {Object.keys(config).map(key => (

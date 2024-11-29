@@ -9,6 +9,10 @@ export type TabBarStatus = {
 export type TabParamList = {
   HomeTab: undefined;
   ProfileTab: undefined;
+  SearchTab: undefined;
+  OtherTab: undefined;
+  QRScanTab: undefined;
+  SessionTab: undefined;
   // add more tab params...
 };
 
