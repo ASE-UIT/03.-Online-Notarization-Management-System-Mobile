@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
 const Header = () => {
   return (
@@ -10,17 +10,32 @@ const Header = () => {
         <Text style={styles.title}>CongChungOnline</Text>
       </View>
 
-      {/* Icons */}
+      {/* Notification Button */}
       <View style={styles.rightSection}>
-        <Image source={require('./assets/header/noti.png')} style={styles.iconNoti} />
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Thông báo được nhấn!');
+          }}>
+          <Image source={require('./assets/header/noti.png')} style={styles.iconNoti} />
+        </TouchableOpacity>
       </View>
 
       {/* User Info */}
       <View style={styles.userSection}>
         <Image source={require('./assets/header/Avatar.png')} style={styles.avatar} />
         <Text style={styles.username}>Nguyễn Quốc Thắng</Text>
-        <Image source={require('./assets/header/VerifiedRounded.png')} style={styles.icon} />
-        <Image source={require('./assets/header/QR.png')} style={styles.iconQR} />
+        <TouchableOpacity
+          onPress={() => {
+            console.log('Verified icon được nhấn!');
+          }}>
+          <Image source={require('./assets/header/VerifiedRounded.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            console.log('QR được nhấn!');
+          }}>
+          <Image source={require('./assets/header/QR.png')} style={styles.iconQR} />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -28,10 +43,8 @@ const Header = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#f9f6f4',
+    backgroundColor: 'transparent',
     padding: 16,
-    borderBottomLeftRadius: 16,
-    borderBottomRightRadius: 16,
   },
   leftSection: {
     flexDirection: 'row',
@@ -46,7 +59,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#FFF',
   },
   rightSection: {
     position: 'absolute',
@@ -62,7 +75,7 @@ const styles = StyleSheet.create({
   iconQR: {
     width: 36,
     height: 36,
-    marginLeft: 80,
+    marginLeft: 110,
     resizeMode: 'contain',
   },
   iconNoti: {

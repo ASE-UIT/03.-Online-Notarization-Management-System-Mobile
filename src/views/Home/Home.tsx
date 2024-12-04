@@ -12,15 +12,15 @@ const Home = () => {
       <Header />
 
       {/* Main */}
-      <ScrollView style={styles.content}>
-        <Main />
-      </ScrollView>
+      <Main />
     </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
   backgroundImage: {
+    position: 'absolute',
+    top: 40,
     flex: 1,
     resizeMode: 'cover',
     width: '100%',

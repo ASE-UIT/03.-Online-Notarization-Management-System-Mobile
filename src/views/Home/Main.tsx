@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, FlatList } from 'react-native';
-
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const services = [
   { id: 1, name: 'Vay - Mượn Tài sản' },
   { id: 2, name: 'Vay - Mượn Tài sản' },
@@ -23,40 +23,50 @@ const information = [
     issued: '09/11/2024',
     updated: '11/11/2024',
   },
+  {
+    id: 3,
+    title:
+      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
+    issued: '09/11/2024',
+    updated: '11/11/2024',
+  },
 ];
 
 export default function Main() {
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {/* Các loại dịch vụ */}
       <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
-      <View style={styles.serviceList}>
-        {services.map(service => (
-          <View key={service.id} style={styles.serviceItem}>
-            <Image
-              source={require('./assets/main/Icon.png')} // Đường dẫn đến icon
-              style={styles.serviceIcon}
-            />
-            <Text style={styles.serviceText}>{service.name}</Text>
-          </View>
-        ))}
-      </View>
-
-      {/* Tại sao nên sử dụng dịch vụ */}
-      <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
-      <Image
-        source={require('./assets/main/imageEx.png')} // Đường dẫn đến hình ảnh minh họa
-        style={styles.mainImage}
-      />
-      <View style={styles.pagination}>
-        <View style={styles.dot} />
-        <View style={styles.activeDot} />
-        <View style={styles.dot} />
-      </View>
-
-      {/* Thông tin */}
-      <Text style={styles.sectionTitle}>Thông tin</Text>
-      <View>
+      <SafeAreaView>
+        {/* ScrollView ngang cho các dịch vụ */}
+        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+          {services.map(service => (
+            <View key={service.id} style={styles.serviceItem}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('icon được nhấn!');
+                }}>
+                <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
+              </TouchableOpacity>
+              <Text style={styles.serviceText}>{service.name}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+      <ScrollView style={styles.container}>
+        {/* Tại sao nên sử dụng dịch vụ */}
+        <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
+        <Image
+          source={require('./assets/main/imageEx.png')} // Đường dẫn đến hình ảnh minh họa
+          style={styles.mainImage}
+        />
+        <View style={styles.pagination}>
+          <View style={styles.dot} />
+          <View style={styles.activeDot} />
+          <View style={styles.dot} />
+        </View>
+        {/* Thông tin */}
+        <Text style={styles.sectionTitle}>Thông tin</Text>
         {information.map(info => (
           <View key={info.id} style={styles.infoCard}>
             <Text style={styles.infoTitle}>{info.title}</Text>
@@ -65,8 +75,8 @@ export default function Main() {
             </Text>
           </View>
         ))}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -75,29 +85,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFF',
     padding: 16,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
   },
-  serviceList: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 32,
+  scrollView: {
+    marginBottom: 10,
   },
   serviceItem: {
     alignItems: 'center',
+    marginRight: 16, // Khoảng cách giữa các item
   },
   serviceIcon: {
     width: 50,
     height: 50,
-    marginBottom: 8,
+    marginBottom: 5,
   },
   serviceText: {
-    marginLeft: 15,
     fontSize: 14,
-    textAlign: 'center',
+    color: '#333',
   },
   mainImage: {
     width: '100%',
