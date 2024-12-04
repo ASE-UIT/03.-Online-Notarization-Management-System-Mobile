@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
 const services = [
   { id: 1, name: 'Vay - Mượn Tài sản' },
   { id: 2, name: 'Vay - Mượn Tài sản' },
@@ -35,25 +36,25 @@ const information = [
 export default function Main() {
   return (
     <View style={styles.container}>
-      {/* Các loại dịch vụ */}
-      <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
-      <SafeAreaView>
-        {/* ScrollView ngang cho các dịch vụ */}
-        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-          {services.map(service => (
-            <View key={service.id} style={styles.serviceItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('icon được nhấn!');
-                }}>
-                <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
-              </TouchableOpacity>
-              <Text style={styles.serviceText}>{service.name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Các loại dịch vụ */}
+        <Text style={styles.section}>Các loại dịch vụ</Text>
+        <SafeAreaView>
+          {/* ScrollView ngang cho các dịch vụ */}
+          <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+            {services.map(service => (
+              <View key={service.id} style={styles.serviceItem}>
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log('icon được nhấn!');
+                  }}>
+                  <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
+                </TouchableOpacity>
+                <Text style={styles.serviceText}>{service.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
         {/* Tại sao nên sử dụng dịch vụ */}
         <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
         <Image
@@ -87,6 +88,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
+  },
+  section: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: -10,
   },
   sectionTitle: {
     fontSize: 18,
