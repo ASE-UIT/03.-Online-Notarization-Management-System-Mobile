@@ -16,7 +16,10 @@ const Header = () => {
           onPress={() => {
             console.log('Thông báo được nhấn!');
           }}>
-          <Image source={require('./assets/header/noti.png')} style={styles.iconNoti} />
+          {/* Thay Image bằng Ionicons */}
+          <View style={styles.notificationContainer}>
+            <Ionicons name="notifications" size={24} color="#FF9800" />
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -24,17 +27,14 @@ const Header = () => {
       <View style={styles.userSection}>
         <Image source={require('./assets/header/Avatar.png')} style={styles.avatar} />
         <Text style={styles.username}>Nguyễn Quốc Thắng</Text>
-        <TouchableOpacity
-          onPress={() => {
-            console.log('Verified icon được nhấn!');
-          }}>
-          <Image source={require('./assets/header/VerifiedRounded.png')} style={styles.icon} />
-        </TouchableOpacity>
+        <Image source={require('./assets/header/VerifiedRounded.png')} style={styles.icon} />
         <TouchableOpacity
           onPress={() => {
             console.log('QR được nhấn!');
           }}>
-          <Image source={require('./assets/header/QR.png')} style={styles.iconQR} />
+          <View style={styles.qrContainer}>
+            <Ionicons name="qr-code-outline" size={32} color="#CB7689" />
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -75,14 +75,27 @@ const styles = StyleSheet.create({
   iconQR: {
     width: 36,
     height: 36,
-    marginLeft: 110,
+    // position: 'absolute',
+    // top: -17,
+    // left: 120,
     resizeMode: 'contain',
   },
-  iconNoti: {
-    width: 40,
-    height: 40,
-    marginLeft: 12,
-    resizeMode: 'contain',
+  notificationContainer: {
+    backgroundColor: '#FFF7E6', // Màu vàng nhạt cho background
+    borderRadius: 50, // Tạo hình tròn cho background
+    padding: 5, // Khoảng cách giữa icon và viền background
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qrContainer: {
+    position: 'absolute',
+    top: -20,
+    left: 110,
+    backgroundColor: '#E0E0E0',
+    borderRadius: 50, // Tạo hình tròn cho background
+    padding: 4, // Khoảng cách giữa icon và viền background
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   userSection: {
     flexDirection: 'row',
