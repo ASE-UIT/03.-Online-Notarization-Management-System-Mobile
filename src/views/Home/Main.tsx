@@ -1,6 +1,18 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated-carousel';
+import { useSharedValue } from 'react-native-reanimated';
+import { colors } from '@theme';
+import CarouselComponent from '@components/CarouselComponent';
 
 const services = [
   { id: 1, name: 'Vay - Mượn Tài sản' },
@@ -33,61 +45,85 @@ const information = [
   },
 ];
 
+const data = [
+  { id: 1, source: require('@assets/images/imageEx.png') },
+  { id: 2, source: require('@assets/images/imageEx.png') },
+  { id: 3, source: require('@assets/images/imageEx.png') },
+  { id: 4, source: require('@assets/images/imageEx.png') },
+  { id: 5, source: require('@assets/images/imageEx.png') },
+  { id: 6, source: require('@assets/images/imageEx.png') },
+];
+const windowWidth = Dimensions.get('window').width;
+
 export default function Main() {
+  const ref = useRef<ICarouselInstance>(null);
+  const progress = useSharedValue<number>(0);
+  const onPressPagination = (index: number) => {
+    ref.current?.scrollTo({
+      /**
+       * Calculate the difference between the current index and the target index
+       * to ensure that the carousel scrolls to the nearest index
+       */
+      count: index - progress.value,
+      animated: true,
+    });
+  };
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Các loại dịch vụ */}
-        <Text style={styles.section}>Các loại dịch vụ</Text>
-        <SafeAreaView>
-          {/* ScrollView ngang cho các dịch vụ */}
-          <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-            {services.map(service => (
-              <View key={service.id} style={styles.serviceItem}>
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log('icon được nhấn!');
-                  }}>
-                  <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
-                </TouchableOpacity>
-                <Text style={styles.serviceText}>{service.name}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </SafeAreaView>
-        {/* Tại sao nên sử dụng dịch vụ */}
-        <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
-        <Image
-          source={require('./assets/main/imageEx.png')} // Đường dẫn đến hình ảnh minh họa
-          style={styles.mainImage}
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Các loại dịch vụ */}
+      <Text style={styles.section}>Các loại dịch vụ</Text>
+      <SafeAreaView>
+        {/* ScrollView ngang cho các dịch vụ */}
+        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
+          {services.map(service => (
+            <View key={service.id} style={styles.serviceItem}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('icon được nhấn!');
+                }}>
+                <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
+              </TouchableOpacity>
+              <Text style={styles.serviceText}>{service.name}</Text>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+      {/* Tại sao nên sử dụng dịch vụ */}
+      <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
+      <View>
+        <CarouselComponent
+          ref={ref}
+          width={windowWidth}
+          height={windowWidth / 2}
+          data={data}
+          progress={progress}
+          color={colors.primary[300]}
+          onPressPagination={onPressPagination}
         />
-        <View style={styles.pagination}>
-          <View style={styles.dot} />
-          <View style={styles.activeDot} />
-          <View style={styles.dot} />
+      </View>
+      {/* Thông tin */}
+      <Text style={styles.sectionTitle}>Thông tin</Text>
+      {information.map(info => (
+        <View key={info.id} style={styles.infoCard}>
+          <Text style={styles.infoTitle}>{info.title}</Text>
+          <Text style={styles.infoDetails}>
+            Ban hành: {info.issued} | Cập nhật: {info.updated}
+          </Text>
         </View>
-        {/* Thông tin */}
-        <Text style={styles.sectionTitle}>Thông tin</Text>
-        {information.map(info => (
-          <View key={info.id} style={styles.infoCard}>
-            <Text style={styles.infoTitle}>{info.title}</Text>
-            <Text style={styles.infoDetails}>
-              Ban hành: {info.issued} | Cập nhật: {info.updated}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-    </View>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 12,
     backgroundColor: '#FFF',
-    padding: 16,
+    paddingHorizontal: 16,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
+    marginTop: 8,
   },
   section: {
     fontSize: 18,
@@ -114,33 +150,8 @@ const styles = StyleSheet.create({
   serviceText: {
     fontSize: 14,
     color: '#333',
-  },
-  mainImage: {
-    width: '100%',
-    height: 150,
-    borderRadius: 8,
-    marginBottom: 16,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  pagination: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 32,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D3D3D3',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#C62828',
-    marginHorizontal: 4,
+    width: 90,
+    textAlign: 'center',
   },
   infoCard: {
     backgroundColor: '#F9F9F9',
@@ -152,6 +163,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     elevation: 2,
+    marginHorizontal: 4,
   },
   infoTitle: {
     fontSize: 16,

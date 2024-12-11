@@ -1,43 +1,41 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // Import Ionicons từ @expo/vector-icons
+import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors } from '@theme';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 const Header = () => {
   return (
-    <View style={styles.container}>
-      {/* Logo */}
-      <View style={styles.leftSection}>
-        <Image source={require('./assets/header/logo.png')} style={styles.logo} />
-        <Text style={styles.title}>CongChungOnline</Text>
-      </View>
-
-      {/* Notification Button */}
-      <View style={styles.rightSection}>
-        <TouchableOpacity
-          onPress={() => {
-            console.log('Thông báo được nhấn!');
-          }}>
-          {/* Thay Image bằng Ionicons */}
-          <View style={styles.notificationContainer}>
-            <Ionicons name="notifications" size={24} color="#FF9800" />
-          </View>
+    <ImageBackground
+      style={styles.container}
+      source={require('@assets/images/background_header.png')}>
+      {/* Top Section */}
+      <View style={styles.topSection}>
+        {/* App Logo */}
+        <View style={styles.leftSection}>
+          <Image source={require('./assets/header/logo.png')} style={styles.logo} />
+          <Text style={styles.title}>CongChungOnline</Text>
+        </View>
+        {/* Notification Button */}
+        <TouchableOpacity style={styles.notificationContainer}>
+          <Ionicons name="notifications" size={24} color={colors.yellow[500]} />
         </TouchableOpacity>
       </View>
-
       {/* User Info */}
       <View style={styles.userSection}>
-        <Image source={require('./assets/header/Avatar.png')} style={styles.avatar} />
-        <Text style={styles.username}>Nguyễn Quốc Thắng</Text>
-        <Image source={require('./assets/header/VerifiedRounded.png')} style={styles.icon} />
+        <View style={styles.userInforWrapper}>
+          <Image source={require('./assets/header/Avatar.png')} style={styles.avatar} />
+          <Text style={styles.username}>Nguyễn Quốc Thắng</Text>
+          <MaterialIcons name="verified" size={24} color={colors.gray[500]} />
+        </View>
         <TouchableOpacity
           onPress={() => {
             console.log('QR được nhấn!');
-          }}>
-          <View style={styles.qrContainer}>
-            <Ionicons name="qr-code-outline" size={32} color="#CB7689" />
-          </View>
+          }}
+          style={styles.qrContainer}>
+          <Ionicons name="qr-code-outline" size={32} color={colors.primary[300]} />
         </TouchableOpacity>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -46,10 +44,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     padding: 16,
   },
+  topSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignContent: 'center',
+    marginVertical: 16,
+  },
   leftSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
   },
   logo: {
     width: 34,
@@ -57,14 +60,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#FFF',
-  },
-  rightSection: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
   },
   icon: {
     width: 36,
@@ -81,28 +79,30 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   notificationContainer: {
-    backgroundColor: '#FFF7E6', // Màu vàng nhạt cho background
+    backgroundColor: colors.yellow[50], // Màu vàng nhạt cho background
     borderRadius: 50, // Tạo hình tròn cho background
-    padding: 5, // Khoảng cách giữa icon và viền background
+    padding: 12, // Khoảng cách giữa icon và viền background
     alignItems: 'center',
     justifyContent: 'center',
   },
+  userInforWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   qrContainer: {
-    position: 'absolute',
-    top: -20,
-    left: 110,
     backgroundColor: '#E0E0E0',
     borderRadius: 50, // Tạo hình tròn cho background
-    padding: 4, // Khoảng cách giữa icon và viền background
+    padding: 8, // Khoảng cách giữa icon và viền background
     alignItems: 'center',
     justifyContent: 'center',
   },
   userSection: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 8,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -110,8 +110,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   avatar: {
-    width: 40,
-    height: 40,
+    width: 48,
+    height: 48,
     borderRadius: 20,
     marginRight: 8,
   },
