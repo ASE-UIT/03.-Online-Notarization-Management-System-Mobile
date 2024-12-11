@@ -128,7 +128,7 @@ export default function TabNavigator() {
         component={OtherStackNavigator}
         options={{
           tabBarIcon: ({ focused }) => (
-            <TabBarIconWithLabel name="bars" label="Session" focused={focused} />
+            <TabBarIconWithLabel name="bars" label="Other" focused={focused} />
           ),
         }}
       />
