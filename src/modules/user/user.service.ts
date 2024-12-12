@@ -5,10 +5,8 @@ import {
   IRefreshTokenResponse,
   IRegisterRequest,
   IRegisterResponse,
-  IToken,
 } from './user.typeDefs';
 import axiosConfig from '@utils/axiosConfig';
-import { useUserSlice } from './user.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 async function login(data: ILoginRequest): Promise<ILoginResponse> {
