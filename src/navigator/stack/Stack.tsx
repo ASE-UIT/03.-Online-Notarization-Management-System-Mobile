@@ -14,6 +14,7 @@ import Search from '@views/Search';
 import Session from '@views/Session';
 import Other from '@views/Other';
 import QRScan from '@views/QRScan';
+import Policy from '@views/Policy';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -99,6 +100,20 @@ export function OtherStackNavigator() {
       <Stack.Screen
         component={Other}
         name="OtherStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Policy}
+        name="PolicyStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Profile}
+        name="ProfileStack"
         options={{
           headerShown: false,
         }}
