@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@theme';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-const Header = () => {
+const Header = ({ username }: { username: string }) => {
   return (
     <ImageBackground
       style={styles.container}
@@ -23,8 +23,7 @@ const Header = () => {
       {/* User Info */}
       <View style={styles.userSection}>
         <View style={styles.userInforWrapper}>
-          <Image source={require('./assets/header/Avatar.png')} style={styles.avatar} />
-          <Text style={styles.username}>Nguyễn Quốc Thắng</Text>
+          <Text style={styles.username}>{username}</Text>
           <MaterialIcons name="verified" size={24} color={colors.gray[500]} />
         </View>
         <TouchableOpacity
