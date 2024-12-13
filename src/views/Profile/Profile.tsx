@@ -11,25 +11,21 @@ export default function Profile({ navigation }: { navigation: any }) {
     district: false,
     ward: false,
   });
-
   const [personalInfo, setPersonalInfo] = useState({
     name: 'Nguyễn Quốc Thắng',
     phone: '+84 123456789',
     email: 'Test@gmail.com',
     id: '0123456789',
   });
-
   const [addressInfo, setAddressInfo] = useState({
     street: '69 Trần Duy Hưng',
-    ward: '',
-    district: '',
-    city: '',
+    ward: 'Đông Hoà',
+    district: 'Dĩ An',
+    city: 'Bình Dương',
   });
-
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
-
   useEffect(() => {
     const fetchProvinces = async () => {
       const data = getProvinces();
@@ -37,18 +33,15 @@ export default function Profile({ navigation }: { navigation: any }) {
     };
     fetchProvinces();
   }, []);
-
   const handleCitySelect = (provinceCode: string, provinceName: string) => {
     setDistricts(getDistrictsByProvinceCode(provinceCode));
     setAddressInfo(prev => ({ ...prev, city: provinceName, district: '', ward: '' }));
     setWards([]);
   };
-
   const handleDistrictSelect = (districtCode: string, districtName: string) => {
     setWards(getWardsByDistrictCode(districtCode));
     setAddressInfo(prev => ({ ...prev, district: districtName, ward: '' }));
   };
-
   const handleWardSelect = (wardCode: string, wardName: string) => {
     setAddressInfo(prev => ({ ...prev, ward: wardName }));
   };
@@ -288,7 +281,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    top: 40,
+    top: 40, // Điều chỉnh vị trí của dropdown so với input
     left: 0,
     right: 0,
     backgroundColor: 'white',
@@ -296,7 +289,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 5,
     zIndex: 1,
-    maxHeight: 250,
+    maxHeight: 250, // Đặt chiều cao tối đa cho dropdown
   },
   dropdownList: {
     padding: 10,
@@ -361,45 +354,65 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputWrapperEditingColumn: {
-    marginBottom: 15,
+    marginBottom: 15, // Khoảng cách dưới mỗi input
+    borderWidth: 1, // Thêm viền với độ dày là 1
+    borderColor: 'black', // Màu viền là đen
+    borderRadius: 5, // Tạo góc bo tròn cho viền nếu cần
+    padding: 2, // Khoảng cách giữa viền và các phần tử bên trong
   },
   labelEditing: {
     fontSize: 14,
     color: 'gray',
-    marginBottom: 5,
+    marginBottom: -15,
+  },
+  inputContainerEditing: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'transparent',
+    borderRadius: 5,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 10,
   },
   inputEditing: {
-    borderWidth: 1,
-    borderColor: 'black',
-    borderRadius: 5,
-    padding: 10,
+    flex: 1,
     fontSize: 14,
+    paddingVertical: 10,
   },
   inputBold: {
     fontWeight: 'bold',
   },
+  iconBackground: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#9EA2AE',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 10,
+  },
   inputWrapperEditingColumnAddress: {
     marginBottom: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'row', // Đảm bảo các phần tử nằm trên cùng một dòng
+    alignItems: 'center', // Căn giữa các phần tử theo chiều dọc
+    justifyContent: 'space-between', // Đảm bảo khoảng cách hợp lý giữa nhãn và trường nhập liệu
   },
   labelEditingAddress: {
     fontSize: 14,
     color: 'gray',
-    width: 140,
-    marginRight: 10,
-    textAlign: 'left',
+    width: 140, // Chiều rộng cố định cho nhãn (có thể điều chỉnh tùy theo nội dung)
+    marginRight: 10, // Khoảng cách giữa nhãn và input
+    textAlign: 'left', // Đảm bảo văn bản trong nhãn căn trái
   },
   inputContainerEditingAddress: {
-    flexDirection: 'row',
+    flexDirection: 'row', // Hiển thị theo chiều ngang
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 5,
     backgroundColor: 'white',
     paddingHorizontal: 10,
-    flex: 1,
+    flex: 1, // Đảm bảo input chiếm hết không gian còn lại
   },
   inputEditingAddress: {
     flex: 1,
