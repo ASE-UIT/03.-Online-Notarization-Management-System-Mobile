@@ -1,95 +1,57 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from 'vn-provinces';
 
 export default function Profile({ navigation }: { navigation: any }) {
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Để điều khiển hiển thị dropdown
+  const [isDropdownVisible, setIsDropdownVisible] = useState({
+    city: false,
+    district: false,
+    ward: false,
+  });
+
   const [personalInfo, setPersonalInfo] = useState({
     name: 'Nguyễn Quốc Thắng',
     phone: '+84 123456789',
     email: 'Test@gmail.com',
     id: '0123456789',
   });
+
   const [addressInfo, setAddressInfo] = useState({
     street: '69 Trần Duy Hưng',
-    ward: 'Đông Hoà',
-    district: 'Dĩ An',
-    city: 'Bình Dương',
+    ward: '',
+    district: '',
+    city: '',
   });
 
-  // Danh sách 63 tỉnh thành
-  const provinces = [
-    'Hà Nội',
-    'Hồ Chí Minh',
-    'Bình Dương',
-    'Đà Nẵng',
-    'Hải Phòng',
-    'Cần Thơ',
-    'An Giang',
-    'Bà Rịa-Vũng Tàu',
-    'Bắc Giang',
-    'Bắc Kạn',
-    'Bến Tre',
-    'Bình Định',
-    'Bình Phước',
-    'Bình Thuận',
-    'Cao Bằng',
-    'Cà Mau',
-    'Đắk Lắk',
-    'Đắk Nông',
-    'Điện Biên',
-    'Đồng Nai',
-    'Đồng Tháp',
-    'Gia Lai',
-    'Hà Giang',
-    'Hà Nam',
-    'Hà Tây',
-    'Hậu Giang',
-    'Hòa Bình',
-    'Hưng Yên',
-    'Khánh Hòa',
-    'Kiên Giang',
-    'Kon Tum',
-    'Lai Châu',
-    'Lâm Đồng',
-    'Lạng Sơn',
-    'Lào Cai',
-    'Long An',
-    'Nam Định',
-    'Nghệ An',
-    'Ninh Bình',
-    'Ninh Thuận',
-    'Phú Thọ',
-    'Phú Yên',
-    'Quảng Bình',
-    'Quảng Nam',
-    'Quảng Ngãi',
-    'Quảng Ninh',
-    'Quảng Trị',
-    'Sóc Trăng',
-    'Sơn La',
-    'Tây Ninh',
-    'Thái Bình',
-    'Thái Nguyên',
-    'Thanh Hóa',
-    'Thừa Thiên-Huế',
-    'Tiền Giang',
-    'Trà Vinh',
-    'Tuyên Quang',
-    'Vĩnh Long',
-    'Vĩnh Phúc',
-    'Yên Bái',
-    'Hòa Bình',
-    'Bắc Ninh',
-    'Bến Tre',
-    'Cà Mau',
-    'Bình Định',
-    'Lào Cai',
-    'Bắc Kạn',
-    'Sơn La',
-  ];
+  const [provinces, setProvinces] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const data = getProvinces();
+      setProvinces(data);
+    };
+    fetchProvinces();
+  }, []);
+
+  const handleCitySelect = (provinceCode: string, provinceName: string) => {
+    setDistricts(getDistrictsByProvinceCode(provinceCode));
+    setAddressInfo(prev => ({ ...prev, city: provinceName, district: '', ward: '' }));
+    setWards([]);
+  };
+
+  const handleDistrictSelect = (districtCode: string, districtName: string) => {
+    setWards(getWardsByDistrictCode(districtCode));
+    setAddressInfo(prev => ({ ...prev, district: districtName, ward: '' }));
+  };
+
+  const handleWardSelect = (wardCode: string, wardName: string) => {
+    setAddressInfo(prev => ({ ...prev, ward: wardName }));
+  };
 
   return (
     <View style={styles.container}>
@@ -180,8 +142,106 @@ export default function Profile({ navigation }: { navigation: any }) {
               <Text style={styles.editText}>Chỉnh sửa</Text>
             </TouchableOpacity>
           </View>
+
           {isEditingAddress ? (
             <View>
+              {/* Tỉnh/Thành phố */}
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Tỉnh/thành phố:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
+                    value={addressInfo.city}
+                    editable={false}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setIsDropdownVisible(prev => ({ ...prev, city: !prev.city }))}>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {isDropdownVisible.city && (
+                <View style={styles.dropdownContainer}>
+                  <ScrollView style={styles.dropdownList}>
+                    {provinces.map(province => (
+                      <TouchableOpacity
+                        key={province.code}
+                        onPress={() => {
+                          handleCitySelect(province.code, province.name);
+                          setIsDropdownVisible(prev => ({ ...prev, city: false }));
+                        }}>
+                        <Text style={styles.dropdownItem}>{province.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Quận/Huyện */}
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Quận/huyện:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
+                    value={addressInfo.district}
+                    editable={false}
+                  />
+                  <TouchableOpacity
+                    onPress={() =>
+                      setIsDropdownVisible(prev => ({ ...prev, district: !prev.district }))
+                    }>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {isDropdownVisible.district && (
+                <View style={styles.dropdownContainer}>
+                  <ScrollView style={styles.dropdownList}>
+                    {districts.map(district => (
+                      <TouchableOpacity
+                        key={district.code}
+                        onPress={() => {
+                          handleDistrictSelect(district.code, district.name);
+                          setIsDropdownVisible(prev => ({ ...prev, district: false }));
+                        }}>
+                        <Text style={styles.dropdownItem}>{district.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
+
+              {/* Xã/Phường */}
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Xã phường/thị trấn:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
+                    value={addressInfo.ward}
+                    editable={false}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setIsDropdownVisible(prev => ({ ...prev, ward: !prev.ward }))}>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {isDropdownVisible.ward && (
+                <View style={styles.dropdownContainer}>
+                  <ScrollView style={styles.dropdownList}>
+                    {wards.map(ward => (
+                      <TouchableOpacity
+                        key={ward.code}
+                        onPress={() => {
+                          handleWardSelect(ward.code, ward.name);
+                          setIsDropdownVisible(prev => ({ ...prev, ward: false }));
+                        }}>
+                        <Text style={styles.dropdownItem}>{ward.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
               <View style={styles.inputWrapperEditingColumnAddress}>
                 <Text style={styles.labelEditingAddress}>Số nhà/đường phố:</Text>
                 <View style={styles.inputContainerEditingAddress}>
@@ -197,76 +257,20 @@ export default function Profile({ navigation }: { navigation: any }) {
                   </TouchableOpacity>
                 </View>
               </View>
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Xã phường/thị trấn:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
-                    value={addressInfo.ward}
-                    onChangeText={text => setAddressInfo(prev => ({ ...prev, ward: text }))}
-                  />
-                  <TouchableOpacity onPress={() => setAddressInfo(prev => ({ ...prev, ward: '' }))}>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Quận/huyện:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
-                    value={addressInfo.district}
-                    onChangeText={text => setAddressInfo(prev => ({ ...prev, district: text }))}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setAddressInfo(prev => ({ ...prev, district: '' }))}>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Tỉnh/thành phố:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
-                    value={addressInfo.city}
-                    onChangeText={text => setAddressInfo(prev => ({ ...prev, city: text }))}
-                  />
-                  <TouchableOpacity onPress={() => setIsDropdownVisible(!isDropdownVisible)}>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {isDropdownVisible && (
-                <View style={styles.dropdownContainer}>
-                  <ScrollView style={styles.dropdownList}>
-                    {provinces.map((province, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        onPress={() => {
-                          setAddressInfo(prev => ({ ...prev, city: province }));
-                          setIsDropdownVisible(false);
-                        }}>
-                        <Text style={styles.dropdownItem}>{province}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
             </View>
           ) : (
             <View>
               <Text style={styles.text}>
-                Số nhà/đường phố: <Text style={styles.bold}>{addressInfo.street}</Text>
-              </Text>
-              <Text style={styles.text}>
-                Xã phường/thị trấn: <Text style={styles.bold}>{addressInfo.ward}</Text>
+                Tỉnh/thành phố: <Text style={styles.bold}>{addressInfo.city}</Text>
               </Text>
               <Text style={styles.text}>
                 Quận/huyện: <Text style={styles.bold}>{addressInfo.district}</Text>
               </Text>
               <Text style={styles.text}>
-                Tỉnh/thành phố: <Text style={styles.bold}>{addressInfo.city}</Text>
+                Xã phường/thị trấn: <Text style={styles.bold}>{addressInfo.ward}</Text>
+              </Text>
+              <Text style={styles.text}>
+                Số nhà/đường phố: <Text style={styles.bold}>{addressInfo.street}</Text>
               </Text>
             </View>
           )}
@@ -284,7 +288,7 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     position: 'absolute',
-    top: 40, // Điều chỉnh vị trí của dropdown so với input
+    top: 40,
     left: 0,
     right: 0,
     backgroundColor: 'white',
@@ -292,7 +296,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 5,
     zIndex: 1,
-    maxHeight: 250, // Đặt chiều cao tối đa cho dropdown
+    maxHeight: 250,
   },
   dropdownList: {
     padding: 10,
@@ -357,65 +361,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   inputWrapperEditingColumn: {
-    marginBottom: 15, // Khoảng cách dưới mỗi input
-    borderWidth: 1, // Thêm viền với độ dày là 1
-    borderColor: 'black', // Màu viền là đen
-    borderRadius: 5, // Tạo góc bo tròn cho viền nếu cần
-    padding: 2, // Khoảng cách giữa viền và các phần tử bên trong
+    marginBottom: 15,
   },
   labelEditing: {
     fontSize: 14,
     color: 'gray',
-    marginBottom: -15,
-  },
-  inputContainerEditing: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-    borderRadius: 5,
-    backgroundColor: 'transparent',
-    paddingHorizontal: 10,
+    marginBottom: 5,
   },
   inputEditing: {
-    flex: 1,
+    borderWidth: 1,
+    borderColor: 'black',
+    borderRadius: 5,
+    padding: 10,
     fontSize: 14,
-    paddingVertical: 10,
   },
   inputBold: {
     fontWeight: 'bold',
   },
-  iconBackground: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#9EA2AE',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 10,
-  },
   inputWrapperEditingColumnAddress: {
     marginBottom: 15,
-    flexDirection: 'row', // Đảm bảo các phần tử nằm trên cùng một dòng
-    alignItems: 'center', // Căn giữa các phần tử theo chiều dọc
-    justifyContent: 'space-between', // Đảm bảo khoảng cách hợp lý giữa nhãn và trường nhập liệu
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   labelEditingAddress: {
     fontSize: 14,
     color: 'gray',
-    width: 140, // Chiều rộng cố định cho nhãn (có thể điều chỉnh tùy theo nội dung)
-    marginRight: 10, // Khoảng cách giữa nhãn và input
-    textAlign: 'left', // Đảm bảo văn bản trong nhãn căn trái
+    width: 140,
+    marginRight: 10,
+    textAlign: 'left',
   },
   inputContainerEditingAddress: {
-    flexDirection: 'row', // Hiển thị theo chiều ngang
+    flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'black',
     borderRadius: 5,
     backgroundColor: 'white',
     paddingHorizontal: 10,
-    flex: 1, // Đảm bảo input chiếm hết không gian còn lại
+    flex: 1,
   },
   inputEditingAddress: {
     flex: 1,
