@@ -2,7 +2,7 @@ import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated
 import { View, Image, StyleSheet } from 'react-native';
 
 function CarouselComponent({
-  ref,
+  componentRef,
   width,
   height,
   data,
@@ -10,7 +10,7 @@ function CarouselComponent({
   color,
   onPressPagination,
 }: {
-  ref: React.RefObject<ICarouselInstance>;
+  componentRef: React.RefObject<ICarouselInstance>;
   width: number;
   height: number;
   data: any[];
@@ -21,7 +21,7 @@ function CarouselComponent({
   return (
     <>
       <Carousel
-        ref={ref}
+        ref={componentRef}
         width={width - 32}
         height={height}
         data={data}

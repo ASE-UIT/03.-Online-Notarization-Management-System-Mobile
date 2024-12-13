@@ -92,7 +92,7 @@ export default function Main() {
       <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
       <View>
         <CarouselComponent
-          ref={ref}
+          componentRef={ref}
           width={windowWidth}
           height={windowWidth / 2}
           data={data}

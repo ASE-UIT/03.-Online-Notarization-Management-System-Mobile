@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useAppSlice } from '@modules/app';
+import { useUserSlice } from '@modules/user';
 import { colors, fonts, images } from '@theme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Image } from 'expo-image';
@@ -8,16 +8,27 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Checkbox from 'expo-checkbox';
 import { StackProps } from '@navigator';
 import { InputFieldProps } from 'src/types';
+import Toast from 'react-native-toast-message';
+import UserService from '@modules/user/user.service';
+import { validateEmail, validatePassword } from '@utils/validation';
 
 const SignIn = ({ navigation }: StackProps) => {
-  const { dispatch, setLoggedIn, setUser } = useAppSlice();
+  const { dispatch, setLoggedIn, setUser } = useUserSlice();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
-
-  const handleLogin = () => {
-    const user = { name: 'random', email };
+  const handleLogin = async () => {
+    if (!validateEmail(email) || !validatePassword(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra',
+        text2: 'Email hoặc mật khẩu không hợp lệ',
+      });
+      return;
+    }
+    const loginResponse = await UserService.login({ email, password });
+    const user = loginResponse.user;
     dispatch(setUser(user));
     dispatch(setLoggedIn(true));
     navigation.navigate('HomeStack');
@@ -74,6 +85,7 @@ const SignIn = ({ navigation }: StackProps) => {
         <Divider text="hoặc" />
         <SocialLoginButton iconSource={images.google} text="Đăng nhập bằng Google" />
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 };

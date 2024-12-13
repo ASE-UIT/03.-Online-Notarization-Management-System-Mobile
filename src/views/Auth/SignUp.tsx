@@ -8,15 +8,37 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import Checkbox from 'expo-checkbox';
 import { StackProps } from '@navigator';
 import { InputFieldProps } from 'src/types';
+import { validateEmail } from '@utils/validation';
+import Toast from 'react-native-toast-message';
+import UserService from '@modules/user/user.service';
 
 const SignUp = ({ navigation }: StackProps) => {
   const { dispatch, setLoggedIn, setUser } = useAppSlice();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
 
-  const handleSignUp = () => {};
+  const handleSignUp = async () => {
+    if (!validateEmail(email) || !validatePassword(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra',
+        text2: 'Email hoặc mật khẩu không hợp lệ',
+      });
+      return;
+    }
+    const registerResponse = await UserService.register({ name, email, password });
+    const user = registerResponse.user;
+    dispatch(setUser(user));
+    dispatch(setLoggedIn(true));
+    navigation.navigate('HomeStack');
+  };
+  const validatePassword = (password: string) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
   const moveToSignIn = () => {
     navigation.navigate('SignInStack');
   };
@@ -29,8 +51,8 @@ const SignUp = ({ navigation }: StackProps) => {
         <InputField
           label="Họ và tên"
           icon="user"
-          value={email}
-          onChangeText={setEmail}
+          value={name}
+          onChangeText={setName}
           placeholder="Họ và tên"
         />
         <InputField
@@ -55,6 +77,12 @@ const SignUp = ({ navigation }: StackProps) => {
         <View style={styles.emailNotiWrapper}>
           <Checkbox value={isRemember} onValueChange={setIsRemember} />
           <Text style={styles.emailNotiText}>Tôi muốn nhận thông báo qua email</Text>
+        </View>
+
+        <View style={styles.validationWrapper}>
+          <Text style={styles.validationText}>• Mật khẩu phải có tối thiểu 8 kí tự</Text>
+          <Text style={styles.validationText}>• Mật khẩu phải có ít nhất 1 kí tự số</Text>
+          <Text style={styles.validationText}>• Mật khẩu phải có ít nhất 1 kí tự chữ cái</Text>
         </View>
 
         <TouchableOpacity style={styles.signupButton} onPress={handleSignUp}>
@@ -206,6 +234,15 @@ const styles = StyleSheet.create({
     marginLeft: 12,
     fontSize: 18,
     fontFamily: fonts.beVietnamPro.regular,
+  },
+  validationText: {
+    color: colors.gray[300],
+    fontSize: 16,
+    fontFamily: fonts.beVietnamPro.regular,
+  },
+  validationWrapper: {
+    marginBottom: 28,
+    paddingHorizontal: 16,
   },
 });
 
