@@ -26,6 +26,7 @@ async function register(data: IRegisterRequest): Promise<IRegisterResponse> {
   );
   AsyncStorage.setItem('accessToken', JSON.stringify(response.data.tokens.access));
   AsyncStorage.setItem('refreshToken', JSON.stringify(response.data.tokens.refresh));
+  AsyncStorage.setItem('user', JSON.stringify(response.data.user));
   return response.data;
 }
 async function logout(refreshToken: string): Promise<void> {

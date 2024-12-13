@@ -1,4 +1,5 @@
-import { IUser } from './app.typeDefs';
+import { IUser } from '@modules/user';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export function useAppService() {
   /**
@@ -6,8 +7,12 @@ export function useAppService() {
    */
   async function getUser(): Promise<IUser> {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      return { name: 'test user', email: 'testuserr@test.com' };
+      const user = await AsyncStorage.getItem('user');
+      if (user) {
+        return JSON.parse(user) as IUser;
+      } else {
+        return Promise.reject('User not found');
+      }
     } catch (err) {
       return Promise.reject(err);
     }
