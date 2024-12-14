@@ -4,9 +4,13 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
 import { StackProps } from '@navigator';
-import { useDocumentSlice } from '@modules/document';
+import { DocumentService, IUploadDocumentRequest, useDocumentSlice } from '@modules/document';
 import Toast from 'react-native-toast-message';
 import { DocumentTypeCode, getDocumentNameByCode } from '@utils/constants';
+import { INotarizationService } from '@modules/notarizationService';
+import { INotarizationField } from '@modules/notarizationField';
+import * as FileSystem from 'expo-file-system'; // Để đọc file nếu cần
+import FormData from 'form-data'; // Để gửi multipart form data
 
 const ConfirmInformation = ({ navigation }: StackProps) => {
   const {
@@ -26,7 +30,7 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     navigation.goBack();
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     Toast.show({
       type: 'success',
       text1: 'Yêu cầu công chứng đã được tạo',
@@ -35,8 +39,49 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
       autoHide: true,
       position: 'bottom',
     });
-    dispatch(resetDocumentState());
-    navigation.navigate('HomeStack');
+
+    // Chuyển trạng thái thành đối tượng IUploadDocumentRequest
+    const requestPayload: IUploadDocumentRequest = {
+      notarizationService: notarizationService as INotarizationService,
+      notarizationField: notarizationField as INotarizationField,
+      requesterInfo,
+      files: files.map(file => ({
+        name: file.name,
+        uri: file.uri,
+        type: file.type,
+        size: file.size,
+      })),
+      amount,
+    };
+
+    const formData = new FormData();
+
+    formData.append('notarizationService', JSON.stringify(requestPayload.notarizationService));
+    formData.append('notarizationField', JSON.stringify(requestPayload.notarizationField));
+    formData.append('requesterInfo', JSON.stringify(requestPayload.requesterInfo));
+    formData.append('amount', requestPayload.amount.toString());
+
+    requestPayload.files.forEach(file => {
+      formData.append('files', {
+        uri: file.uri,
+        name: file.name,
+        type: file.type,
+      });
+    });
+
+    try {
+      // Gọi API để upload tài liệu
+      console.log('FormData:', formData);
+      const result = await DocumentService.uploadDocument(formData);
+      console.log('Result:', result);
+
+      // // Nếu thành công, reset lại trạng thái và chuyển hướng
+      // dispatch(resetDocumentState());
+      // navigation.navigate('HomeStack');
+    } catch (error) {
+      console.error('Error uploading document:', error);
+      // Hiển thị lỗi cho người dùng
+    }
   };
 
   useFocusEffect(
@@ -47,7 +92,7 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
 
   const renderFiles = () => {
     if (!Array.isArray(files)) {
-      console.error('Expected files to be an array');
+      console.log('Expected files to be an array');
       return null;
     }
 

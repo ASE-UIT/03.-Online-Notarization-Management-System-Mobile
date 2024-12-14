@@ -35,38 +35,38 @@ const ProvideInformation = ({ navigation }: StackProps) => {
   );
 
   const handleNextStep = () => {
-    // if (!fullName || !email || !phoneNumber || copyNumber <= 0 || !idNumber) {
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Có lỗi xảy ra',
-    //     text2: 'Vui lòng nhập đầy đủ thông tin công chứng',
-    //     visibilityTime: 2000,
-    //     autoHide: true,
-    //     position: 'bottom',
-    //   });
-    //   return;
-    // }
+    if (!fullName || !email || !phoneNumber || copyNumber <= 0 || !idNumber) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra',
+        text2: 'Vui lòng nhập đầy đủ thông tin công chứng',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+      return;
+    }
 
-    // const missingDocuments =
-    //   notarizationService?.required_documents.filter(
-    //     document => !selectedFiles[document] || selectedFiles[document].length === 0,
-    //   ) ?? [];
+    const missingDocuments =
+      notarizationService?.required_documents.filter(
+        document => !selectedFiles[document] || selectedFiles[document].length === 0,
+      ) ?? [];
 
-    // if (missingDocuments.length > 0) {
-    //   const missingDocNames = missingDocuments
-    //     .map(doc => getDocumentNameByCode(doc as DocumentTypeCode))
-    //     .join(', ');
+    if (missingDocuments.length > 0) {
+      const missingDocNames = missingDocuments
+        .map(doc => getDocumentNameByCode(doc as DocumentTypeCode))
+        .join(', ');
 
-    //   Toast.show({
-    //     type: 'error',
-    //     text1: 'Thiếu tài liệu',
-    //     text2: `Vui lòng tải lên: ${missingDocNames}`,
-    //     visibilityTime: 3000,
-    //     position: 'bottom',
-    //   });
+      Toast.show({
+        type: 'error',
+        text1: 'Thiếu tài liệu',
+        text2: `Vui lòng tải lên: ${missingDocNames}`,
+        visibilityTime: 3000,
+        position: 'bottom',
+      });
 
-    //   return;
-    // }
+      return;
+    }
     dispatch(
       setRequesterInfo({ fullName, email, phoneNumber, citizenId: idNumber, amount: copyNumber }),
     );

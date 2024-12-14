@@ -8,7 +8,7 @@ async function getAllNotarizationField(): Promise<IGetAllNotarizationFieldRespon
     );
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch notarization fields:', error);
+    console.log('Failed to fetch notarization fields:', error);
     throw new Error('Failed to fetch notarization fields');
   }
 }

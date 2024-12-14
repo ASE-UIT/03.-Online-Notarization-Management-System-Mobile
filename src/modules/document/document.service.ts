@@ -1,20 +1,22 @@
-import { IGetAllNotarizationFieldResponse } from './notarizationField.typeDefs';
 import axiosConfig from '@utils/axiosConfig';
+import { IUploadDocumentResponse } from './document.typeDefs';
+import FormData from 'form-data';
 
-async function getAllNotarizationField(): Promise<IGetAllNotarizationFieldResponse> {
+async function uploadDocument(data: FormData): Promise<IUploadDocumentResponse> {
   try {
-    const response = await axiosConfig.get<IGetAllNotarizationFieldResponse>(
-      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/notarization-fields/get-all-notarization-fields',
+    const response = await axiosConfig.post<IUploadDocumentResponse>(
+      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/notarization/upload-files',
+      data,
     );
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch notarization fields:', error);
-    throw new Error('Failed to fetch notarization fields');
+    console.error('Failed to upload:', error);
+    throw new Error('Failed to upload');
   }
 }
 
-const NotarizationFieldService = {
-  getAllNotarizationField,
+const DocumentService = {
+  uploadDocument,
 };
 
-export default NotarizationFieldService;
+export default DocumentService;

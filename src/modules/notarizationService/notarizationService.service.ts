@@ -14,8 +14,8 @@ async function getNotarizationServicesByFieldId(
     );
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch notarization fields:', error);
-    throw new Error('Failed to fetch notarization fields');
+    console.log('Failed to fetch notarization services:', error);
+    throw new Error('Failed to fetch notarization services');
   }
 }
 
