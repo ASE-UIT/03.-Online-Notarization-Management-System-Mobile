@@ -7,32 +7,52 @@ import { CreateProgressBar, ForwardStepBar } from '@components/Bar';
 import NotarizationFieldService from '@modules/notarizationField/notarizationField.service';
 import { INotarizationField } from '@modules/notarizationField';
 import { INotarizationService, notarizationServiceService } from '@modules/notarizationService';
+import Toast from 'react-native-toast-message';
+import { useDocumentSlice } from '@modules/document';
 
 const ServiceAndField = ({ navigation }: StackProps) => {
   const [step, setStep] = useState(0);
   const [selectedField, setSelectedField] = useState<INotarizationField | null>(null);
   const [fields, setFields] = useState<{ label: string; value: INotarizationField }[]>([]);
+  const [isLoadingFields, setIsLoadingFields] = useState(true);
 
   const [selectedService, setSelectedService] = useState<INotarizationService | null>(null);
   const [services, setServices] = useState<{ label: string; value: INotarizationService }[]>([]);
+  const [isLoadingServices, setIsLoadingServices] = useState(true);
+
+  const { dispatch, setServiceAndField } = useDocumentSlice();
 
   const handleNextStep = () => {
+    if (!selectedField || !selectedService) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra',
+        text2: 'Vui lòng chọn lĩnh vực và dịch vụ công chứng',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+      return;
+    }
+
+    dispatch(setServiceAndField({ service: selectedService, field: selectedField }));
     navigation.navigate('ProvideInformation');
   };
 
   useEffect(() => {
     const fetchFields = async () => {
+      setIsLoadingFields(true);
       try {
         const response = await NotarizationFieldService.getAllNotarizationField();
-
         const fieldsData = response.map(field => ({
           label: field.name,
           value: field,
         }));
-
         setFields(fieldsData);
       } catch (error) {
         console.error('Error fetching notarization fields:', error);
+      } finally {
+        setIsLoadingFields(false);
       }
     };
 
@@ -40,23 +60,22 @@ const ServiceAndField = ({ navigation }: StackProps) => {
   }, []);
 
   useEffect(() => {
-    console.log('Selected field:', selectedField);
-
     const fetchServices = async () => {
+      if (!selectedField?.id) return;
+      setIsLoadingServices(true);
       try {
-        if (selectedField?.id) {
-          const response = await notarizationServiceService.getNotarizationServicesByFieldId(
-            selectedField.id,
-          );
-
-          const serviceData = response.map(service => ({
-            label: service.name,
-            value: service,
-          }));
-          setServices(serviceData);
-        }
+        const response = await notarizationServiceService.getNotarizationServicesByFieldId(
+          selectedField.id,
+        );
+        const serviceData = response.map(service => ({
+          label: service.name,
+          value: service,
+        }));
+        setServices(serviceData);
       } catch (error) {
         console.error('Error fetching notarization services:', error);
+      } finally {
+        setIsLoadingServices(false);
       }
     };
 
@@ -73,7 +92,11 @@ const ServiceAndField = ({ navigation }: StackProps) => {
             <Text style={styles.sectionHeader}>Lĩnh Vực Công Chứng</Text>
             <Dropdown
               style={styles.inputContainer}
-              data={fields}
+              data={
+                isLoadingFields
+                  ? [{ label: 'Loading...', value: {} as INotarizationField }]
+                  : fields
+              }
               labelField="label"
               valueField="value"
               placeholder="Chọn lĩnh vực công chứng"
@@ -85,7 +108,11 @@ const ServiceAndField = ({ navigation }: StackProps) => {
             {selectedField ? (
               <Dropdown
                 style={styles.inputContainer}
-                data={services}
+                data={
+                  isLoadingServices
+                    ? [{ label: 'Loading...', value: {} as INotarizationService }]
+                    : services
+                }
                 labelField="label"
                 valueField="value"
                 placeholder="Chọn dịch vụ công chứng"
@@ -135,7 +162,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.semiBold,
-    fontSize: 16,
+    fontSize: 15,
   },
   inputContainer: {
     height: 50,

@@ -4,15 +4,40 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
 import { StackProps } from '@navigator';
+import { useDocumentSlice } from '@modules/document';
+import Toast from 'react-native-toast-message';
+import { DocumentTypeCode, getDocumentNameByCode } from '@utils/constants';
 
 const ConfirmInformation = ({ navigation }: StackProps) => {
+  const {
+    dispatch,
+    resetDocumentState,
+    notarizationService,
+    notarizationField,
+    requesterInfo,
+    amount,
+    files,
+    clearFiles,
+  } = useDocumentSlice();
   const [step, setStep] = useState(0);
 
   const handleBack = () => {
+    dispatch(clearFiles());
     navigation.goBack();
   };
 
-  const handleNextStep = () => {};
+  const handleNextStep = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Yêu cầu công chứng đã được tạo',
+      text2: 'Vui lòng chờ chúng tôi xác nhận yêu cầu của bạn',
+      visibilityTime: 3000,
+      autoHide: true,
+      position: 'bottom',
+    });
+    dispatch(resetDocumentState());
+    navigation.navigate('HomeStack');
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -20,22 +45,54 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     }, []),
   );
 
+  const renderFiles = () => {
+    if (!Array.isArray(files)) {
+      console.error('Expected files to be an array');
+      return null;
+    }
+
+    console.log(files);
+
+    return files.map((fileObj, index) => {
+      if (fileObj && typeof fileObj === 'object') {
+        return Object.entries(fileObj).map(([document, fileArray]) => {
+          if (Array.isArray(fileArray)) {
+            return (
+              <View key={`${document}-${index}`} style={styles.fileContainer}>
+                <Text style={styles.title}>
+                  {getDocumentNameByCode(document as DocumentTypeCode)}
+                </Text>
+                {fileArray.map((file, fileIndex) => (
+                  <Text key={`${file.uri}-${fileIndex}`} style={styles.info}>
+                    • {file.name}
+                  </Text>
+                ))}
+              </View>
+            );
+          }
+          return null;
+        });
+      }
+      return null;
+    });
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.main}>
         <CreateProgressBar currentPage={step} setCurrentPage={setStep} />
-        <ScrollView style={styles.contentContainer}>
+        <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
           <Text style={styles.header}>Kiểm tra lại thông tin của bạn</Text>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>Thông tin công chứng</Text>
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Lĩnh vực công chứng:</Text>
-              <Text style={styles.info}>Linh vuc cong chung</Text>
+              <Text style={styles.info}>{notarizationField?.name}</Text>
             </View>
 
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Dịch vụ công chứng:</Text>
-              <Text style={styles.info}>Dich vu cong chung</Text>
+              <Text style={styles.info}>{notarizationService?.name}</Text>
             </View>
           </View>
 
@@ -43,41 +100,33 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
             <Text style={styles.sectionHeader}>Thông tin khách hàng</Text>
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Họ và tên:</Text>
-              <Text style={styles.info}>Nguyễn Văn A</Text>
+              <Text style={styles.info}>{requesterInfo.fullName}</Text>
             </View>
 
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Số điện thoại:</Text>
-              <Text style={styles.info}>0941788455</Text>
+              <Text style={styles.info}>{requesterInfo.phoneNumber}</Text>
             </View>
 
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Số CMND/CCCD:</Text>
-              <Text style={styles.info}>0941788455</Text>
+              <Text style={styles.info}>{requesterInfo.citizenId}</Text>
             </View>
 
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Địa chỉ email:</Text>
-              <Text style={styles.info}>0941788455</Text>
+              <Text style={styles.info}>{requesterInfo.email}</Text>
             </View>
 
             <View style={styles.informationContainer}>
               <Text style={styles.title}>Số lượng bản sao:</Text>
-              <Text style={styles.info}>0941788455</Text>
+              <Text style={styles.info}>{amount}</Text>
             </View>
           </View>
 
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>Danh sách tài liệu đã đăng tải</Text>
-            <View style={styles.informationContainer}>
-              <Text style={styles.title}>Lĩnh vực công chứng:</Text>
-              <Text style={styles.info}>Linh vuc cong chung</Text>
-            </View>
-
-            <View style={styles.informationContainer}>
-              <Text style={styles.title}>Dịch vụ công chứng:</Text>
-              <Text style={styles.info}>Dich vu cong chung</Text>
-            </View>
+            {renderFiles()}
           </View>
         </ScrollView>
       </View>
@@ -119,7 +168,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.semiBold,
-    fontSize: 16,
+    fontSize: 15,
   },
   informationContainer: {
     padding: '2%',
@@ -141,6 +190,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.beVietnamPro.regular,
     fontSize: 14,
     flex: 1,
+  },
+  fileContainer: {
+    padding: '2%',
+    backgroundColor: colors.white[100],
+    justifyContent: 'flex-start',
   },
 });
 

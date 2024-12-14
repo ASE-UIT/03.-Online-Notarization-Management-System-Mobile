@@ -1,45 +1,32 @@
 import { CreateProgressBar, ForwardStepBar } from '@components/Bar';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
 import { StackProps } from '@navigator';
 import * as DocumentPicker from 'expo-document-picker';
+import Toast from 'react-native-toast-message';
+import { useDocumentSlice } from '@modules/document';
+import { getDocumentNameByCode, DocumentTypeCode } from '@utils/constants';
+import { Feather } from '@expo/vector-icons';
+
+type FileType = {
+  name: string;
+  uri: string;
+  size: number;
+  mimeType: string;
+};
 
 const ProvideInformation = ({ navigation }: StackProps) => {
+  const { dispatch, setRequesterInfo, notarizationService, addFile } = useDocumentSlice();
   const [step, setStep] = useState(0);
-  const [selectedFiles, setSelectedFiles] = useState<any | null>(null);
-  const [selectedField, setSelectedField] = useState('');
-  const handleNextStep = () => {
-    navigation.navigate('ConfirmInformation');
-  };
+  const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: any }>({});
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
-  const fieldsToUpload = [
-    { key: 'cmnd', label: 'CMND/CCCD' },
-    { key: 'contract', label: 'Hợp đồng' },
-    { key: 'license', label: 'Giấy phép' },
-    // Thêm các mục khác nếu cần
-  ];
-
-  const renderFieldsToUpload = () => {
-    // return fieldsToUpload.map(field => (
-    //   <View key={field.key}>
-    //     <Text>{field.label}</Text>
-    //     {selectedFiles[field.key]?.name ? (
-    //       <Text>File: {selectedFiles[field.key].name}</Text>
-    //     ) : (
-    //       <Text>Chưa chọn tệp</Text>
-    //     )}
-    //     <Pressable onPress={() => pickFile}>
-    //       <Text>Chọn tệp</Text>
-    //     </Pressable>
-    //   </View>
-    // ));
-  };
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [idNumber, setIdNumber] = useState('');
+  const [email, setEmail] = useState('');
+  const [copyNumber, setCopyNumber] = useState(0);
 
   useFocusEffect(
     useCallback(() => {
@@ -47,21 +34,158 @@ const ProvideInformation = ({ navigation }: StackProps) => {
     }, []),
   );
 
-  useEffect(() => {
-    console.log(selectedFiles);
-  }, [selectedFiles]);
+  const handleNextStep = () => {
+    // if (!fullName || !email || !phoneNumber || copyNumber <= 0 || !idNumber) {
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Có lỗi xảy ra',
+    //     text2: 'Vui lòng nhập đầy đủ thông tin công chứng',
+    //     visibilityTime: 2000,
+    //     autoHide: true,
+    //     position: 'bottom',
+    //   });
+    //   return;
+    // }
 
-  // Hàm chọn tệp từ thiết bị
-  const pickFile = async () => {
+    // const missingDocuments =
+    //   notarizationService?.required_documents.filter(
+    //     document => !selectedFiles[document] || selectedFiles[document].length === 0,
+    //   ) ?? [];
+
+    // if (missingDocuments.length > 0) {
+    //   const missingDocNames = missingDocuments
+    //     .map(doc => getDocumentNameByCode(doc as DocumentTypeCode))
+    //     .join(', ');
+
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Thiếu tài liệu',
+    //     text2: `Vui lòng tải lên: ${missingDocNames}`,
+    //     visibilityTime: 3000,
+    //     position: 'bottom',
+    //   });
+
+    //   return;
+    // }
+    dispatch(
+      setRequesterInfo({ fullName, email, phoneNumber, citizenId: idNumber, amount: copyNumber }),
+    );
+
+    dispatch(addFile(selectedFiles));
+    navigation.navigate('ConfirmInformation');
+  };
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
+  const pickFile = async (document: string) => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: '*/*', // This allows all file types
+        type: '*/*',
+        multiple: true,
       });
 
-      setSelectedFiles(result);
+      const VALID_FORMATS = ['pdf', 'jpg', 'png', 'jpeg'];
+      const timestamp = new Date().getTime();
+
+      const files = result.assets ?? result.output ?? [];
+      const updatedFiles: FileType[] = [];
+
+      files.forEach((file, index) => {
+        const originalFileName = file.name || `file_${index}`;
+        const fileExtension = originalFileName.split('.').pop();
+
+        if (!VALID_FORMATS.some(format => fileExtension?.toLowerCase() === format)) {
+          Toast.show({
+            type: 'error',
+            text1: 'Tài liệu không hợp lệ',
+            text2: `${originalFileName} không đúng định dạng. Chỉ PDF và ảnh được hỗ trợ`,
+            visibilityTime: 2000,
+            position: 'bottom',
+          });
+          return;
+        }
+
+        const newFileName = `${document}_${timestamp}.${fileExtension}`;
+        const renamedFile: FileType = {
+          name: newFileName,
+          uri: file.uri,
+          mimeType: file.mimeType ?? 'application/octet-stream',
+          size: file.size ?? 0,
+        };
+
+        updatedFiles.push(renamedFile);
+      });
+
+      if (updatedFiles.length > 0) {
+        setSelectedFiles(prevState => ({
+          ...prevState,
+          [document]: [...(prevState[document] || []), ...updatedFiles],
+        }));
+
+        Toast.show({
+          type: 'success',
+          text1: 'Tải tệp thành công',
+          text2: `Đã chọn ${updatedFiles.length} tệp.`,
+          visibilityTime: 2000,
+          position: 'bottom',
+        });
+      } else {
+        console.log('Không có file nào hợp lệ để tải lên.');
+      }
     } catch (error) {
       console.log('Unknown error: ', error);
     }
+  };
+
+  const deleteFile = (document: string, fileIndex: number) => {
+    setSelectedFiles(prevState => {
+      const updatedFiles = [...(prevState[document] || [])];
+      updatedFiles.splice(fileIndex, 1);
+
+      if (updatedFiles.length === 0) {
+        const { [document]: _, ...rest } = prevState;
+        return rest;
+      }
+
+      return {
+        ...prevState,
+        [document]: updatedFiles,
+      };
+    });
+  };
+
+  const renderFieldsToUpload = () => {
+    return notarizationService?.required_documents.map((document: string, index: number) => (
+      <View key={document} style={{ marginVertical: '2%' }}>
+        <View style={styles.uploadFileHeaderContainer}>
+          <Text style={[styles.sectionHeader, { flex: 1 }]}>
+            {getDocumentNameByCode(document as DocumentTypeCode)}{' '}
+            {selectedFiles[document]?.length > 0 && `(${selectedFiles[document].length} tệp)`}
+          </Text>
+          <Pressable style={styles.uploadFileButton} onPress={() => pickFile(document)}>
+            <Text style={styles.addText}>Thêm tệp</Text>
+          </Pressable>
+          <View />
+        </View>
+
+        {selectedFiles[document] && selectedFiles[document].length > 0 && (
+          <View style={styles.filesUploadedContainer}>
+            {selectedFiles[document].map((file: FileType, fileIndex: number) => (
+              <View key={`${document}_${fileIndex}`} style={styles.fileRow}>
+                <Text style={styles.filesText}>{file.name}</Text>
+                <Pressable
+                  style={styles.deleteFileButton}
+                  onPress={() => deleteFile(document, fileIndex)}>
+                  <Feather name="x-circle" size={24} color={colors.gray[600]} />
+                </Pressable>
+              </View>
+            ))}
+          </View>
+        )}
+      </View>
+    ));
   };
 
   return (
@@ -75,38 +199,43 @@ const ProvideInformation = ({ navigation }: StackProps) => {
             <TextInput
               style={styles.inputContainer}
               placeholder="Nhập họ và tên"
-              value={selectedField}
-              onChangeText={setSelectedField}
+              value={fullName}
+              onChangeText={setFullName}
             />
 
             <Text style={styles.sectionHeader}>Số điện thoại</Text>
             <TextInput
               style={styles.inputContainer}
               placeholder="Nhập số điện thoại"
-              value={selectedField}
-              onChangeText={setSelectedField}
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
               keyboardType="numeric"
             />
             <Text style={styles.sectionHeader}>Số CMND/CCCD</Text>
             <TextInput
               style={styles.inputContainer}
               placeholder="Nhập số CMND/CCCD"
-              value={selectedField}
-              onChangeText={setSelectedField}
+              value={idNumber}
+              onChangeText={setIdNumber}
             />
             <Text style={styles.sectionHeader}>Email</Text>
             <TextInput
               style={styles.inputContainer}
               placeholder="Địa chỉ email"
-              value={selectedField}
-              onChangeText={setSelectedField}
+              value={email}
+              onChangeText={setEmail}
             />
             <Text style={styles.sectionHeader}>Số bản sao</Text>
             <TextInput
               style={styles.inputContainer}
               placeholder="Số lượng bản sao"
-              value={selectedField}
-              onChangeText={setSelectedField}
+              value={copyNumber.toString()}
+              onChangeText={text => {
+                const numericValue = parseInt(text, 10);
+                if (!isNaN(numericValue)) {
+                  setCopyNumber(numericValue);
+                }
+              }}
               keyboardType="numeric"
             />
           </View>
@@ -115,10 +244,6 @@ const ProvideInformation = ({ navigation }: StackProps) => {
           <View style={styles.sectionContainer}>{renderFieldsToUpload()}</View>
         </ScrollView>
       </View>
-      {selectedFiles?.assets?.[0] && <Text>File đã chọn: {selectedFiles.assets[0].name}</Text>}
-      <Pressable onPress={pickFile} style={styles.sectionContainer}>
-        <Text style={styles.sectionHeader}>Chọn tệp</Text>
-      </Pressable>
       <ForwardStepBar step={2} totalStep={3} onBack={handleBack} onNext={handleNextStep} />
     </View>
   );
@@ -156,7 +281,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.semiBold,
-    fontSize: 16,
+    fontSize: 15,
   },
   inputContainer: {
     height: 50,
@@ -165,7 +290,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingLeft: '3%',
     marginVertical: '2%',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: fonts.beVietnamPro.regular,
     color: colors.black,
     backgroundColor: colors.white[100],
@@ -173,6 +298,39 @@ const styles = StyleSheet.create({
   placeHolder: {
     color: colors.gray[300],
   },
+  uploadFileHeaderContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  uploadFileButton: {
+    backgroundColor: colors.primary[100],
+    padding: '2%',
+    marginVertical: '2%',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  addText: {
+    color: colors.primary[400],
+    fontFamily: fonts.beVietnamPro.semiBold,
+    fontSize: 14,
+  },
+  filesUploadedContainer: {
+    flex: 1,
+    marginTop: '2%',
+  },
+  fileRow: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    marginTop: '3%',
+  },
+  filesText: {
+    flex: 1,
+    color: colors.gray[700],
+    fontFamily: fonts.beVietnamPro.regular,
+    fontSize: 12,
+  },
+  deleteFileButton: {},
 });
 
 export default ProvideInformation;

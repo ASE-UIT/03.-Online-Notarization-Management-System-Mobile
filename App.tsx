@@ -8,6 +8,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SignUp } from '@views/Auth';
 import { useUserSlice } from '@modules/user';
 import { useAppSlice, useAppService, IUser } from '@modules/app';
+import Toast from 'react-native-toast-message';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +31,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Provider store={store}>
         <Navigator />
+        <Toast />
       </Provider>
     </GestureHandlerRootView>
   );
