@@ -17,6 +17,7 @@ async function login(data: ILoginRequest): Promise<ILoginResponse> {
   );
   AsyncStorage.setItem('accessToken', JSON.stringify(response.data.tokens.access));
   AsyncStorage.setItem('refreshToken', JSON.stringify(response.data.tokens.refresh));
+  AsyncStorage.setItem('user', JSON.stringify(response.data.user));
   return response.data;
 }
 async function register(data: IRegisterRequest): Promise<IRegisterResponse> {
@@ -26,6 +27,7 @@ async function register(data: IRegisterRequest): Promise<IRegisterResponse> {
   );
   AsyncStorage.setItem('accessToken', JSON.stringify(response.data.tokens.access));
   AsyncStorage.setItem('refreshToken', JSON.stringify(response.data.tokens.refresh));
+  AsyncStorage.setItem('user', JSON.stringify(response.data.user));
   return response.data;
 }
 async function logout(refreshToken: string): Promise<void> {
@@ -33,6 +35,7 @@ async function logout(refreshToken: string): Promise<void> {
     await axios.post(process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/auth/logout', {
       refreshToken,
     });
+    AsyncStorage.clear();
   } catch (err) {
     return Promise.reject(err);
   }

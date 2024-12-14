@@ -11,20 +11,17 @@ import { useDataPersist, DataPersistKeys } from '@hooks';
 import { isWeb } from '@utils/deviceInfo';
 import { AuthStackNavigator } from './stack';
 import TabNavigator from './tab';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserSlice } from '@modules/user';
 
 // keep the splash screen visible while complete fetching resources
 SplashScreen.preventAutoHideAsync();
 
 function Navigator() {
   const { getUser } = useAppService();
-  const { dispatch, checked, loggedIn, setUser, setLoggedIn } = useAppSlice();
+  const { dispatch, loggedIn, setUser, setLoggedIn } = useUserSlice();
   const { setPersistData, getPersistData } = useDataPersist();
-
-  const [isOpen, setOpen] = useState(true);
-
-  /**
-   * preload assets and user data
-   */
+  // TODO: switch router by loggedIn status
   const preload = async () => {
     try {
       // preload assets
@@ -35,7 +32,7 @@ function Navigator() {
 
       // store user data to redux
       dispatch(setUser(user));
-      dispatch(setLoggedIn(!user));
+      dispatch(setLoggedIn(user ? true : false));
 
       // store user data to persistent storage (async storage)
       if (user) setPersistData<IUser>(DataPersistKeys.USER, user);
@@ -46,43 +43,30 @@ function Navigator() {
       console.log('[##] preload error:', err);
 
       // if preload failed, try to get user data from persistent storage
-      getPersistData<IUser>(DataPersistKeys.USER)
-        .then(user => {
-          if (user) {
-            dispatch(setUser(user));
-            dispatch(setLoggedIn(!!user));
-          }
-        })
-        .finally(() => {
-          // hide splash screen
-          SplashScreen.hideAsync();
-        });
+      // getPersistData<IUser>(DataPersistKeys.USER)
+      //   .then(user => {
+      //     if (user) {
+      //       dispatch(setUser(user));
+      //       dispatch(setLoggedIn(!!user));
+      //     }
+      //   })
+      //   .finally(() => {
+      //     // hide splash screen
+      //     SplashScreen.hideAsync();
+      //   });
     }
   };
 
   useEffect(() => {
     preload();
   }, []);
-
-  // TODO: switch router by loggedIn status
   console.log('[##] loggedIn', loggedIn);
 
-  return checked && loggedIn ? (
-    <>
-      <NavigationContainer>
-        <TabNavigator />
-      </NavigationContainer>
-      {!isWeb && (
-        <BottomSheet isOpen={isOpen} initialOpen>
-          <WelcomeBottomSheetContents onClose={() => setOpen(false)} />
-        </BottomSheet>
-      )}
-    </>
-  ) : (
+  return (
     <NavigationContainer>
-      <AuthStackNavigator />
+      {loggedIn ? <TabNavigator/> : <AuthStackNavigator/>}
     </NavigationContainer>
-  );
+  )
 }
 
 export default Navigator;

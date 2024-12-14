@@ -7,13 +7,11 @@ import { colors } from '@theme';
 
 // views
 import Home from '@views/Home';
-import Details from '@views/Details';
-import Profile from '@views/Profile';
 import { SignIn, SignUp } from '@views/Auth';
 import Search from '@views/Search';
 import Session from '@views/Session';
-import Other from '@views/Other';
 import QRScan from '@views/QRScan';
+import { Other, Policy, Profile } from '@views/Other';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -99,6 +97,20 @@ export function OtherStackNavigator() {
       <Stack.Screen
         component={Other}
         name="OtherStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Policy}
+        name="PolicyStack"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={Profile}
+        name="ProfileStack"
         options={{
           headerShown: false,
         }}

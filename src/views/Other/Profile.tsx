@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
-import { getProvinces, getDistrictsByProvinceCode, getWardsByDistrictCode } from 'vn-provinces';
 
 export default function Profile({ navigation }: { navigation: any }) {
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [isDropdownVisible, setIsDropdownVisible] = useState({
-    city: false,
-    district: false,
-    ward: false,
-  });
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Để điều khiển hiển thị dropdown
   const [personalInfo, setPersonalInfo] = useState({
     name: 'Nguyễn Quốc Thắng',
     phone: '+84 123456789',
@@ -23,28 +18,78 @@ export default function Profile({ navigation }: { navigation: any }) {
     district: 'Dĩ An',
     city: 'Bình Dương',
   });
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      const data = getProvinces();
-      setProvinces(data);
-    };
-    fetchProvinces();
-  }, []);
-  const handleCitySelect = (provinceCode: string, provinceName: string) => {
-    setDistricts(getDistrictsByProvinceCode(provinceCode));
-    setAddressInfo(prev => ({ ...prev, city: provinceName, district: '', ward: '' }));
-    setWards([]);
-  };
-  const handleDistrictSelect = (districtCode: string, districtName: string) => {
-    setWards(getWardsByDistrictCode(districtCode));
-    setAddressInfo(prev => ({ ...prev, district: districtName, ward: '' }));
-  };
-  const handleWardSelect = (wardCode: string, wardName: string) => {
-    setAddressInfo(prev => ({ ...prev, ward: wardName }));
-  };
+
+  // Danh sách 63 tỉnh thành
+  const provinces = [
+    'Hà Nội',
+    'Hồ Chí Minh',
+    'Bình Dương',
+    'Đà Nẵng',
+    'Hải Phòng',
+    'Cần Thơ',
+    'An Giang',
+    'Bà Rịa-Vũng Tàu',
+    'Bắc Giang',
+    'Bắc Kạn',
+    'Bến Tre',
+    'Bình Định',
+    'Bình Phước',
+    'Bình Thuận',
+    'Cao Bằng',
+    'Cà Mau',
+    'Đắk Lắk',
+    'Đắk Nông',
+    'Điện Biên',
+    'Đồng Nai',
+    'Đồng Tháp',
+    'Gia Lai',
+    'Hà Giang',
+    'Hà Nam',
+    'Hà Tây',
+    'Hậu Giang',
+    'Hòa Bình',
+    'Hưng Yên',
+    'Khánh Hòa',
+    'Kiên Giang',
+    'Kon Tum',
+    'Lai Châu',
+    'Lâm Đồng',
+    'Lạng Sơn',
+    'Lào Cai',
+    'Long An',
+    'Nam Định',
+    'Nghệ An',
+    'Ninh Bình',
+    'Ninh Thuận',
+    'Phú Thọ',
+    'Phú Yên',
+    'Quảng Bình',
+    'Quảng Nam',
+    'Quảng Ngãi',
+    'Quảng Ninh',
+    'Quảng Trị',
+    'Sóc Trăng',
+    'Sơn La',
+    'Tây Ninh',
+    'Thái Bình',
+    'Thái Nguyên',
+    'Thanh Hóa',
+    'Thừa Thiên-Huế',
+    'Tiền Giang',
+    'Trà Vinh',
+    'Tuyên Quang',
+    'Vĩnh Long',
+    'Vĩnh Phúc',
+    'Yên Bái',
+    'Hòa Bình',
+    'Bắc Ninh',
+    'Bến Tre',
+    'Cà Mau',
+    'Bình Định',
+    'Lào Cai',
+    'Bắc Kạn',
+    'Sơn La',
+  ];
 
   return (
     <View style={styles.container}>
@@ -135,106 +180,8 @@ export default function Profile({ navigation }: { navigation: any }) {
               <Text style={styles.editText}>Chỉnh sửa</Text>
             </TouchableOpacity>
           </View>
-
           {isEditingAddress ? (
             <View>
-              {/* Tỉnh/Thành phố */}
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Tỉnh/thành phố:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
-                    value={addressInfo.city}
-                    editable={false}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setIsDropdownVisible(prev => ({ ...prev, city: !prev.city }))}>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {isDropdownVisible.city && (
-                <View style={styles.dropdownContainer}>
-                  <ScrollView style={styles.dropdownList}>
-                    {provinces.map(province => (
-                      <TouchableOpacity
-                        key={province.code}
-                        onPress={() => {
-                          handleCitySelect(province.code, province.name);
-                          setIsDropdownVisible(prev => ({ ...prev, city: false }));
-                        }}>
-                        <Text style={styles.dropdownItem}>{province.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-
-              {/* Quận/Huyện */}
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Quận/huyện:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
-                    value={addressInfo.district}
-                    editable={false}
-                  />
-                  <TouchableOpacity
-                    onPress={() =>
-                      setIsDropdownVisible(prev => ({ ...prev, district: !prev.district }))
-                    }>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {isDropdownVisible.district && (
-                <View style={styles.dropdownContainer}>
-                  <ScrollView style={styles.dropdownList}>
-                    {districts.map(district => (
-                      <TouchableOpacity
-                        key={district.code}
-                        onPress={() => {
-                          handleDistrictSelect(district.code, district.name);
-                          setIsDropdownVisible(prev => ({ ...prev, district: false }));
-                        }}>
-                        <Text style={styles.dropdownItem}>{district.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
-
-              {/* Xã/Phường */}
-              <View style={styles.inputWrapperEditingColumnAddress}>
-                <Text style={styles.labelEditingAddress}>Xã phường/thị trấn:</Text>
-                <View style={styles.inputContainerEditingAddress}>
-                  <TextInput
-                    style={[styles.inputEditingAddress, { fontWeight: 'bold', color: '#000' }]} // fontWeight để tô đậm
-                    value={addressInfo.ward}
-                    editable={false}
-                  />
-                  <TouchableOpacity
-                    onPress={() => setIsDropdownVisible(prev => ({ ...prev, ward: !prev.ward }))}>
-                    <Entypo name="chevron-down" size={16} color="black" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              {isDropdownVisible.ward && (
-                <View style={styles.dropdownContainer}>
-                  <ScrollView style={styles.dropdownList}>
-                    {wards.map(ward => (
-                      <TouchableOpacity
-                        key={ward.code}
-                        onPress={() => {
-                          handleWardSelect(ward.code, ward.name);
-                          setIsDropdownVisible(prev => ({ ...prev, ward: false }));
-                        }}>
-                        <Text style={styles.dropdownItem}>{ward.name}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                </View>
-              )}
               <View style={styles.inputWrapperEditingColumnAddress}>
                 <Text style={styles.labelEditingAddress}>Số nhà/đường phố:</Text>
                 <View style={styles.inputContainerEditingAddress}>
@@ -250,20 +197,76 @@ export default function Profile({ navigation }: { navigation: any }) {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Xã phường/thị trấn:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
+                    value={addressInfo.ward}
+                    onChangeText={text => setAddressInfo(prev => ({ ...prev, ward: text }))}
+                  />
+                  <TouchableOpacity onPress={() => setAddressInfo(prev => ({ ...prev, ward: '' }))}>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Quận/huyện:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
+                    value={addressInfo.district}
+                    onChangeText={text => setAddressInfo(prev => ({ ...prev, district: text }))}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setAddressInfo(prev => ({ ...prev, district: '' }))}>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.inputWrapperEditingColumnAddress}>
+                <Text style={styles.labelEditingAddress}>Tỉnh/thành phố:</Text>
+                <View style={styles.inputContainerEditingAddress}>
+                  <TextInput
+                    style={[styles.inputEditingAddress, styles.inputBoldAddress]}
+                    value={addressInfo.city}
+                    onChangeText={text => setAddressInfo(prev => ({ ...prev, city: text }))}
+                  />
+                  <TouchableOpacity onPress={() => setIsDropdownVisible(!isDropdownVisible)}>
+                    <Entypo name="chevron-down" size={16} color="black" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              {isDropdownVisible && (
+                <View style={styles.dropdownContainer}>
+                  <ScrollView style={styles.dropdownList}>
+                    {provinces.map((province, index) => (
+                      <TouchableOpacity
+                        key={index}
+                        onPress={() => {
+                          setAddressInfo(prev => ({ ...prev, city: province }));
+                          setIsDropdownVisible(false);
+                        }}>
+                        <Text style={styles.dropdownItem}>{province}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </View>
+              )}
             </View>
           ) : (
             <View>
               <Text style={styles.text}>
-                Tỉnh/thành phố: <Text style={styles.bold}>{addressInfo.city}</Text>
-              </Text>
-              <Text style={styles.text}>
-                Quận/huyện: <Text style={styles.bold}>{addressInfo.district}</Text>
+                Số nhà/đường phố: <Text style={styles.bold}>{addressInfo.street}</Text>
               </Text>
               <Text style={styles.text}>
                 Xã phường/thị trấn: <Text style={styles.bold}>{addressInfo.ward}</Text>
               </Text>
               <Text style={styles.text}>
-                Số nhà/đường phố: <Text style={styles.bold}>{addressInfo.street}</Text>
+                Quận/huyện: <Text style={styles.bold}>{addressInfo.district}</Text>
+              </Text>
+              <Text style={styles.text}>
+                Tỉnh/thành phố: <Text style={styles.bold}>{addressInfo.city}</Text>
               </Text>
             </View>
           )}
