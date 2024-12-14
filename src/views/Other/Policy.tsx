@@ -5,12 +5,6 @@ import { Entypo } from '@expo/vector-icons';
 export default function Policy({ navigation }: { navigation: any }) {
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Entypo name="chevron-left" size={24} color="black" onPress={() => navigation.goBack()} />
-        <Text style={styles.headerTitle}>Chính sách</Text>
-      </View>
-
       {/* Content */}
       <ScrollView style={styles.content}>
         <Text style={styles.sectionTitle}>1. Mục Đích Sử Dụng</Text>
@@ -125,7 +119,6 @@ export default function Policy({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20,
     flex: 1,
     backgroundColor: 'white',
   },

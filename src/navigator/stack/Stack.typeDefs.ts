@@ -12,7 +12,9 @@ export type StackParamList = {
 
   SearchStack: undefined;
   SessionStack: undefined;
+
   OtherStack: undefined;
+  AddSessionStack: undefined;
   QRScanStack: undefined;
 };
 

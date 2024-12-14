@@ -93,12 +93,6 @@ export default function Profile({ navigation }: { navigation: any }) {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Entypo name="chevron-left" size={24} color="black" onPress={() => navigation.goBack()} />
-        <Text style={styles.headerTitle}>Tài khoản của tôi</Text>
-      </View>
-
       {/* Content */}
       <ScrollView contentContainerStyle={styles.content}>
         {/* Personal Info */}
@@ -278,7 +272,6 @@ export default function Profile({ navigation }: { navigation: any }) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20,
     flex: 1,
     backgroundColor: 'white',
   },
