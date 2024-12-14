@@ -32,8 +32,8 @@ export interface IDocumentState {
   files: {
     name: string;
     uri: string;
-    type: string;
     size: number;
+    mimeType: string;
   }[];
   amount: number;
 }
@@ -41,10 +41,9 @@ export interface IDocumentState {
 export interface IUploadDocumentRequest {
   notarizationService: INotarizationService;
   files: {
-    name: string;
+    name: string | number;
     uri: string;
     type: string;
-    size: number;
   }[];
   notarizationField: INotarizationField;
   requesterInfo: {

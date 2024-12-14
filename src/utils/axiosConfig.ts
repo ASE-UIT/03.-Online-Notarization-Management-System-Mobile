@@ -43,6 +43,7 @@ axiosConfig.interceptors.response.use(
     }
 
     if (error.response?.status !== 410) {
+      console.log('status:', error.response?.status);
       Toast.show({
         type: 'error',
         text1: 'Có lỗi xảy ra',

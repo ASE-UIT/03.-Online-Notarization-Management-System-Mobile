@@ -1,6 +1,6 @@
 import { CreateProgressBar, ForwardStepBar } from '@components/Bar';
-import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, BackHandler } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
 import { StackProps } from '@navigator';
@@ -9,8 +9,8 @@ import Toast from 'react-native-toast-message';
 import { DocumentTypeCode, getDocumentNameByCode } from '@utils/constants';
 import { INotarizationService } from '@modules/notarizationService';
 import { INotarizationField } from '@modules/notarizationField';
-import * as FileSystem from 'expo-file-system'; // Để đọc file nếu cần
-import FormData from 'form-data'; // Để gửi multipart form data
+import FormData from 'form-data';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 const ConfirmInformation = ({ navigation }: StackProps) => {
   const {
@@ -24,32 +24,33 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     clearFiles,
   } = useDocumentSlice();
   const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const handleBack = () => {
     dispatch(clearFiles());
     navigation.goBack();
   };
 
-  const handleNextStep = async () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Yêu cầu công chứng đã được tạo',
-      text2: 'Vui lòng chờ chúng tôi xác nhận yêu cầu của bạn',
-      visibilityTime: 3000,
-      autoHide: true,
-      position: 'bottom',
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
     });
 
-    // Chuyển trạng thái thành đối tượng IUploadDocumentRequest
+    return () => backHandler.remove();
+  }, []);
+
+  const handleNextStep = async () => {
+    const extractedFiles = Object.values(files[0]).flatMap(fileGroup => fileGroup);
+    console.log(extractedFiles);
     const requestPayload: IUploadDocumentRequest = {
       notarizationService: notarizationService as INotarizationService,
       notarizationField: notarizationField as INotarizationField,
       requesterInfo,
-      files: files.map(file => ({
+      files: extractedFiles.map(file => ({
         name: file.name,
         uri: file.uri,
-        type: file.type,
-        size: file.size,
+        type: file.mimeType,
       })),
       amount,
     };
@@ -59,28 +60,32 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     formData.append('notarizationService', JSON.stringify(requestPayload.notarizationService));
     formData.append('notarizationField', JSON.stringify(requestPayload.notarizationField));
     formData.append('requesterInfo', JSON.stringify(requestPayload.requesterInfo));
-    formData.append('amount', requestPayload.amount.toString());
-
+    formData.append('amount', requestPayload.amount);
+    console.log(requestPayload.files);
     requestPayload.files.forEach(file => {
-      formData.append('files', {
-        uri: file.uri,
-        name: file.name,
-        type: file.type,
-      });
+      formData.append('files', file);
     });
 
-    try {
-      // Gọi API để upload tài liệu
-      console.log('FormData:', formData);
-      const result = await DocumentService.uploadDocument(formData);
-      console.log('Result:', result);
+    setLoading(true);
 
-      // // Nếu thành công, reset lại trạng thái và chuyển hướng
-      // dispatch(resetDocumentState());
-      // navigation.navigate('HomeStack');
+    try {
+      const result = await DocumentService.uploadDocument(formData);
+      console.log(result);
+      Toast.show({
+        type: 'success',
+        text1: 'Yêu cầu công chứng đã được tạo',
+        text2: 'Vui lòng chờ chúng tôi xác nhận yêu cầu của bạn',
+        visibilityTime: 3000,
+        autoHide: true,
+        position: 'bottom',
+      });
+
+      dispatch(resetDocumentState());
+      navigation.navigate('HomeStack');
     } catch (error) {
       console.error('Error uploading document:', error);
-      // Hiển thị lỗi cho người dùng
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -124,6 +129,7 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
 
   return (
     <View style={styles.container}>
+      <Spinner visible={loading} textContent="Đang tải..." textStyle={{ color: '#fff' }} />
       <View style={styles.main}>
         <CreateProgressBar currentPage={step} setCurrentPage={setStep} />
         <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>

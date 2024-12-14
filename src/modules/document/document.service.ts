@@ -7,6 +7,11 @@ async function uploadDocument(data: FormData): Promise<IUploadDocumentResponse> 
     const response = await axiosConfig.post<IUploadDocumentResponse>(
       process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/notarization/upload-files',
       data,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
     );
     return response.data;
   } catch (error) {
