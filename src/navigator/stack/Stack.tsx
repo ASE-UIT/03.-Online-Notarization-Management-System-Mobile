@@ -5,15 +5,15 @@ import { StackParamList } from './Stack.typeDefs';
 import { StyleSheet } from 'react-native';
 import { DrawerProps } from '../drawer/Drawer.typeDefs';
 import { StackHeaderLeft, StackHeaderTitle } from './components';
-import { colors } from '@theme';
+import { colors, fonts } from '@theme';
 
 // views
 import Home from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import Search from '@views/Search';
-import Session from '@views/Session';
 import QRScan from '@views/QRScan';
-import { Other, Policy, Profile } from '@views/Other';
+import { Other, Policy, Profile, Wallet } from '@views/Other';
+import { AddSession, Session } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
 
@@ -21,8 +21,8 @@ const Stack = createNativeStackNavigator<StackParamList>();
 
 const navigationProps = {
   headerTintColor: colors.white,
-  headerStyle: { backgroundColor: colors.darkPurple },
-  headerTitleStyle: { fontSize: 18 },
+  headerStyle: { backgroundColor: '#fff', alignItems: 'center' },
+  headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
 };
 
 export function AuthStackNavigator() {
@@ -137,6 +137,14 @@ export function SessionStackNavigator() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        component={AddSession}
+        name="AddSessionStack"
+        options={{
+          headerTitle: 'Tạo phiên công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -155,14 +163,24 @@ export function OtherStackNavigator() {
         component={Policy}
         name="PolicyStack"
         options={{
-          headerShown: false,
+          headerTitle: 'Chính sách',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
       <Stack.Screen
         component={Profile}
         name="ProfileStack"
         options={{
-          headerShown: false,
+          headerTitle: 'Tài khoản của tôi',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={Wallet}
+        name="WalletStack"
+        options={{
+          headerTitle: 'Ví của tôi',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
     </Stack.Navigator>

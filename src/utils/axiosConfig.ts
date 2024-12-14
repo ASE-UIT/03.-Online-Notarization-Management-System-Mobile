@@ -15,9 +15,11 @@ const axiosConfig = axios.create({
 axiosConfig.interceptors.request.use(
   async config => {
     const accessTokenString = await AsyncStorage.getItem('accessToken');
-    const accessToken = accessTokenString ? JSON.parse(accessTokenString).token : null;
-    if (accessToken) {
-      config.headers.Authorization = `Bearer ${accessToken}`;
+    const accessToken = accessTokenString ? JSON.parse(accessTokenString) : null;
+
+    console.log('accessToken', accessToken?.token);
+    if (accessToken?.token) {
+      config.headers.Authorization = `Bearer ${accessToken.token}`;
     }
     return config;
   },
@@ -32,8 +34,10 @@ axiosConfig.interceptors.response.use(
   },
   async error => {
     if (error.response?.status === 401) {
-      const refreshToken = await AsyncStorage.getItem('refreshToken');
-      UserService.logout(refreshToken as string).then(() => {
+      const refreshTokenString = await AsyncStorage.getItem('refreshToken');
+      const refreshToken = refreshTokenString ? JSON.parse(refreshTokenString) : null;
+
+      UserService.logout(refreshToken?.token as string).then(() => {
         window.location.href = '/signin';
       });
     }
@@ -49,7 +53,8 @@ axiosConfig.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response && error.response.status === 401 && originalRequest) {
       if (!refreshTokenPromise) {
-        const refreshToken = await AsyncStorage.getItem('refreshToken');
+        const refreshTokenString = await AsyncStorage.getItem('refreshToken');
+        const refreshToken = refreshTokenString ? JSON.parse(refreshTokenString) : null;
 
         interface AxiosErrorWithConfig extends Error {
           config?: any;
@@ -61,11 +66,11 @@ axiosConfig.interceptors.response.use(
           };
         }
 
-        refreshTokenPromise = UserService.refreshAccessToken(refreshToken as string)
+        refreshTokenPromise = UserService.refreshAccessToken(refreshToken.token as string)
           .then((response: IRefreshTokenResponse) => {
-            const newAccessToken = response.access.token;
-            AsyncStorage.setItem('accessToken', newAccessToken);
-            axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
+            const newAccessToken = response.access;
+            AsyncStorage.setItem('accessToken', JSON.stringify(newAccessToken));
+            axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken.token}`;
             return axiosConfig(originalRequest);
           })
           .catch(async (error: AxiosErrorWithConfig) => {
