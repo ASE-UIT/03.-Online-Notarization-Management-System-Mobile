@@ -3,11 +3,13 @@ import { StyleSheet, ScrollView, ImageBackground, SafeAreaView } from 'react-nat
 import Header from './Header'; // Import Header component
 import Main from './Main'; // Import Main component
 import { useUserSlice } from '@modules/user';
+import { StackProps } from '@navigator';
 
-const Home = () => {
+const Home = ({ navigation, route }: StackProps) => {
   const { user } = useUserSlice();
   const [username, setUsername] = useState(user?.name || '');
   console.log('user', user);
+  const stackProps = { navigation, route };
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -17,7 +19,7 @@ const Home = () => {
         <Header username={username} />
 
         {/* Main */}
-        <Main />
+        <Main {...stackProps} />
       </ImageBackground>
     </SafeAreaView>
   );

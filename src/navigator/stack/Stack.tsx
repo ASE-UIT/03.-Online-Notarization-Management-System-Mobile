@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackParamList } from './Stack.typeDefs';
+import { StyleSheet } from 'react-native';
 import { DrawerProps } from '../drawer/Drawer.typeDefs';
 import { StackHeaderLeft, StackHeaderTitle } from './components';
 import { colors } from '@theme';
@@ -12,6 +14,8 @@ import Search from '@views/Search';
 import Session from '@views/Session';
 import QRScan from '@views/QRScan';
 import { Other, Policy, Profile } from '@views/Other';
+
+import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -49,7 +53,27 @@ export function AuthStackNavigator() {
   );
 }
 
-export function HomeStackNavigator() {
+export function HomeStackNavigator({ navigation, route }) {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeStack';
+
+    const hiddenScreens = ['CreateServiceAndField', 'ProvideInformation', 'ConfirmInformation'];
+    if (hiddenScreens.includes(routeName)) {
+      navigation.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          backgroundColor: colors.white[50],
+          borderTopColor: colors.gray[100],
+          borderTopWidth: 1,
+          height: 80,
+        },
+      });
+    }
+  }, [navigation, route]);
+
   return (
     <Stack.Navigator screenOptions={navigationProps}>
       <Stack.Screen
@@ -57,6 +81,32 @@ export function HomeStackNavigator() {
         name="HomeStack"
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={ServiceAndField}
+        name="CreateServiceAndField"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Tạo hồ sơ công chứng',
+        }}
+      />
+      <Stack.Screen
+        component={ProvideInformation}
+        name="ProvideInformation"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Tạo hồ sơ công chứng',
+          animation: 'none',
+        }}
+      />
+      <Stack.Screen
+        component={ConfirmInformation}
+        name="ConfirmInformation"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Tạo hồ sơ công chứng',
+          animation: 'none',
         }}
       />
     </Stack.Navigator>
@@ -132,3 +182,9 @@ export function QRScanStackNavigator() {
     </Stack.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  headerBackground: {
+    backgroundColor: colors.white[100],
+  },
+});
