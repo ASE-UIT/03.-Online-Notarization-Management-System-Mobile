@@ -4,15 +4,15 @@ import { AntDesign, MaterialIcons, Entypo, Feather } from '@expo/vector-icons';
 import { colors, fonts } from '@theme'; // Thay thế nếu bạn có theme riêng
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserService from '@modules/user/user.service';
-import * as Updates from "expo-updates";
+import * as Updates from 'expo-updates';
 export default function Other({ navigation }: { navigation: any }) {
   const handleLogout = async () => {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     UserService.logout(refreshToken as string);
 
     await AsyncStorage.clear();
-    Updates.reloadAsync()
-  }
+    Updates.reloadAsync();
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -47,7 +47,7 @@ export default function Other({ navigation }: { navigation: any }) {
         {/* Menu Item 3 */}
         <TouchableOpacity
           style={styles.menuItem}
-          onPress={() => navigation.navigate('PolicyStack')}>
+          onPress={() => navigation.navigate('WalletStack')}>
           <AntDesign name="wallet" size={24} color={colors.gray[500]} />
           <Text style={styles.menuText}>Ví tài liệu</Text>
           <Entypo name="chevron-right" size={24} color={colors.gray[500]} style={styles.menuIcon} />
@@ -65,7 +65,12 @@ export default function Other({ navigation }: { navigation: any }) {
         <TouchableOpacity style={[styles.menuItem, styles.logoutItem]} onPress={handleLogout}>
           <Feather name="log-out" size={24} color={colors.primary[500]} />
           <Text style={[styles.menuText, styles.logoutText]}>Đăng xuất</Text>
-          <Entypo name="chevron-right" size={24} color={colors.primary[500]} style={styles.menuIcon} />
+          <Entypo
+            name="chevron-right"
+            size={24}
+            color={colors.primary[500]}
+            style={styles.menuIcon}
+          />
         </TouchableOpacity>
       </View>
     </View>

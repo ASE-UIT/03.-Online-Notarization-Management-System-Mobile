@@ -5,6 +5,7 @@ export type StackParamList = {
   DetailsStack: { from: string };
   ProfileStack: undefined;
   PolicyStack: undefined;
+  WalletStack: undefined;
   // add more screen props...
 
   SignInStack: undefined;

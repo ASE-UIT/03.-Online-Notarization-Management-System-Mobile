@@ -10,7 +10,7 @@ import Home from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import Search from '@views/Search';
 import QRScan from '@views/QRScan';
-import { Other, Policy, Profile } from '@views/Other';
+import { Other, Policy, Profile, Wallet } from '@views/Other';
 import { AddSession, Session } from '@views/Session';
 
 const Stack = createNativeStackNavigator<StackParamList>();
@@ -122,6 +122,14 @@ export function OtherStackNavigator() {
         name="ProfileStack"
         options={{
           headerTitle: 'Tài khoản của tôi',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={Wallet}
+        name="WalletStack"
+        options={{
+          headerTitle: 'Ví của tôi',
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
