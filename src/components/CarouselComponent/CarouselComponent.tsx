@@ -19,7 +19,7 @@ function CarouselComponent({
   onPressPagination: (index: number) => void;
 }) {
   return (
-    <>
+    <View>
       <Carousel
         ref={componentRef}
         width={width - 32}
@@ -44,7 +44,7 @@ function CarouselComponent({
         containerStyle={{ gap: 5, marginTop: 10 }}
         onPress={onPressPagination}
       />
-    </>
+    </View>
   );
 }
 const styles = StyleSheet.create({
