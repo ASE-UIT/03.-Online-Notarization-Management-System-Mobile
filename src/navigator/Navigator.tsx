@@ -21,12 +21,7 @@ function Navigator() {
   const { getUser } = useAppService();
   const { dispatch, loggedIn, setUser, setLoggedIn } = useUserSlice();
   const { setPersistData, getPersistData } = useDataPersist();
-
-  const [isOpen, setOpen] = useState(true);
-
-  /**
-   * preload assets and user data
-   */
+  // TODO: switch router by loggedIn status
   const preload = async () => {
     try {
       // preload assets
@@ -65,8 +60,6 @@ function Navigator() {
   useEffect(() => {
     preload();
   }, []);
-
-  // TODO: switch router by loggedIn status
   console.log('[##] loggedIn', loggedIn);
 
   return (

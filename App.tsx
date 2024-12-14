@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import { loadFonts } from '@theme';
 import * as SplashScreen from 'expo-splash-screen';
 import { SignUp } from '@views/Auth';
+import { useUserSlice } from '@modules/user';
+import { useAppSlice, useAppService, IUser } from '@modules/app';
 
 SplashScreen.preventAutoHideAsync();
 

@@ -7,14 +7,11 @@ import { colors } from '@theme';
 
 // views
 import Home from '@views/Home';
-import Details from '@views/Details';
-import Profile from '@views/Profile';
 import { SignIn, SignUp } from '@views/Auth';
 import Search from '@views/Search';
 import Session from '@views/Session';
-import Other from '@views/Other';
 import QRScan from '@views/QRScan';
-import Policy from '@views/Policy';
+import { Other, Policy, Profile } from '@views/Other';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
