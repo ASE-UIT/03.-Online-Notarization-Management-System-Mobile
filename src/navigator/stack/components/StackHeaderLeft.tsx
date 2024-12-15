@@ -2,9 +2,17 @@ import { Pressable, Modal, View, Text, StyleSheet } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@theme';
+import { colors, fonts } from '@theme';
 
-export function StackHeaderLeft({ isCreateScreen }: { isCreateScreen: boolean }) {
+export function StackHeaderLeft({
+  isCreateScreen,
+  onConfirm,
+  onBack,
+}: Readonly<{
+  isCreateScreen: boolean;
+  onConfirm?: () => void;
+  onBack?: () => void;
+}>) {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
   const handleGoBack = () => {
@@ -16,7 +24,12 @@ export function StackHeaderLeft({ isCreateScreen }: { isCreateScreen: boolean })
   };
 
   const confirmGoBack = () => {
-    navigation.goBack();
+    if (onConfirm) {
+      onConfirm();
+    } else {
+      navigation.goBack();
+    }
+
     setShowModal(false);
   };
 
@@ -30,7 +43,7 @@ export function StackHeaderLeft({ isCreateScreen }: { isCreateScreen: boolean })
       </Pressable>
       <Modal
         animationType="none"
-        transparent={true}
+        transparent
         visible={showModal}
         onRequestClose={() => setShowModal(false)}>
         <View style={styles.container}>
@@ -40,8 +53,7 @@ export function StackHeaderLeft({ isCreateScreen }: { isCreateScreen: boolean })
             <View style={styles.infoContainer}>
               <Ionicons name="alert-circle-outline" size={20} color={colors.red[500]} />
               <Text style={styles.infoText}>
-                Lưu ý: Nếu xác nhận, tất cả các thao tác của bạn bao gồm Tạo ảnh và Chỉnh sửa sẽ bị
-                mất.
+                Lưu ý: Nếu xác nhận, tất cả các thao tác của bạn sẽ bị mất.
               </Text>
             </View>
             <View style={{ flexDirection: 'row', marginTop: '5%' }}>
@@ -49,7 +61,7 @@ export function StackHeaderLeft({ isCreateScreen }: { isCreateScreen: boolean })
                 style={{
                   flex: 1,
                   flexDirection: 'row',
-                  justifyContent: 'flex-end',
+                  justifyContent: 'space-between',
                 }}>
                 <Pressable onPress={() => setShowModal(false)} style={styles.cancelButton}>
                   <Text style={[styles.buttonText, { color: colors.black[600] }]}>Hủy</Text>
@@ -71,7 +83,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.black[100],
+    backgroundColor: colors.backgroundBlack,
     padding: '5%',
   },
   modalContent: {
@@ -79,11 +91,12 @@ const styles = StyleSheet.create({
     padding: '5%',
     borderRadius: 10,
     alignItems: 'center',
+    elevation: 5,
   },
   title: {
-    fontSize: 14,
+    fontSize: 15,
     color: colors.black[100],
-    fontFamily: 'helvetica-neue-bold',
+    fontFamily: fonts.beVietnamPro.semiBold,
     lineHeight: 20,
   },
   infoContainer: {
@@ -95,25 +108,27 @@ const styles = StyleSheet.create({
     marginLeft: '5%',
     fontSize: 14,
     lineHeight: 20,
-    color: colors.black[100],
-    fontFamily: 'helvetica-neue-medium',
+    color: colors.black,
+    fontFamily: fonts.beVietnamPro.regular,
   },
   cancelButton: {
     backgroundColor: colors.black[100],
     padding: '4%',
+    paddingHorizontal: '7%',
     borderRadius: 5,
     borderColor: colors.black[100],
     borderWidth: 1,
   },
   confirmButton: {
-    backgroundColor: colors.black[100],
+    backgroundColor: colors.primary[500],
     padding: '4%',
+    paddingHorizontal: '3%',
     borderRadius: 5,
     marginLeft: '2%',
   },
   buttonText: {
     color: colors.white[100],
-    fontSize: 12,
-    fontFamily: 'helvetica-neue-bold',
+    fontSize: 13,
+    fontFamily: fonts.beVietnamPro.bold,
   },
 });

@@ -13,6 +13,7 @@ import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated
 import { useSharedValue } from 'react-native-reanimated';
 import { colors } from '@theme';
 import CarouselComponent from '@components/CarouselComponent';
+import { StackProps } from '@navigator';
 
 const services = [
   { id: 1, name: 'Vay - Mượn Tài sản' },
@@ -55,7 +56,7 @@ const data = [
 ];
 const windowWidth = Dimensions.get('window').width;
 
-export default function Main() {
+export default function Main({ navigation }: StackProps) {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const onPressPagination = (index: number) => {
@@ -68,6 +69,9 @@ export default function Main() {
       animated: true,
     });
   };
+  const handleCreateDocument = () => {
+    navigation.navigate('CreateServiceAndField');
+  };
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Các loại dịch vụ */}
@@ -77,10 +81,7 @@ export default function Main() {
         <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
           {services.map(service => (
             <View key={service.id} style={styles.serviceItem}>
-              <TouchableOpacity
-                onPress={() => {
-                  console.log('icon được nhấn!');
-                }}>
+              <TouchableOpacity onPress={handleCreateDocument}>
                 <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
               </TouchableOpacity>
               <Text style={styles.serviceText}>{service.name}</Text>

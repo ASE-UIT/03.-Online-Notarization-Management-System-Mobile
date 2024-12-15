@@ -1,3 +1,4 @@
+import { ProvideInformation } from '@views/Notarization';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type StackParamList = {
@@ -5,6 +6,7 @@ export type StackParamList = {
   DetailsStack: { from: string };
   ProfileStack: undefined;
   PolicyStack: undefined;
+  WalletStack: undefined;
   // add more screen props...
 
   SignInStack: undefined;
@@ -16,6 +18,10 @@ export type StackParamList = {
   OtherStack: undefined;
   AddSessionStack: undefined;
   QRScanStack: undefined;
+
+  CreateServiceAndField: undefined;
+  ProvideInformation: undefined;
+  ConfirmInformation: undefined;
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;
