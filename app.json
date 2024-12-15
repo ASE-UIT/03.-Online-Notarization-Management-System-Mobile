@@ -38,6 +38,17 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     },
-    "plugins": ["expo-asset", "expo-font"]
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow CongChungOnline to access your camera",
+          "microphonePermission": "Allow CongChungOnline to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
   }
 }

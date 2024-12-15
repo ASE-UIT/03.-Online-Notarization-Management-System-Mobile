@@ -25,6 +25,11 @@ const navigationProps = {
   headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
 };
 
+const qrNavigationProps = {
+  headerStyle: { backgroundColor: 'transparent', alignItems: 'center' },
+  headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
+};
+
 const renderHeaderLeft = (isCreateScreen: boolean, onConfirm?: () => void) => {
   return <StackHeaderLeft isCreateScreen={isCreateScreen} onConfirm={onConfirm} />;
 };
@@ -203,12 +208,18 @@ export function OtherStackNavigator() {
 
 export function QRScanStackNavigator() {
   return (
-    <Stack.Navigator screenOptions={navigationProps}>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { alignItems: 'center' },
+        headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
+        headerTransparent: true,
+      }}>
       <Stack.Screen
         component={QRScan}
         name="QRScanStack"
         options={{
-          headerShown: false,
+          headerTitle: 'Ví của tôi',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
     </Stack.Navigator>
