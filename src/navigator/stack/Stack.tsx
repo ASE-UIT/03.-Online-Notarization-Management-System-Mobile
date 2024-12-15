@@ -1,10 +1,9 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StackParamList } from './Stack.typeDefs';
+import { StackParamList, StackProps } from './Stack.typeDefs';
 import { StyleSheet } from 'react-native';
-import { DrawerProps } from '../drawer/Drawer.typeDefs';
-import { StackHeaderLeft, StackHeaderTitle } from './components';
+import { StackHeaderLeft } from './components';
 import { colors, fonts } from '@theme';
 
 // views
@@ -17,7 +16,6 @@ import { AddSession, Session } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
 import { useDocumentSlice } from '@modules/document';
-import Button from '@components/Button';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -25,6 +23,10 @@ const navigationProps = {
   headerTintColor: colors.white,
   headerStyle: { backgroundColor: '#fff', alignItems: 'center' },
   headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
+};
+
+const renderHeaderLeft = (isCreateScreen: boolean, onConfirm?: () => void) => {
+  return <StackHeaderLeft isCreateScreen={isCreateScreen} onConfirm={onConfirm} />;
 };
 
 export function AuthStackNavigator() {
@@ -57,7 +59,6 @@ export function AuthStackNavigator() {
 
 export function HomeStackNavigator({ navigation, route }) {
   const { dispatch, resetDocumentState } = useDocumentSlice();
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeStack';
@@ -79,21 +80,13 @@ export function HomeStackNavigator({ navigation, route }) {
     }
   }, [navigation, route]);
 
-  const handleBack = () => {
-    setIsModalVisible(true);
-  };
-
   const handleConfirmBack = () => {
     dispatch(resetDocumentState());
-    navigation.goBack();
-  };
-
-  const handleCancelBack = () => {
-    setIsModalVisible(false); // Đóng modal nếu không xác nhận
+    navigation.navigate('HomeStack');
   };
 
   return (
-    <Stack.Navigator screenOptions={navigationProps}>
+    <Stack.Navigator>
       <Stack.Screen
         component={Home}
         name="HomeStack"
@@ -107,6 +100,7 @@ export function HomeStackNavigator({ navigation, route }) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerLeft: () => renderHeaderLeft(false),
         }}
       />
       <Stack.Screen
@@ -116,7 +110,7 @@ export function HomeStackNavigator({ navigation, route }) {
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
           animation: 'none',
-          headerLeft: () => <Button onPress={handleBack} title="Back" />,
+          headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
       />
       <Stack.Screen
@@ -126,7 +120,7 @@ export function HomeStackNavigator({ navigation, route }) {
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
           animation: 'none',
-          headerLeft: () => <Button onPress={handleBack} title="Back" />,
+          headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
       />
     </Stack.Navigator>
@@ -135,7 +129,7 @@ export function HomeStackNavigator({ navigation, route }) {
 
 export function SearchStackNavigator() {
   return (
-    <Stack.Navigator screenOptions={navigationProps}>
+    <Stack.Navigator>
       <Stack.Screen
         component={Search}
         name="SearchStack"
