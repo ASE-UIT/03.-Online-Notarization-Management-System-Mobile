@@ -49,6 +49,7 @@
           "recordAudioAndroid": true
         }
       ]
-    ]
+    ],
+    "newArchEnabled": true
   }
 }
