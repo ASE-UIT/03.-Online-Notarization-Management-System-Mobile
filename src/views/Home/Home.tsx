@@ -30,7 +30,6 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     width: '100%',
     height: '100%',
-    paddingTop: 12,
   },
   container: {},
 });

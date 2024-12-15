@@ -8,16 +8,27 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import { SessionCard } from '@components/SessionCard';
+import { ISession } from '@modules/session/session.typeDefs';
+import SessionService from '@modules/session/session.service';
 
 export default function Session({ navigation }: { navigation: any }) {
+  const [userSession, setUserSession] = useState<ISession[]>([]);
   const navigateToAddSession = () => {
     navigation.navigate('AddSessionStack');
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await SessionService.getSessionByUserId();
+      setUserSession(data);
+      console.log(data);
+    };
+    fetchData();
+  }, []);
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -57,9 +68,9 @@ export default function Session({ navigation }: { navigation: any }) {
       </View>
       <View style={styles.sessionCardWrapper}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <SessionCard />
-          <SessionCard />
-          <SessionCard />
+          {userSession.map(session => (
+            <SessionCard key={session.id} session={session} />
+          ))}
         </ScrollView>
       </View>
     </SafeAreaView>

@@ -89,7 +89,6 @@ export default function TabNavigator() {
           backgroundColor: 'transparent',
           shadowOpacity: 0, // Removes shadow
           borderBottomWidth: 0, // Removes bottom border
-          display: route.name === 'QRScanTab' ? 'none' : 'flex', // Hide tab bar on QRScanTab
         },
       })}>
       <Tab.Screen
@@ -111,12 +110,6 @@ export default function TabNavigator() {
         }}
       />
       <Tab.Screen
-        listeners={({ navigation }) => ({
-          tabPress: e => {
-            e.preventDefault();
-            navigation.navigate('QRScanTab');
-          },
-        })}
         name="QRScanTab"
         component={QRScanStackNavigator}
         options={{ tabBarButton: props => <CustomTabBarButton {...props} name="qrcode" /> }}

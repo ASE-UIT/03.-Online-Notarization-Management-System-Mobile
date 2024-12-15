@@ -7,10 +7,16 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
 import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import NotarizationFieldService from '@modules/notarizationField/notarizationField.service';
+import { INotarizationField } from '@modules/notarizationField';
+import { INotarizationService } from '@modules/notarizationService';
+import NotarizationServiceService from '@modules/notarizationService/notarizationService.service';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import RNDateTimePicker from '@react-native-community/datetimepicker';
 
 const data1 = [
   { label: 'Hello', value: '1' },
@@ -34,9 +40,40 @@ const data2 = [
 ];
 
 export default function AddSession({ navigation }: { navigation: any }) {
-  const [value1, setValue1] = useState<string | null>(null);
-  const [value2, setValue2] = useState<string | null>(null);
+  const [notaryFieldSelection, setNotaryFieldSelection] = useState<string | null>(null);
+  const [notaryServiceSelection, setNotaryServiceSelection] = useState<string | null>(null);
+  const [notaryFieldList, setNotaryFieldList] = useState<INotarizationField[] | null>(null);
+  const [notaryServiceList, setNotaryServiceList] = useState<INotarizationService[] | null>(null);
+  const [startTime, setStartTime] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endTime, setEndTime] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [amount, setAmount] = useState<number | null>(null);
+  const [user, setUser] = useState<object[] | null>(null);
 
+  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
+  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
+  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
+  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
+  useEffect(() => {
+    const fetchNotarizationField = async () => {
+      const response = await NotarizationFieldService.getAllNotarizationField();
+      setNotaryFieldList(response);
+    };
+    fetchNotarizationField();
+  }, []);
+  useEffect(() => {
+    const fetchNotarizationService = async () => {
+      if (notaryFieldSelection) {
+        const response =
+          await NotarizationServiceService.getNotarizationServicesByFieldId(notaryFieldSelection);
+        setNotaryServiceList(response);
+        console.log(response);
+      }
+    };
+    fetchNotarizationService();
+  }, [notaryFieldSelection]);
   return (
     <View style={styles.container}>
       <ScrollView style={{ flex: 1, padding: 20 }}>
@@ -50,16 +87,16 @@ export default function AddSession({ navigation }: { navigation: any }) {
           </View>
           <View>
             <CustomDropdown
-              data={data1}
-              value={value1}
-              setValue={setValue1}
+              data={notaryFieldList || []}
+              value={notaryFieldSelection}
+              setValue={setNotaryFieldSelection}
               title="Lĩnh vực công chứng"
               placeholder="Chọn lĩnh vực công chứng"
             />
             <CustomDropdown
-              data={data2}
-              value={value2}
-              setValue={setValue2}
+              data={notaryServiceList || []}
+              value={notaryServiceSelection}
+              setValue={setNotaryServiceSelection}
               title="Dịch vụ công chứng"
               placeholder="Chọn dịch vụ công chứng"
             />
@@ -76,15 +113,45 @@ export default function AddSession({ navigation }: { navigation: any }) {
           <View style={{ marginBottom: 8 }}>
             <Text style={styles.textTitle}>Thời gian bắt đầu</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <DateTimeWrapper icon="calendar" margin={12} />
-              <DateTimeWrapper icon="clockcircleo" />
+              <DateTimeWrapper
+                icon="clockcircleo"
+                DateTimeValue={startTime}
+                type="time"
+                onPress={setShowStartTimePicker}
+                showDateTimePicker={showStartTimePicker}
+                setDateTimeValue={setStartTime}
+                margin={12}
+              />
+              <DateTimeWrapper
+                icon="calendar"
+                DateTimeValue={startDate}
+                type="date"
+                onPress={setShowStartDatePicker}
+                showDateTimePicker={showStartDatePicker}
+                setDateTimeValue={setStartDate}
+              />
             </View>
           </View>
           <View style={{ marginBottom: 12 }}>
             <Text style={styles.textTitle}>Thời gian kết thúc</Text>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <DateTimeWrapper icon="calendar" margin={12} />
-              <DateTimeWrapper icon="clockcircleo" />
+              <DateTimeWrapper
+                icon="clockcircleo"
+                DateTimeValue={endTime}
+                type="time"
+                margin={12}
+                onPress={setShowEndTimePicker}
+                showDateTimePicker={showEndTimePicker}
+                setDateTimeValue={setEndTime}
+              />
+              <DateTimeWrapper
+                icon="calendar"
+                DateTimeValue={endDate}
+                type="date"
+                onPress={setShowEndDatePicker}
+                showDateTimePicker={showEndDatePicker}
+                setDateTimeValue={setEndDate}
+              />
             </View>
           </View>
         </View>
@@ -129,9 +196,19 @@ export default function AddSession({ navigation }: { navigation: any }) {
 const DateTimeWrapper = ({
   icon,
   margin,
+  showDateTimePicker = false,
+  onPress,
+  setDateTimeValue,
+  DateTimeValue,
+  type,
 }: {
   icon: keyof typeof AntDesign.glyphMap;
   margin?: number;
+  showDateTimePicker?: boolean;
+  onPress?: React.Dispatch<React.SetStateAction<boolean>>;
+  setDateTimeValue?: React.Dispatch<React.SetStateAction<Date | null>>;
+  DateTimeValue: Date | null;
+  type?: 'date' | 'time';
 }) => {
   return (
     <View
@@ -146,10 +223,28 @@ const DateTimeWrapper = ({
         paddingVertical: 8,
         marginRight: margin,
       }}>
-      <TextInput style={{ width: '80%' }} />
-      <TouchableOpacity>
+      <TextInput
+        style={{ width: '80%' }}
+        value={
+          type == 'date'
+            ? DateTimeValue?.toLocaleDateString('en-GB')
+            : DateTimeValue?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        }
+      />
+      <TouchableOpacity onPress={() => onPress?.(true)}>
         <AntDesign name={icon} size={24} color="black" />
       </TouchableOpacity>
+      {showDateTimePicker && (
+        <RNDateTimePicker
+          mode={type}
+          value={new Date()}
+          onChange={(event, date) => {
+            const currentDate = date || DateTimeValue;
+            onPress?.(false);
+            setDateTimeValue?.(currentDate);
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -161,7 +256,7 @@ const CustomDropdown = ({
   title,
   placeholder,
 }: {
-  data: { label: string; value: string }[];
+  data: (INotarizationField | INotarizationService)[];
   value: string | null;
   setValue: React.Dispatch<React.SetStateAction<string | null>>;
   title?: string;
@@ -179,13 +274,13 @@ const CustomDropdown = ({
         data={data}
         search
         maxHeight={300}
-        labelField="label"
-        valueField="value"
+        labelField="name"
+        valueField="id"
         placeholder={placeholder || 'Chọn...'}
         searchPlaceholder="Search..."
         value={value}
         onChange={item => {
-          setValue(item.value);
+          setValue(item.id);
         }}
       />
     </View>
