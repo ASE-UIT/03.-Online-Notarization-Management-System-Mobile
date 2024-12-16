@@ -7,6 +7,7 @@ export type StackParamList = {
   ProfileStack: undefined;
   PolicyStack: undefined;
   WalletStack: undefined;
+  QRCodeStack: undefined;
   // add more screen props...
 
   SignInStack: undefined;
@@ -18,6 +19,7 @@ export type StackParamList = {
   OtherStack: undefined;
   AddSessionStack: undefined;
   QRScanStack: undefined;
+  TransferNFTStack: undefined;
 
   CreateServiceAndField: undefined;
   ProvideInformation: undefined;
