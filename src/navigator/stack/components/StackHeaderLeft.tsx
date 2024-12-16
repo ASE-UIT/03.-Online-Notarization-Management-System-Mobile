@@ -8,10 +8,12 @@ export function StackHeaderLeft({
   isCreateScreen,
   onConfirm,
   onBack,
+  backColor,
 }: Readonly<{
   isCreateScreen: boolean;
   onConfirm?: () => void;
   onBack?: () => void;
+  backColor?: string;
 }>) {
   const navigation = useNavigation();
   const [showModal, setShowModal] = useState(false);
@@ -39,7 +41,7 @@ export function StackHeaderLeft({
         hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}
         onPress={handleGoBack}
         style={{ marginRight: 10 }}>
-        <Ionicons name="chevron-back" size={24} />
+        <Ionicons name="chevron-back" size={24} color={backColor} />
       </Pressable>
       <Modal
         animationType="none"

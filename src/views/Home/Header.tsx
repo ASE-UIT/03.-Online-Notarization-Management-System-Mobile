@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@theme';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-const Header = ({ username }: { username: string }) => {
+const Header = ({ username, onPress }: { username: string; onPress: () => void }) => {
   return (
     <ImageBackground
       style={styles.container}
@@ -26,11 +26,7 @@ const Header = ({ username }: { username: string }) => {
           <Text style={styles.username}>{username}</Text>
           <MaterialIcons name="verified" size={24} color={colors.gray[500]} />
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            console.log('QR được nhấn!');
-          }}
-          style={styles.qrContainer}>
+        <TouchableOpacity onPress={onPress} style={styles.qrContainer}>
           <Ionicons name="qr-code-outline" size={32} color={colors.primary[300]} />
         </TouchableOpacity>
       </View>

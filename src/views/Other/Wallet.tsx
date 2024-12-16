@@ -11,13 +11,9 @@ export default function Wallet() {
   const [userWallet, setUserWallet] = useState<IUserWallet>();
   useEffect(() => {
     const fetchUserWallet = async () => {
-      try {
-        const response = await UserWalletService.getUserWallet();
-        setUserWallet(response);
-        console.log('response', response);
-      } catch (err) {
-        console.log(err);
-      }
+      const response = await UserWalletService.getUserWallet();
+      setUserWallet(response);
+      console.log('response', response);
     };
     fetchUserWallet();
   }, []);
