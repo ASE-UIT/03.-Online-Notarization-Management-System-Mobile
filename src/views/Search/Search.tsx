@@ -17,7 +17,7 @@ import { DocumentService, IDocumentHistoryStatus } from '@modules/document';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StackProps } from '@navigator';
 
-export default function Search({ navigation }: StackProps) {
+export default function Search({ navigation }: Readonly<StackProps>) {
   const [searching, setSearching] = useState(false);
   const [fileId, setFileId] = useState('');
   const [results, setResults] = useState<any[]>([]);
