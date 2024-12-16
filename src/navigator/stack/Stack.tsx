@@ -7,10 +7,10 @@ import { StackHeaderLeft } from './components';
 import { colors, fonts } from '@theme';
 
 // views
-import Home from '@views/Home';
+import { Home, QRCodeScreen } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import Search from '@views/Search';
-import QRScan from '@views/QRScan';
+import { QRScan, TransferNFT } from '@views/QRScan';
 import { Other, Policy, Profile, Wallet } from '@views/Other';
 import { AddSession, Session } from '@views/Session';
 
@@ -68,7 +68,12 @@ export function HomeStackNavigator({ navigation, route }) {
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'HomeStack';
 
-    const hiddenScreens = ['CreateServiceAndField', 'ProvideInformation', 'ConfirmInformation'];
+    const hiddenScreens = [
+      'CreateServiceAndField',
+      'ProvideInformation',
+      'ConfirmInformation',
+      'QRCodeStack',
+    ];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
         tabBarStyle: { display: 'none' },
@@ -91,7 +96,7 @@ export function HomeStackNavigator({ navigation, route }) {
   };
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName="HomeStack">
       <Stack.Screen
         component={Home}
         name="HomeStack"
@@ -126,6 +131,16 @@ export function HomeStackNavigator({ navigation, route }) {
           headerTitle: 'Tạo hồ sơ công chứng',
           animation: 'none',
           headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
+        }}
+      />
+      <Stack.Screen
+        component={QRCodeScreen}
+        name="QRCodeStack"
+        options={{
+          headerTitle: 'QR Code',
+          headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
+          headerTransparent: true,
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
     </Stack.Navigator>
@@ -206,20 +221,51 @@ export function OtherStackNavigator() {
   );
 }
 
-export function QRScanStackNavigator() {
+export function QRScanStackNavigator({ navigation, route }) {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'QRScanStack';
+
+    const hiddenScreens = ['QRScanStack', 'TransferNFTStack'];
+    if (hiddenScreens.includes(routeName)) {
+      navigation.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          backgroundColor: colors.white[50],
+          borderTopColor: colors.gray[100],
+          borderTopWidth: 1,
+          height: 80,
+        },
+      });
+    }
+  }, [navigation, route]);
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { alignItems: 'center' },
-        headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
-        headerTransparent: true,
-      }}>
+    <Stack.Navigator>
       <Stack.Screen
         component={QRScan}
         name="QRScanStack"
         options={{
           headerTitle: 'Ví của tôi',
+          headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold, color: '#fff' },
+          headerTransparent: true,
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} backColor="#fff" />,
+        }}
+      />
+      <Stack.Screen
+        component={TransferNFT}
+        name="TransferNFTStack"
+        options={{
+          headerTitle: 'Chuyển tài liệus số',
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={Home}
+        name="HomeStack"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>

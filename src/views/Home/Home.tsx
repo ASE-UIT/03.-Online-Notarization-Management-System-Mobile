@@ -9,6 +9,9 @@ const Home = ({ navigation, route }: StackProps) => {
   const { user } = useUserSlice();
   const [username, setUsername] = useState(user?.name || '');
   console.log('user', user);
+  const handleNavigateToQRCode = () => {
+    navigation.navigate('QRCodeStack');
+  };
   const stackProps = { navigation, route };
   return (
     <SafeAreaView style={styles.container}>
@@ -16,7 +19,7 @@ const Home = ({ navigation, route }: StackProps) => {
         source={require('./assets/background.png')} // Đường dẫn ảnh nền
         style={styles.backgroundImage}>
         {/* Header */}
-        <Header username={username} />
+        <Header username={username} onPress={() => handleNavigateToQRCode()} />
 
         {/* Main */}
         <Main {...stackProps} />

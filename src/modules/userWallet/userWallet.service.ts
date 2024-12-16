@@ -8,8 +8,25 @@ async function getUserWallet(): Promise<IUserWallet> {
   return response.data;
 }
 
+async function transferNFT(
+  transactionHash: string,
+  toUserId: string,
+  amount: number,
+): Promise<string> {
+  const response = await axiosConfig.post(
+    process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/userWallet/wallet/transfer',
+    {
+      transactionHash,
+      toUserId,
+      amount,
+    },
+  );
+  return response.data;
+}
+
 const UserWalletService = {
   getUserWallet,
+  transferNFT,
 };
 
 export default UserWalletService;

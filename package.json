@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~4.0.0",
-    "@gorhom/bottom-sheet": "^4",
+    "@gorhom/bottom-sheet": "^5.0.6",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-navigation/bottom-tabs": "^6.5.20",
@@ -52,6 +52,7 @@
     "react-native-element-dropdown": "^2.12.2",
     "react-native-gesture-handler": "~2.20.2",
     "react-native-loading-spinner-overlay": "^3.0.1",
+    "react-native-qrcode-svg": "^6.3.12",
     "react-native-reanimated": "~3.16.1",
     "react-native-reanimated-carousel": "4.0.0-alpha.12",
     "react-native-safe-area-context": "4.12.0",

@@ -17,7 +17,6 @@ import SessionService from '@modules/session/session.service';
 
 export default function Session({ navigation }: { navigation: any }) {
   const [userSession, setUserSession] = useState<ISession[]>([]);
-  const [dependency, setDependency] = useState<number>(0);
   const navigateToAddSession = () => {
     navigation.navigate('AddSessionStack');
   };
@@ -28,7 +27,7 @@ export default function Session({ navigation }: { navigation: any }) {
       setUserSession(sessions);
     };
     fetchData();
-  });
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>

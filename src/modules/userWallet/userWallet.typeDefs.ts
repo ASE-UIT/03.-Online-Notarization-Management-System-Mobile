@@ -15,4 +15,5 @@ export interface INFTItem {
   tokenURI: string;
   contractAddress: string;
   mintedAt: Date;
+  selected?: boolean;
 }
