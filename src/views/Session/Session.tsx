@@ -8,16 +8,28 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import Entypo from '@expo/vector-icons/Entypo';
 import { SessionCard } from '@components/SessionCard';
+import { ISession } from '@modules/session/session.typeDefs';
+import SessionService from '@modules/session/session.service';
 
 export default function Session({ navigation }: { navigation: any }) {
+  const [userSession, setUserSession] = useState<ISession[]>([]);
+  const [dependency, setDependency] = useState<number>(0);
   const navigateToAddSession = () => {
     navigation.navigate('AddSessionStack');
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const sessions = await SessionService.getSessionByUserId();
+      setUserSession(sessions);
+    };
+    fetchData();
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <View>
@@ -42,7 +54,9 @@ export default function Session({ navigation }: { navigation: any }) {
         />
       </View>
       <View style={styles.bodyHeader}>
-        <Text style={{ fontFamily: fonts.beVietnamPro.bold, fontSize: 18 }}>Danh sách (10)</Text>
+        <Text style={{ fontFamily: fonts.beVietnamPro.bold, fontSize: 18 }}>
+          Danh sách ({userSession.length})
+        </Text>
         <TouchableOpacity style={styles.addSessionButton} onPress={navigateToAddSession}>
           <AntDesign name="pluscircle" size={24} color={colors.primary[400]} />
           <Text
@@ -57,9 +71,9 @@ export default function Session({ navigation }: { navigation: any }) {
       </View>
       <View style={styles.sessionCardWrapper}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          <SessionCard />
-          <SessionCard />
-          <SessionCard />
+          {userSession.map((session, index) => (
+            <SessionCard key={index} session={session} />
+          ))}
         </ScrollView>
       </View>
     </SafeAreaView>

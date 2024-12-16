@@ -5,6 +5,7 @@ import {
   IRefreshTokenResponse,
   IRegisterRequest,
   IRegisterResponse,
+  IUser,
 } from './user.typeDefs';
 import axiosConfig from '@utils/axiosConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -54,11 +55,19 @@ async function refreshAccessToken(refreshToken: string): Promise<IRefreshTokenRe
   }
 }
 
+async function searchUserByEmail(email: string): Promise<IUser[]> {
+  const response = await axiosConfig.get<IUser[]>(
+    process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/users/search-user-by-email/' + email,
+  );
+  return response.data;
+}
+
 const UserService = {
   login,
   logout,
   refreshAccessToken,
   register,
+  searchUserByEmail,
 };
 
 export default UserService;
