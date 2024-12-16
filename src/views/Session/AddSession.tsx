@@ -9,39 +9,46 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
-import { Dropdown } from 'react-native-element-dropdown';
+import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import NotarizationFieldService from '@modules/notarizationField/notarizationField.service';
 import { INotarizationField } from '@modules/notarizationField';
 import { INotarizationService } from '@modules/notarizationService';
 import NotarizationServiceService from '@modules/notarizationService/notarizationService.service';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
+import { validateEmail } from '@utils/validation';
+import Toast from 'react-native-toast-message';
+import { COLORS } from 'src/constants';
+import SessionService from '@modules/session/session.service';
+import { ICreateSessionRequest } from '@modules/session/session.typeDefs';
+import { SelectList } from 'react-native-dropdown-select-list';
+import { IUser } from '@modules/user';
+import UserService from '@modules/user/user.service';
+interface User {
+  email: string;
+}
 
-const data1 = [
-  { label: 'Hello', value: '1' },
-  { label: 'Hello', value: '2' },
-  { label: 'Hello', value: '3' },
-  { label: 'Hello', value: '4' },
-  { label: 'Hello', value: '5' },
-  { label: 'Hello', value: '6' },
-  { label: 'Hello', value: '7' },
-  { label: 'Hello', value: '8' },
-];
-const data2 = [
-  { label: 'Hi', value: '1' },
-  { label: 'Hi', value: '2' },
-  { label: 'Hi', value: '3' },
-  { label: 'Hi', value: '4' },
-  { label: 'Hi', value: '5' },
-  { label: 'Hi', value: '6' },
-  { label: 'Hi', value: '7' },
-  { label: 'Hi', value: '8' },
-];
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
 
 export default function AddSession({ navigation }: { navigation: any }) {
-  const [notaryFieldSelection, setNotaryFieldSelection] = useState<string | null>(null);
-  const [notaryServiceSelection, setNotaryServiceSelection] = useState<string | null>(null);
+  const [notaryFieldSelection, setNotaryFieldSelection] = useState<INotarizationField | null>(null);
+  const [notaryServiceSelection, setNotaryServiceSelection] = useState<INotarizationService | null>(
+    null,
+  );
   const [notaryFieldList, setNotaryFieldList] = useState<INotarizationField[] | null>(null);
   const [notaryServiceList, setNotaryServiceList] = useState<INotarizationService[] | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
@@ -49,12 +56,73 @@ export default function AddSession({ navigation }: { navigation: any }) {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
-  const [user, setUser] = useState<object[] | null>(null);
+  const [users, setUsers] = useState<User[] | null>(null);
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [sessionName, setSessionName] = useState<string>('');
+  const [userList, setUserList] = useState<IUser[]>([]);
 
   const [showStartTimePicker, setShowStartTimePicker] = useState(false);
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+
+  const [selected, setSelected] = useState<IUser[]>([]);
+  const debounceUserEmail = useDebounce(userEmail, 500);
+
+  const handleCreateSession = async () => {
+    if (
+      !notaryFieldSelection ||
+      !notaryServiceSelection ||
+      !startTime ||
+      !startDate ||
+      !endTime ||
+      !endDate ||
+      !amount ||
+      !userList
+    ) {
+      Toast.show({
+        type: 'error',
+        text1: 'Có lỗi xảy ra',
+        text2: 'Vui lòng điền đầy đủ thông tin',
+      });
+      return;
+    }
+    const input: ICreateSessionRequest = {
+      sessionName,
+      notaryField: notaryFieldSelection,
+      notaryService: notaryServiceSelection,
+      startTime: startTime
+        ? startTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        : '',
+      startDate: startDate,
+      endTime: endTime
+        ? endTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+        : '',
+      endDate: endDate,
+      amount: amount,
+      users: selected.map(user => ({ email: user.email })),
+    };
+
+    const response = await SessionService.createSession(input);
+    if (response) {
+      Toast.show({ type: 'success', text1: 'Tạo phiên công chứng thành công' });
+      navigation.goBack();
+      console.log(response);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserList = async () => {
+      if (debounceUserEmail !== '') {
+        const response = await UserService.searchUserByEmail(debounceUserEmail);
+        setUserList(response);
+        console.log(response);
+      } else {
+        setUserList([]);
+      }
+    };
+    fetchUserList();
+  }, [debounceUserEmail]);
 
   useEffect(() => {
     const fetchNotarizationField = async () => {
@@ -63,17 +131,29 @@ export default function AddSession({ navigation }: { navigation: any }) {
     };
     fetchNotarizationField();
   }, []);
+
   useEffect(() => {
     const fetchNotarizationService = async () => {
       if (notaryFieldSelection) {
-        const response =
-          await NotarizationServiceService.getNotarizationServicesByFieldId(notaryFieldSelection);
+        console.log(notaryFieldSelection.id);
+        const response = await NotarizationServiceService.getNotarizationServicesByFieldId(
+          notaryFieldSelection.id,
+        );
         setNotaryServiceList(response);
-        console.log(response);
       }
     };
     fetchNotarizationService();
   }, [notaryFieldSelection]);
+
+  const renderItem = (item: IUser) => {
+    return (
+      <View style={styles.item}>
+        <Text style={styles.selectedTextStyle}>{item.email}</Text>
+        <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView style={{ flex: 1, padding: 20 }}>
@@ -83,17 +163,19 @@ export default function AddSession({ navigation }: { navigation: any }) {
             <TextInput
               style={styles.input}
               placeholder="Vd: Phiên giao dịch hợp đồng mua bán nhà đất..."
+              value={sessionName}
+              onChangeText={setSessionName}
             />
           </View>
           <View>
-            <CustomDropdown
+            <CustomDropdown<INotarizationField>
               data={notaryFieldList || []}
               value={notaryFieldSelection}
               setValue={setNotaryFieldSelection}
               title="Lĩnh vực công chứng"
               placeholder="Chọn lĩnh vực công chứng"
             />
-            <CustomDropdown
+            <CustomDropdown<INotarizationService>
               data={notaryServiceList || []}
               value={notaryServiceSelection}
               setValue={setNotaryServiceSelection}
@@ -103,12 +185,38 @@ export default function AddSession({ navigation }: { navigation: any }) {
           </View>
           <View style={{ marginBottom: 12 }}>
             <Text style={styles.textTitle}>Thêm khách mời</Text>
-            <View style={styles.emailWrapper}>
-              <TextInput style={{ width: '80%' }} placeholder="contact@gmail.com" />
-              <TouchableOpacity style={styles.addEmailButton}>
-                <Text>Thêm</Text>
-              </TouchableOpacity>
-            </View>
+            <MultiSelect
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={userList}
+              labelField="email"
+              valueField="id"
+              placeholder="Chọn người dùng muốn thêm"
+              value={selected.map(item => item.id)}
+              search
+              searchPlaceholder="Tìm kiếm người dùng..."
+              onChange={item => {
+                const selectedUsers = item.map((id: string) =>
+                  userList.find(user => user.id === id),
+                );
+                setSelected(selectedUsers.filter(user => user) as IUser[]);
+              }}
+              onChangeText={setUserEmail}
+              renderItem={renderItem}
+              renderSelectedItem={(item, unSelect) => (
+                <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
+                  <View style={styles.selectedStyle}>
+                    <Text style={styles.textSelectedStyle}>
+                      {item.email.length > 15 ? item.email.slice(0, 15) + '...' : item.email}
+                    </Text>
+                    <AntDesign color="black" name="delete" size={17} />
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
           </View>
           <View style={{ marginBottom: 8 }}>
             <Text style={styles.textTitle}>Thời gian bắt đầu</Text>
@@ -154,6 +262,15 @@ export default function AddSession({ navigation }: { navigation: any }) {
               />
             </View>
           </View>
+          <View>
+            <Text style={styles.textTitle}>Nhập số lượng</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Vd: 1, 10, 100 ..."
+              value={amount?.toString()}
+              onChangeText={text => setAmount(parseInt(text))}
+            />
+          </View>
         </View>
         <View style={{ marginTop: 20, flexDirection: 'row', alignSelf: 'flex-end' }}>
           <TouchableOpacity
@@ -177,7 +294,8 @@ export default function AddSession({ navigation }: { navigation: any }) {
               borderRadius: 8,
               alignItems: 'center',
               marginTop: 20,
-            }}>
+            }}
+            onPress={() => handleCreateSession()}>
             <Text
               style={{
                 color: colors.green[800],
@@ -188,6 +306,7 @@ export default function AddSession({ navigation }: { navigation: any }) {
             </Text>
           </TouchableOpacity>
         </View>
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
@@ -224,7 +343,7 @@ const DateTimeWrapper = ({
         marginRight: margin,
       }}>
       <TextInput
-        style={{ width: '80%' }}
+        style={{ width: '80%', fontFamily: fonts.beVietnamPro.regular }}
         value={
           type == 'date'
             ? DateTimeValue?.toLocaleDateString('en-GB')
@@ -249,16 +368,16 @@ const DateTimeWrapper = ({
   );
 };
 
-const CustomDropdown = ({
+const CustomDropdown = <T extends INotarizationField | INotarizationService>({
   data,
   value,
   setValue,
   title,
   placeholder,
 }: {
-  data: (INotarizationField | INotarizationService)[];
-  value: string | null;
-  setValue: React.Dispatch<React.SetStateAction<string | null>>;
+  data: T[];
+  value: T | null;
+  setValue: React.Dispatch<React.SetStateAction<T | null>>;
   title?: string;
   placeholder?: string;
 }) => {
@@ -277,10 +396,10 @@ const CustomDropdown = ({
         labelField="name"
         valueField="id"
         placeholder={placeholder || 'Chọn...'}
-        searchPlaceholder="Search..."
-        value={value}
+        searchPlaceholder="Tìm kiếm..."
+        value={value?.id}
         onChange={item => {
-          setValue(item.id);
+          setValue(item);
         }}
       />
     </View>
@@ -308,7 +427,7 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: colors.gray[50],
-    padding: 8,
+    padding: 12,
     paddingHorizontal: 12,
     borderRadius: 8,
   },
@@ -373,5 +492,35 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
     elevation: 7,
+  },
+  selectedStyle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 14,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    marginTop: 8,
+    marginRight: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+
+    elevation: 2,
+  },
+  textSelectedStyle: {
+    marginRight: 5,
+    fontSize: 16,
+  },
+  item: {
+    padding: 17,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });

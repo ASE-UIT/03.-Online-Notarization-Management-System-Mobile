@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
 import { ISession } from '@modules/session/session.typeDefs';
+import { COLORS } from 'src/constants';
 
 function SessionCard({ session }: { session: ISession }) {
   const dayLeft = () => {
@@ -39,7 +40,9 @@ function SessionCard({ session }: { session: ISession }) {
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Lĩnh vực: {'  '}</Text>
           <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>
+            <Text
+              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
+              numberOfLines={2}>
               {session.notaryField.name}
             </Text>
           </View>
@@ -47,28 +50,52 @@ function SessionCard({ session }: { session: ISession }) {
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Dịch vụ: {'    '}</Text>
           <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>
+            <Text
+              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
+              numberOfLines={2}>
               {session.notaryService.name}
             </Text>
           </View>
         </View>
       </View>
       <View style={{ flexDirection: 'row' }}>
-        {session.users.map(user => (
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 50,
-              backgroundColor: `#${Math.floor(Math.random() * 16777215).toString(16)}`,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginRight: 4,
-            }}
-            key={user.id}>
-            <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>{user.email.charAt(0)}</Text>
-          </View>
-        ))}
+        {(session.users ?? []).map((user, index) =>
+          index < 7 ? (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                backgroundColor: Object.values(COLORS)[index],
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 4,
+                borderWidth: 1,
+              }}
+              key={index}>
+              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                {user.email.charAt(0)}
+              </Text>
+            </View>
+          ) : index === 7 ? (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                backgroundColor: colors.gray[100],
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 4,
+                borderWidth: 1,
+              }}
+              key={index}>
+              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                +{(session.users?.length ?? 0) - 7}
+              </Text>
+            </View>
+          ) : null,
+        )}
       </View>
       <View>
         <View style={styles.timeWrapper}>

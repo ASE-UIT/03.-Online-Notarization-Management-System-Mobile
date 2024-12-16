@@ -22,6 +22,40 @@ export interface ISession {
   };
 }
 
+export interface ICreateSessionRequest {
+  sessionName: string;
+  notaryField: INotarizationField;
+  notaryService: INotarizationService;
+  startTime: string;
+  startDate: Date;
+  endTime: string;
+  endDate: Date;
+  amount: number;
+  users: {
+    email: string;
+  }[];
+}
+
+export interface ICreateSessionResponse {
+  sessionId: string;
+  notaryField: {
+    name: string;
+  };
+  notaryService: {
+    name: string;
+  };
+  sessionName: string;
+  startTime: Date;
+  startDate: Date;
+  endTime: Date;
+  endDate: Date;
+  users: {
+    email: string;
+    status: string;
+  }[];
+  createdBy: string;
+}
+
 export interface ISessionUser {
   status: string;
   id: string;
