@@ -1,8 +1,8 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AntDesign } from '@expo/vector-icons';
-import { colors } from '@theme';
-import { TabParamList, TabBarStatus } from './Tab.typeDefs';
+import { colors, fonts } from '@theme';
+import { TabParamList } from './Tab.typeDefs';
 import {
   HomeStackNavigator,
   OtherStackNavigator,
@@ -10,7 +10,7 @@ import {
   SearchStackNavigator,
   SessionStackNavigator,
 } from '../stack/Stack';
-import { Image, ImageBackground, TouchableOpacity, View, Text } from 'react-native';
+import { ImageBackground, TouchableOpacity, View, Text } from 'react-native';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
@@ -67,7 +67,14 @@ const TabBarIconWithLabel = ({
         borderTopColor: colors.primary[500],
       }}>
       <AntDesign name={name} size={24} color={focused ? colors.primary[500] : colors.black[700]} />
-      <Text style={{ color: focused ? colors.primary[500] : colors.black[700] }}>{label}</Text>
+      <Text
+        style={{
+          color: focused ? colors.primary[500] : colors.black[700],
+          fontFamily: focused ? fonts.beVietnamPro.semiBold : fonts.beVietnamPro.regular,
+          fontSize: 12,
+        }}>
+        {label}
+      </Text>
     </View>
   );
 };
@@ -77,18 +84,20 @@ export default function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarShowLabel: false, // Hide the tab name
+        tabBarShowLabel: false,
         tabBarBackground: () => (
           <ImageBackground
             source={require('@assets/images/navbar_background.png')}
-            style={{ width: '100%', height: '100%' }}
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+            }}
           />
         ),
         tabBarStyle: {
           height: 70,
           backgroundColor: 'transparent',
-          shadowOpacity: 0, // Removes shadow
-          borderBottomWidth: 0, // Removes bottom border
         },
       })}>
       <Tab.Screen

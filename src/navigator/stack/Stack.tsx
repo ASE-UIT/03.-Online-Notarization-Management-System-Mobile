@@ -9,7 +9,7 @@ import { colors, fonts } from '@theme';
 // views
 import { Home, QRCodeScreen } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
-import Search from '@views/Search';
+import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
 import { Other, Policy, Profile, Wallet } from '@views/Other';
 import { AddSession, Session } from '@views/Session';
@@ -62,7 +62,7 @@ export function AuthStackNavigator() {
   );
 }
 
-export function HomeStackNavigator({ navigation, route }) {
+export function HomeStackNavigator({ navigation, route }: any) {
   const { dispatch, resetDocumentState } = useDocumentSlice();
 
   useLayoutEffect(() => {
@@ -147,7 +147,26 @@ export function HomeStackNavigator({ navigation, route }) {
   );
 }
 
-export function SearchStackNavigator() {
+export function SearchStackNavigator({ navigation, route }: any) {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'SearchStack';
+
+    const hiddenScreens = ['DetailDocument'];
+    if (hiddenScreens.includes(routeName)) {
+      navigation.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          backgroundColor: colors.white[50],
+          borderTopColor: colors.gray[100],
+          borderTopWidth: 1,
+          height: 80,
+        },
+      });
+    }
+  }, [navigation, route]);
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -155,6 +174,15 @@ export function SearchStackNavigator() {
         name="SearchStack"
         options={{
           headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={DetailDocument}
+        name="DetailDocument"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Chi tiết hồ sơ công chứng',
+          headerLeft: () => renderHeaderLeft(false),
         }}
       />
     </Stack.Navigator>

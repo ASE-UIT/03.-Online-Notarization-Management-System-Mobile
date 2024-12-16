@@ -27,7 +27,20 @@ const DOCUMENT_TYPE_LABELS = {
   default: 'Tài liệu không xác định',
 };
 
+export const DOCUMENT_STATUS_LABELS = {
+  pending: 'Đang chờ xử lý',
+  processing: 'Đang xử lý',
+  digitalSignature: 'Sẵn sàng ký số',
+  completed: 'Hoàn tất',
+  rejected: 'Không hợp lệ',
+};
+
 export type DocumentTypeCode = keyof typeof DOCUMENT_TYPE_LABELS;
+
+export type DocumentStatusCode = keyof typeof DOCUMENT_STATUS_LABELS;
 
 export const getDocumentNameByCode = (code: DocumentTypeCode): string =>
   DOCUMENT_TYPE_LABELS[code] || DOCUMENT_TYPE_LABELS.default;
+
+export const getDocumentStatusByCode = (code: DocumentStatusCode): string =>
+  DOCUMENT_STATUS_LABELS[code] || DOCUMENT_STATUS_LABELS.pending;
