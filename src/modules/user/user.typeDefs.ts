@@ -32,7 +32,7 @@ export interface IUser {
   role: string;
   citizenId: string;
   phoneNumber: string;
-  address: string;
+  address: IAddress;
 }
 
 export interface IToken {
@@ -51,4 +51,11 @@ export interface IUserState {
 export interface IRefreshTokenResponse {
   access: IToken;
   refresh: IToken;
+}
+
+export interface IAddress {
+  province: string;
+  district: string;
+  town: string;
+  street: string;
 }

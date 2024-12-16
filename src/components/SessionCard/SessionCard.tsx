@@ -3,14 +3,24 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
+import { ISession } from '@modules/session/session.typeDefs';
+import { COLORS } from 'src/constants';
 
-function SessionCard({ session }: { session: object }) {
+function SessionCard({ session }: { session: ISession }) {
+  const dayLeft = () => {
+    const endDate = new Date(session.endDate);
+    const currentDate = new Date();
+    const timeDiff = endDate.getTime() - currentDate.getTime();
+    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    return daysLeft > 0 ? `Còn ${daysLeft} ngày` : 'Đã kết thúc';
+  };
   return (
     <View style={styles.cardWrapper}>
       <View style={styles.cardTop}>
         <View>
           <Text style={{ fontFamily: fonts.beVietnamPro.bold, fontSize: 18 }}>
-            Tên phiên công chứng
+            {session.sessionName}
           </Text>
           <Text
             style={{
@@ -18,7 +28,7 @@ function SessionCard({ session }: { session: object }) {
               fontSize: 14,
               color: colors.gray[300],
             }}>
-            tạo bởi Trần Tuệ Tánh
+            tạo bởi {session.creator.name}
           </Text>
         </View>
         <TouchableOpacity>
@@ -30,21 +40,62 @@ function SessionCard({ session }: { session: object }) {
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Lĩnh vực: {'  '}</Text>
           <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Vay mượn tài sản</Text>
+            <Text
+              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
+              numberOfLines={2}>
+              {session.notaryField.name}
+            </Text>
           </View>
         </View>
         <View style={styles.textWrapper}>
           <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Dịch vụ: {'    '}</Text>
           <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Vay mượn tài sản</Text>
+            <Text
+              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
+              numberOfLines={2}>
+              {session.notaryService.name}
+            </Text>
           </View>
         </View>
       </View>
-      <View>
-        <Image
-          source={require('@assets/images/imageEx.png')}
-          style={{ width: 40, height: 40, borderRadius: 50 }}
-        />
+      <View style={{ flexDirection: 'row' }}>
+        {(session.users ?? []).map((user, index) =>
+          index < 7 ? (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                backgroundColor: Object.values(COLORS)[index],
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 4,
+                borderWidth: 1,
+              }}
+              key={index}>
+              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                {user.email.charAt(0)}
+              </Text>
+            </View>
+          ) : index === 7 ? (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 50,
+                backgroundColor: colors.gray[100],
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 4,
+                borderWidth: 1,
+              }}
+              key={index}>
+              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                +{(session.users?.length ?? 0) - 7}
+              </Text>
+            </View>
+          ) : null,
+        )}
       </View>
       <View>
         <View style={styles.timeWrapper}>
@@ -55,7 +106,7 @@ function SessionCard({ session }: { session: object }) {
               marginLeft: 8,
               fontFamily: fonts.beVietnamPro.semiBold,
             }}>
-            Còn 2 ngày
+            {dayLeft()}
           </Text>
         </View>
       </View>

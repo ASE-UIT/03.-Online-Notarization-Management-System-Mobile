@@ -1,20 +1,22 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import React from 'react';
 import { colors, fonts } from '@theme';
 import Feather from '@expo/vector-icons/Feather';
+import { INFTItem } from '@modules/userWallet';
 
-export default function UserWalletCard() {
+export default function UserWalletCard({ item }: { item: INFTItem }) {
   return (
     <View style={styles.cardWrapper}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <View style={{ flexDirection: 'row' }}>
           <Image
-            source={require('@assets/images/imageEx.png')}
+            source={require('@assets/images/pdf-icon.png')}
             style={{ width: 80, height: 80, borderRadius: 10, marginRight: 16 }}
           />
           <View>
-            <Text style={styles.cardTitleText}>Tên tài liệu</Text>
-            <Text style={styles.cardTitleText}>Document Name</Text>
+            <Text style={styles.cardTitleText} numberOfLines={2} ellipsizeMode="tail">
+              {item.filename}
+            </Text>
           </View>
         </View>
         <View
@@ -30,7 +32,7 @@ export default function UserWalletCard() {
                 fontSize: 14,
                 fontFamily: fonts.beVietnamPro.regular,
               }}>
-              10
+              {item.amount}
             </Text>
           </View>
         </View>
@@ -45,14 +47,24 @@ export default function UserWalletCard() {
         <View>
           <View style={styles.dateTimeWrapper}>
             <Text style={styles.dateTimeText}>Ngày nhận: {'    '}</Text>
-            <Text style={styles.dateTimeText}>20/10/2023</Text>
+            <Text style={styles.dateTimeText}>
+              {new Date(item.mintedAt).toLocaleDateString('en-GB')}
+            </Text>
           </View>
           <View style={styles.dateTimeWrapper}>
             <Text style={styles.dateTimeText}>Ngày hết hạn:</Text>
-            <Text style={styles.dateTimeText}>20/10/2023</Text>
+            <Text style={styles.dateTimeText}>
+              {new Date(
+                new Date(item.mintedAt).setMonth(new Date(item.mintedAt).getMonth() + 6),
+              ).toLocaleDateString('en-GB')}
+            </Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.detailButton}>
+        <TouchableOpacity
+          style={styles.detailButton}
+          onPress={() => {
+            Linking.openURL(item.tokenURI);
+          }}>
           <Text
             style={{
               color: colors.white[50],
@@ -88,6 +100,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.beVietnamPro.bold,
     marginBottom: 5,
+    width: 200,
   },
   amountWrapper: {
     backgroundColor: colors.black,

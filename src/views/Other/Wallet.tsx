@@ -8,12 +8,12 @@ import UserWalletService from '@modules/userWallet/userWallet.service';
 import { IUserWallet } from '@modules/userWallet';
 
 export default function Wallet() {
-  const [userWalletItems, setUserWalletItems] = useState<IUserWallet[]>([]);
+  const [userWallet, setUserWallet] = useState<IUserWallet>();
   useEffect(() => {
     const fetchUserWallet = async () => {
       try {
         const response = await UserWalletService.getUserWallet();
-        setUserWalletItems(response);
+        setUserWallet(response);
         console.log('response', response);
       } catch (err) {
         console.log(err);
@@ -24,12 +24,7 @@ export default function Wallet() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <UserWalletCard />
-        <UserWalletCard />
-        <UserWalletCard />
-        <UserWalletCard />
-        <UserWalletCard />
-        <UserWalletCard />
+        {userWallet?.nftItems.map((item, index) => <UserWalletCard key={index} item={item} />)}
         <View style={{ marginBottom: 32 }} />
       </ScrollView>
     </View>
