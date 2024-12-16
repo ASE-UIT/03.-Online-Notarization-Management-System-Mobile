@@ -44,7 +44,7 @@ async function logout(refreshToken: string): Promise<void> {
 async function refreshAccessToken(refreshToken: string): Promise<IRefreshTokenResponse> {
   try {
     const response = await axios.post<IRefreshTokenResponse>(
-      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/auth/refresh-token',
+      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/auth/refresh-tokens',
       {
         refreshToken,
       },

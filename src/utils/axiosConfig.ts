@@ -17,7 +17,6 @@ axiosConfig.interceptors.request.use(
     const accessTokenString = await AsyncStorage.getItem('accessToken');
     const accessToken = accessTokenString ? JSON.parse(accessTokenString) : null;
 
-    console.log('accessToken', accessToken?.token);
     if (accessToken?.token) {
       config.headers.Authorization = `Bearer ${accessToken.token}`;
     }
@@ -33,30 +32,36 @@ axiosConfig.interceptors.response.use(
     return response;
   },
   async error => {
-    if (error.response?.status === 401) {
-      const refreshTokenString = await AsyncStorage.getItem('refreshToken');
-      const refreshToken = refreshTokenString ? JSON.parse(refreshTokenString) : null;
+    // if (error.response?.status === 401) {
+    //   console.log('error', error.response?.status);
+    //   const refreshTokenString = await AsyncStorage.getItem('refreshToken');
+    //   const refreshToken = refreshTokenString ? JSON.parse(refreshTokenString) : null;
 
-      UserService.logout(refreshToken?.token as string).then(() => {
-        window.location.href = '/signin';
-      });
-    }
+    //   const response = await UserService.refreshAccessToken(refreshToken as string);
+    //   const newAccessToken = response.access;
+    //   AsyncStorage.setItem('accessToken', JSON.stringify(newAccessToken));
 
-    if (error.response?.status !== 410) {
-      console.log('status:', error.response?.status);
-      Toast.show({
-        type: 'error',
-        text1: 'Có lỗi xảy ra',
-        text2: error.response?.data?.message || 'Vui lòng thử lại sau',
-      });
-      console.log('error', error.response?.data?.message);
-    }
+    //   const newRefreshToken = response.refresh;
+    //   AsyncStorage.setItem('refreshToken', JSON.stringify(newRefreshToken));
+
+    //   axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken.token}`;
+    //   return axiosConfig(error.config);
+    // }
+
+    // if (error.response?.status !== 410) {
+    //   console.log('status:', error.response?.status);
+    //   Toast.show({
+    //     type: 'error',
+    //     text1: 'Có lỗi xảy ra',
+    //     text2: error.response?.data?.message || 'Vui lòng thử lại sau',
+    //   });
+    //   console.log('error', error.response?.data?.message);
+    // }
     const originalRequest = error.config;
     if (error.response && error.response.status === 401 && originalRequest) {
       if (!refreshTokenPromise) {
         const refreshTokenString = await AsyncStorage.getItem('refreshToken');
         const refreshToken = refreshTokenString ? JSON.parse(refreshTokenString) : null;
-
         interface AxiosErrorWithConfig extends Error {
           config?: any;
           response?: {
@@ -69,18 +74,21 @@ axiosConfig.interceptors.response.use(
 
         refreshTokenPromise = UserService.refreshAccessToken(refreshToken.token as string)
           .then((response: IRefreshTokenResponse) => {
-            const newAccessToken = response.access;
-            AsyncStorage.setItem('accessToken', JSON.stringify(newAccessToken));
-            axiosConfig.defaults.headers.Authorization = `Bearer ${newAccessToken.token}`;
+            console.log('response', response);
+            AsyncStorage.setItem('accessToken', JSON.stringify(response.access));
+            AsyncStorage.setItem('refreshToken', JSON.stringify(response.refresh));
+            axiosConfig.defaults.headers.Authorization = `Bearer ${response.access.token}`;
             return axiosConfig(originalRequest);
           })
           .catch(async (error: AxiosErrorWithConfig) => {
-            await UserService.logout(refreshToken as string).then(() => {
-              window.location.href = '/signin';
-            });
-            return Promise.reject(error);
+            console.log('error', error);
+            // await UserService.logout(refreshToken as string).then(() => {
+            //   window.location.href = '/signin';
+            // });
+            // return Promise.reject(error);
           })
           .finally(() => {
+            console.log('finally');
             refreshTokenPromise = null;
           });
       }
