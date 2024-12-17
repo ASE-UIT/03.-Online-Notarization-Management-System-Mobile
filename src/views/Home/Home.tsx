@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  container: {},
+  container: {
+    paddingBottom: '20%',
+  },
 });
 
 export default Home;

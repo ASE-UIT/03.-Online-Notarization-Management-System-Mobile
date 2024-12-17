@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Dropdown } from 'react-native-element-dropdown';
 import { colors, fonts } from '@theme';
@@ -83,10 +83,10 @@ const ServiceAndField = ({ navigation }: StackProps) => {
   }, [selectedField]);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.main}>
         <CreateProgressBar currentPage={step} setCurrentPage={setStep} />
-        <ScrollView style={styles.contentContainer}>
+        <ScrollView contentContainerStyle={styles.contentContainer}>
           <Text style={styles.header}>Chọn lĩnh vực công chứng và dịch vụ công chứng</Text>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>Lĩnh Vực Công Chứng</Text>
@@ -126,7 +126,7 @@ const ServiceAndField = ({ navigation }: StackProps) => {
         </ScrollView>
       </View>
       <ForwardStepBar step={1} totalStep={3} onNext={handleNextStep} />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -134,15 +134,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white[100],
+    paddingTop: '23%',
   },
   main: {
+    flex: 1,
     paddingTop: '3%',
     paddingHorizontal: '3%',
-    flex: 1,
     alignContent: 'center',
+    backgroundColor: colors.gray[50],
   },
   contentContainer: {
-    flex: 1,
+    flexGrow: 1,
     paddingVertical: '2%',
   },
   header: {

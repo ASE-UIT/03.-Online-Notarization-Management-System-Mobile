@@ -111,6 +111,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           headerLeft: () => renderHeaderLeft(false),
         }}
       />
@@ -120,6 +122,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           animation: 'none',
           headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
@@ -130,6 +134,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           animation: 'none',
           headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
@@ -312,5 +318,10 @@ export function QRScanStackNavigator({ navigation, route }) {
 const styles = StyleSheet.create({
   headerBackground: {
     backgroundColor: colors.white[100],
+    elevation: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: fonts.beVietnamPro.bold,
   },
 });

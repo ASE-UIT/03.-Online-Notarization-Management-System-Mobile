@@ -252,13 +252,15 @@ const ProvideInformation = ({ navigation }: StackProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: '23%',
     backgroundColor: colors.white[100],
   },
   main: {
-    marginTop: '3%',
-    paddingHorizontal: '3%',
     flex: 1,
+    paddingTop: '3%',
+    paddingHorizontal: '3%',
     alignContent: 'center',
+    backgroundColor: colors.gray[50],
   },
   contentContainer: {
     flex: 1,

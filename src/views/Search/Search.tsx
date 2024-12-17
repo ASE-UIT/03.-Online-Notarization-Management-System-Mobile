@@ -156,6 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white[50],
     paddingHorizontal: '4%',
     paddingTop: '8%',
+    paddingBottom: '18%',
   },
   title: {
     fontSize: 24,
