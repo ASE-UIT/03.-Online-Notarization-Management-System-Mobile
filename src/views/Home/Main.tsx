@@ -1,20 +1,12 @@
 import React, { useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSharedValue } from 'react-native-reanimated';
 import { colors, fonts } from '@theme';
 import CarouselComponent from '@components/CarouselComponent';
 import { StackProps } from '@navigator';
-import { FontAwesome, Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const services = [
   {
@@ -80,7 +72,6 @@ export default function Main({ navigation }: StackProps) {
 
   const handleViewMore = () => {
     navigation.navigate('Service');
-    console.log('Xem thêm các dịch vụ khác');
   };
 
   const renderServices = (services: { id: string; name: string; description: string }[]) => {
@@ -124,6 +115,26 @@ export default function Main({ navigation }: StackProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.redSectionContainer}>
+        <Text style={styles.redSectionText}>Tạo hồ sơ công chứng của bạn</Text>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity style={styles.createDocumentButton} onPress={handleCreateDocument}>
+            <Text style={styles.createButtonText}>Tạo hồ sơ</Text>
+            <MaterialIcons name="create-new-folder" size={22} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.redSectionContainer}>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity style={styles.createDocumentButton} onPress={handleCreateDocument}>
+            <Text style={styles.createButtonText}>Gửi tài liệu</Text>
+            <Ionicons name="send" size={18} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.redSectionText, { flex: 1.3, marginLeft: '5%' }]}>
+          Gửi tại liệu công chứng cho người khác
+        </Text>
+      </View>
       <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
       <SafeAreaView>{renderServices(services)}</SafeAreaView>
 
@@ -178,5 +189,33 @@ const styles = StyleSheet.create({
     fontFamily: fonts.beVietnamPro.semiBold,
     color: colors.black,
     textAlign: 'center',
+  },
+  redSectionContainer: {
+    backgroundColor: colors.primary[500],
+    flexDirection: 'row',
+    padding: '6%',
+    borderRadius: 10,
+    marginVertical: '2%',
+  },
+  redSectionText: {
+    color: colors.white[50],
+    flex: 1.5,
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
+  },
+  createDocumentButton: {
+    backgroundColor: colors.white[50],
+    padding: '5%',
+    paddingVertical: '8%',
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: colors.primary[500],
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
+    marginRight: '3%',
   },
 });

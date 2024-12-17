@@ -29,7 +29,7 @@ export type StackParamList = {
 
   DetailDocument: { documentId: string };
 
-  ServiceScreen: undefined;
+  Service: undefined;
   ServiceDetail: { serviceId: string };
 };
 

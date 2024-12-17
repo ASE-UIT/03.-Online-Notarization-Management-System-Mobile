@@ -1,5 +1,7 @@
 export type IGetNotarizationServicesByFieldIdResponse = INotarizationService[];
 
+export type IGetAllNotarrizationServicesResponse = INotarizationService[];
+
 export type IGetNotarizationServicesByFieldIdRequest = string;
 
 export interface INotarizationService {
