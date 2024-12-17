@@ -11,6 +11,7 @@ import { InputFieldProps } from 'src/types';
 import Toast from 'react-native-toast-message';
 import UserService from '@modules/user/user.service';
 import { validateEmail, validatePassword } from '@utils/validation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignIn = ({ navigation }: StackProps) => {
   const { dispatch, setLoggedIn, setUser } = useUserSlice();
@@ -18,6 +19,7 @@ const SignIn = ({ navigation }: StackProps) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isRemember, setIsRemember] = useState(false);
+
   const handleLogin = async () => {
     if (!validateEmail(email) || !validatePassword(password)) {
       Toast.show({
@@ -31,7 +33,12 @@ const SignIn = ({ navigation }: StackProps) => {
     const user = loginResponse.user;
     dispatch(setUser(user));
     dispatch(setLoggedIn(true));
-    navigation.navigate('HomeStack');
+    navigation.navigate('TabNavigator');
+    if (isRemember) {
+      AsyncStorage.setItem('remember', 'true');
+    } else {
+      AsyncStorage.setItem('remember', 'false');
+    }
   };
 
   const moveToSignUp = () => {
