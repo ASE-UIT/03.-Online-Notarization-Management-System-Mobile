@@ -4,17 +4,24 @@ import Header from './Header'; // Import Header component
 import Main from './Main'; // Import Main component
 import { useUserSlice } from '@modules/user';
 import { StackProps } from '@navigator';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation, route }: StackProps) => {
-  const { user } = useUserSlice();
-  const [username, setUsername] = useState(user?.name || '');
+  const [username, setUsername] = useState('');
+  const { user, setUser } = useUserSlice();
   console.log('user at Home', user);
   const handleNavigateToQRCode = () => {
     navigation.navigate('QRCodeStack');
   };
   useEffect(() => {
-    setUsername(user?.name || '');
-  }, [username]);
+    const fetchUser = async () => {
+      const userString = await AsyncStorage.getItem('user');
+      const user = userString ? JSON.parse(userString) : null;
+      setUser(user);
+      setUsername(user?.name || '');
+    };
+    fetchUser();
+  }, []);
   const stackProps = { navigation, route };
   return (
     <SafeAreaView style={styles.container}>

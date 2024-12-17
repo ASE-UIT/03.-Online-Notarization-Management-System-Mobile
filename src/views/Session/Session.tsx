@@ -34,7 +34,7 @@ export default function Session({ navigation, route }: { navigation: any; route:
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View>
         <Text style={{ fontSize: 24, fontFamily: fonts.beVietnamPro.bold, marginBottom: 8 }}>
           Phiên công chứng
@@ -79,9 +79,10 @@ export default function Session({ navigation, route }: { navigation: any; route:
               <SessionCard session={session} />
             </TouchableOpacity>
           ))}
+          <View style={{ height: 100 }} />
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

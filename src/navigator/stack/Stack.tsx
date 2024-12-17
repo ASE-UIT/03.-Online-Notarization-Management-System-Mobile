@@ -82,10 +82,10 @@ export function HomeStackNavigator({ navigation, route }: any) {
     } else {
       navigation.setOptions({
         tabBarStyle: {
-          backgroundColor: colors.white[50],
-          borderTopColor: colors.gray[100],
-          borderTopWidth: 1,
-          height: 80,
+          height: 85,
+          backgroundColor: 'transparent',
+          elevation: 0,
+          position: 'absolute',
         },
       });
     }
@@ -160,10 +160,10 @@ export function SearchStackNavigator({ navigation, route }: any) {
     } else {
       navigation.setOptions({
         tabBarStyle: {
-          backgroundColor: colors.white[50],
-          borderTopColor: colors.gray[100],
-          borderTopWidth: 1,
-          height: 80,
+          height: 85,
+          backgroundColor: 'transparent',
+          elevation: 0,
+          position: 'absolute',
         },
       });
     }
