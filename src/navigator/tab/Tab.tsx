@@ -96,8 +96,10 @@ export default function TabNavigator() {
           />
         ),
         tabBarStyle: {
-          height: 70,
+          height: 85,
           backgroundColor: 'transparent',
+          elevation: 0,
+          position: 'absolute',
         },
       })}>
       <Tab.Screen

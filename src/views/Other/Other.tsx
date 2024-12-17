@@ -80,7 +80,7 @@ export default function Other({ navigation }: { navigation: any }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#fff',
     paddingBottom: 10, // Thêm khoảng cách ở dưới cùng
   },
   headerWrapper: {
