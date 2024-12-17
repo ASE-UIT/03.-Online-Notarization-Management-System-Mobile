@@ -9,7 +9,7 @@ export default function QRCodeScreen() {
   return (
     <View style={styles.container}>
       <QRCode
-        value={user?.id}
+        value={user?.email}
         size={200}
         logo={require('@assets/images/logo-sm.png')}
         logoSize={20}

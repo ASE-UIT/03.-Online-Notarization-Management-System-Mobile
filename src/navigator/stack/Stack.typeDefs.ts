@@ -1,3 +1,4 @@
+import { ISession } from '@modules/session/session.typeDefs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type StackParamList = {
@@ -8,6 +9,7 @@ export type StackParamList = {
   WalletStack: undefined;
   QRCodeStack: undefined;
   TabNavigator: undefined;
+  SessionDetailStack: { session: ISession };
   // add more screen props...
 
   SignInStack: undefined;

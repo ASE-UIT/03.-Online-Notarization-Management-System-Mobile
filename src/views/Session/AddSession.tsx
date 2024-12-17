@@ -9,21 +9,22 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
-import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
+import { Dropdown } from 'react-native-element-dropdown';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import NotarizationFieldService from '@modules/notarizationField/notarizationField.service';
 import { INotarizationField } from '@modules/notarizationField';
 import { INotarizationService } from '@modules/notarizationService';
 import NotarizationServiceService from '@modules/notarizationService/notarizationService.service';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
-import { validateEmail } from '@utils/validation';
 import Toast from 'react-native-toast-message';
-import { COLORS } from 'src/constants';
 import SessionService from '@modules/session/session.service';
 import { ICreateSessionRequest } from '@modules/session/session.typeDefs';
-import { SelectList } from 'react-native-dropdown-select-list';
 import { IUser } from '@modules/user';
 import UserService from '@modules/user/user.service';
+import { MultipleSelectList, SelectList } from 'react-native-dropdown-select-list';
+import { COLORS } from 'src/constants';
+import { CustomDropdown } from '@components/CustomDropdown';
+import { DateTimeWrapper } from '@components/DateTimeWrapper';
 interface User {
   email: string;
 }
@@ -56,7 +57,6 @@ export default function AddSession({ navigation }: { navigation: any }) {
   const [endTime, setEndTime] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [amount, setAmount] = useState<number | null>(null);
-  const [users, setUsers] = useState<User[] | null>(null);
   const [userEmail, setUserEmail] = useState<string>('');
   const [sessionName, setSessionName] = useState<string>('');
   const [userList, setUserList] = useState<IUser[]>([]);
@@ -66,7 +66,7 @@ export default function AddSession({ navigation }: { navigation: any }) {
   const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
 
-  const [selected, setSelected] = useState<IUser[]>([]);
+  const [selected, setSelected] = useState<User[]>([]);
   const debounceUserEmail = useDebounce(userEmail, 500);
 
   const handleCreateSession = async () => {
@@ -100,13 +100,13 @@ export default function AddSession({ navigation }: { navigation: any }) {
         : '',
       endDate: endDate,
       amount: amount,
-      users: selected.map(user => ({ email: user.email })),
+      users: selected,
     };
 
     const response = await SessionService.createSession(input);
     if (response) {
       Toast.show({ type: 'success', text1: 'Tạo phiên công chứng thành công' });
-      navigation.goBack();
+      navigation.navigate('SessionStack');
       console.log(response);
     }
   };
@@ -145,15 +145,6 @@ export default function AddSession({ navigation }: { navigation: any }) {
     fetchNotarizationService();
   }, [notaryFieldSelection]);
 
-  const renderItem = (item: IUser) => {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.selectedTextStyle}>{item.email}</Text>
-        <AntDesign style={styles.icon} color="black" name="Safety" size={20} />
-      </View>
-    );
-  };
-
   return (
     <View style={styles.container}>
       <ScrollView style={{ flex: 1, padding: 20 }}>
@@ -185,38 +176,121 @@ export default function AddSession({ navigation }: { navigation: any }) {
           </View>
           <View style={{ marginBottom: 12 }}>
             <Text style={styles.textTitle}>Thêm khách mời</Text>
-            <MultiSelect
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={userList}
-              labelField="email"
-              valueField="id"
-              placeholder="Chọn người dùng muốn thêm"
-              value={selected.map(item => item.id)}
-              search
-              searchPlaceholder="Tìm kiếm người dùng..."
-              onChange={item => {
-                const selectedUsers = item.map((id: string) =>
-                  userList.find(user => user.id === id),
-                );
-                setSelected(selectedUsers.filter(user => user) as IUser[]);
-              }}
-              onChangeText={setUserEmail}
-              renderItem={renderItem}
-              renderSelectedItem={(item, unSelect) => (
-                <TouchableOpacity onPress={() => unSelect && unSelect(item)}>
-                  <View style={styles.selectedStyle}>
-                    <Text style={styles.textSelectedStyle}>
-                      {item.email.length > 15 ? item.email.slice(0, 15) + '...' : item.email}
-                    </Text>
-                    <AntDesign color="black" name="delete" size={17} />
+            <View style={styles.emailWrapper}>
+              <TextInput
+                style={{ width: '80%', fontFamily: fonts.beVietnamPro.regular }}
+                placeholder="Nhập email"
+                value={userEmail}
+                onChangeText={setUserEmail}
+              />
+              <TouchableOpacity
+                style={styles.addEmailButton}
+                onPress={() => {
+                  setSelected([...selected, { email: userEmail }]);
+                  setUserEmail('');
+                }}>
+                <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>Thêm</Text>
+              </TouchableOpacity>
+            </View>
+            {userList.length > 0 && (
+              <ScrollView
+                style={{
+                  maxHeight: 100,
+                  marginTop: 8,
+                  backgroundColor: colors.gray[50],
+                  borderRadius: 8,
+                }}
+                nestedScrollEnabled={true}>
+                {userList.map(user => {
+                  if (!selected.some(selectedUser => selectedUser.email === user.email)) {
+                    return (
+                      <TouchableOpacity
+                        style={{ padding: 8 }}
+                        key={user.email}
+                        onPress={() => {
+                          setUserEmail(user.email);
+                        }}>
+                        <Text style={{ fontFamily: fonts.beVietnamPro.semiBold, fontSize: 18 }}>
+                          {user.email}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  } else {
+                    return (
+                      <TouchableOpacity
+                        key={user.email}
+                        style={{ backgroundColor: 'red', padding: 8 }}
+                        onPress={() => {
+                          setSelected(
+                            selected.filter(selectedUser => selectedUser.email !== user.email),
+                          );
+                        }}>
+                        <Text style={{ fontFamily: fonts.beVietnamPro.semiBold, fontSize: 18 }}>
+                          {user.email}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  }
+                })}
+              </ScrollView>
+            )}
+            <View style={{ flexDirection: 'row', marginTop: 8 }}>
+              {(selected ?? []).map((user, index) =>
+                index < 6 ? (
+                  <View>
+                    <View
+                      style={{
+                        width: 60,
+                        height: 60,
+                        borderRadius: 50,
+                        backgroundColor: Object.values(COLORS)[index],
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        marginRight: 4,
+                        borderWidth: 1,
+                      }}
+                      key={index}>
+                      <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                        {user.email.charAt(0)}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={{
+                        position: 'absolute',
+                        right: 0,
+                        top: 0,
+                        zIndex: 999,
+                        backgroundColor: 'white',
+                        borderRadius: 50,
+                      }}
+                      onPress={() => {
+                        setSelected(
+                          selected.filter(selectedUser => selectedUser.email !== user.email),
+                        );
+                      }}>
+                      <AntDesign name="closecircle" size={24} color="black" />
+                    </TouchableOpacity>
                   </View>
-                </TouchableOpacity>
+                ) : index === 6 ? (
+                  <View
+                    style={{
+                      width: 60,
+                      height: 60,
+                      borderRadius: 50,
+                      backgroundColor: colors.gray[100],
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      marginRight: 4,
+                      borderWidth: 1,
+                    }}
+                    key={index}>
+                    <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
+                      +{(selected?.length ?? 0) - 6}
+                    </Text>
+                  </View>
+                ) : null,
               )}
-            />
+            </View>
           </View>
           <View style={{ marginBottom: 8 }}>
             <Text style={styles.textTitle}>Thời gian bắt đầu</Text>
@@ -312,100 +386,6 @@ export default function AddSession({ navigation }: { navigation: any }) {
   );
 }
 
-const DateTimeWrapper = ({
-  icon,
-  margin,
-  showDateTimePicker = false,
-  onPress,
-  setDateTimeValue,
-  DateTimeValue,
-  type,
-}: {
-  icon: keyof typeof AntDesign.glyphMap;
-  margin?: number;
-  showDateTimePicker?: boolean;
-  onPress?: React.Dispatch<React.SetStateAction<boolean>>;
-  setDateTimeValue?: React.Dispatch<React.SetStateAction<Date | null>>;
-  DateTimeValue: Date | null;
-  type?: 'date' | 'time';
-}) => {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-        justifyContent: 'space-between',
-        backgroundColor: colors.gray[50],
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        marginRight: margin,
-      }}>
-      <TextInput
-        style={{ width: '80%', fontFamily: fonts.beVietnamPro.regular }}
-        value={
-          type == 'date'
-            ? DateTimeValue?.toLocaleDateString('en-GB')
-            : DateTimeValue?.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
-        }
-      />
-      <TouchableOpacity onPress={() => onPress?.(true)}>
-        <AntDesign name={icon} size={24} color="black" />
-      </TouchableOpacity>
-      {showDateTimePicker && (
-        <RNDateTimePicker
-          mode={type}
-          value={new Date()}
-          onChange={(event, date) => {
-            const currentDate = date || DateTimeValue;
-            onPress?.(false);
-            setDateTimeValue?.(currentDate);
-          }}
-        />
-      )}
-    </View>
-  );
-};
-
-const CustomDropdown = <T extends INotarizationField | INotarizationService>({
-  data,
-  value,
-  setValue,
-  title,
-  placeholder,
-}: {
-  data: T[];
-  value: T | null;
-  setValue: React.Dispatch<React.SetStateAction<T | null>>;
-  title?: string;
-  placeholder?: string;
-}) => {
-  return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={styles.textTitle}>{title}</Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={data}
-        search
-        maxHeight={300}
-        labelField="name"
-        valueField="id"
-        placeholder={placeholder || 'Chọn...'}
-        searchPlaceholder="Tìm kiếm..."
-        value={value?.id}
-        onChange={item => {
-          setValue(item);
-        }}
-      />
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -436,12 +416,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.beVietnamPro.bold,
     marginBottom: 5,
   },
-  dropdown: {
-    height: 50,
-    backgroundColor: colors.gray[50],
-    borderRadius: 8,
-    paddingHorizontal: 12,
-  },
   icon: {
     marginRight: 5,
   },
@@ -454,22 +428,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 14,
   },
-  placeholderStyle: {
-    fontSize: 14,
-    color: colors.gray[200],
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-    fontFamily: fonts.beVietnamPro.bold,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
   emailWrapper: {
     flexDirection: 'row',
     flex: 1,
@@ -477,7 +435,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 12,
+    padding: 8,
+    paddingRight: 24,
   },
   addEmailButton: {
     backgroundColor: '#fff',
