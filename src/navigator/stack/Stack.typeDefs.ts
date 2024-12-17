@@ -1,4 +1,3 @@
-import { ProvideInformation } from '@views/Notarization';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type StackParamList = {
@@ -24,6 +23,8 @@ export type StackParamList = {
   CreateServiceAndField: undefined;
   ProvideInformation: undefined;
   ConfirmInformation: undefined;
+
+  DetailDocument: { documentId: string };
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;

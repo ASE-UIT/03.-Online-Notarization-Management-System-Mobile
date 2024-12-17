@@ -48,9 +48,9 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
       notarizationField: notarizationField as INotarizationField,
       requesterInfo,
       files: extractedFiles.map(file => ({
-        name: file.name,
-        uri: file.uri,
-        type: file.mimeType,
+        name: (file as any).name,
+        uri: (file as any).uri,
+        type: (file as any).mimeType,
       })),
       amount,
     };

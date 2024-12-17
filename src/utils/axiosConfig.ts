@@ -16,7 +16,6 @@ axiosConfig.interceptors.request.use(
   async config => {
     const accessTokenString = await AsyncStorage.getItem('accessToken');
     const accessToken = accessTokenString ? JSON.parse(accessTokenString) : null;
-
     if (accessToken?.token) {
       config.headers.Authorization = `Bearer ${accessToken.token}`;
     }

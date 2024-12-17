@@ -76,3 +76,40 @@ export interface IUploadDocumentResponse {
   output: any[];
   id: string;
 }
+
+export interface IDocumentHistoryStatus {
+  _id: string;
+  files: {
+    _id: string;
+    filename: string;
+    firebaseUrl: string;
+  }[];
+  notarizationService: INotarizationService;
+  notarizationField: INotarizationField;
+  requesterInfo: {
+    fullName: string;
+    citizenId: string;
+    phoneNumber: string;
+    email: string;
+  };
+  userId: string;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+  status: {
+    _id: string;
+    documentId: string;
+    status: string;
+    updatedAt: Date;
+    feedback?: string;
+  };
+  output: {
+    _id: string;
+    filename: string;
+    firebaseUrl: string;
+    transactionHash: string;
+    uploadedAt: Date;
+  }[];
+}
+
+export type IDocumentHistoryStatusResponse = IDocumentHistoryStatus[];
