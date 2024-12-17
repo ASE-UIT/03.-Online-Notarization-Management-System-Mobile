@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white[50],
     paddingHorizontal: '4%',
     paddingTop: '8%',
-    paddingBottom: '18%',
+    paddingBottom: '20%',
   },
   title: {
     fontSize: 24,
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF',
+    backgroundColor: colors.white[50],
     height: 45,
     paddingHorizontal: '2%',
     borderRadius: 5,
@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: '3%',
     marginBottom: 10,
+    elevation: 5,
   },
   cardTitle: {
     fontSize: 17,

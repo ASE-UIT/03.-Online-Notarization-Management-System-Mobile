@@ -47,6 +47,19 @@ const ProvideInformation = ({ navigation }: StackProps) => {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi email',
+        text2: 'Vui lòng nhập đúng định dạng email',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+      return;
+    }
+
     const missingDocuments =
       notarizationService?.required_documents.filter(
         document => !selectedFiles[document] || selectedFiles[document].length === 0,
@@ -217,6 +230,7 @@ const ProvideInformation = ({ navigation }: StackProps) => {
               placeholder="Nhập số CMND/CCCD"
               value={idNumber}
               onChangeText={setIdNumber}
+              keyboardType="numeric"
             />
             <Text style={styles.sectionHeader}>Email</Text>
             <TextInput
@@ -253,14 +267,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: '23%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
   },
   main: {
     flex: 1,
     paddingTop: '3%',
     paddingHorizontal: '3%',
     alignContent: 'center',
-    backgroundColor: colors.gray[50],
+    backgroundColor: colors.white[100],
   },
   contentContainer: {
     flex: 1,
@@ -277,7 +291,7 @@ const styles = StyleSheet.create({
     padding: '2%',
     borderRadius: 10,
     borderColor: colors.gray[300],
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     elevation: 3,
   },
   sectionHeader: {
@@ -295,7 +309,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.beVietnamPro.regular,
     color: colors.black,
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
   },
   placeHolder: {
     color: colors.gray[300],

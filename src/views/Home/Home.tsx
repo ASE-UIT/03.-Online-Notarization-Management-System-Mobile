@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, ImageBackground, SafeAreaView } from 'react-native';
+import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
 import Header from './Header'; // Import Header component
 import Main from './Main'; // Import Main component
 import { useUserSlice } from '@modules/user';
@@ -25,13 +25,8 @@ const Home = ({ navigation, route }: StackProps) => {
   const stackProps = { navigation, route };
   return (
     <SafeAreaView style={styles.container}>
-      <ImageBackground
-        source={require('./assets/background.png')} // Đường dẫn ảnh nền
-        style={styles.backgroundImage}>
-        {/* Header */}
+      <ImageBackground source={require('./assets/background.png')} style={styles.backgroundImage}>
         <Header username={username} onPress={() => handleNavigateToQRCode()} />
-
-        {/* Main */}
         <Main {...stackProps} />
       </ImageBackground>
     </SafeAreaView>

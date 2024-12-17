@@ -317,7 +317,7 @@ export function QRScanStackNavigator({ navigation, route }) {
 
 const styles = StyleSheet.create({
   headerBackground: {
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     elevation: 5,
   },
   headerTitle: {

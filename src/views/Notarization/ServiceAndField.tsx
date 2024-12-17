@@ -133,7 +133,7 @@ const ServiceAndField = ({ navigation }: StackProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     paddingTop: '23%',
   },
   main: {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     paddingTop: '3%',
     paddingHorizontal: '3%',
     alignContent: 'center',
-    backgroundColor: colors.gray[50],
+    backgroundColor: colors.white[100],
   },
   contentContainer: {
     flexGrow: 1,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     padding: '2%',
     borderRadius: 10,
     borderColor: colors.gray[300],
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     elevation: 3,
   },
   sectionHeader: {
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.beVietnamPro.regular,
     color: colors.black,
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
   },
   placeHolder: {
     marginLeft: '2%',
