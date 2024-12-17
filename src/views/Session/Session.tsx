@@ -15,7 +15,7 @@ import { SessionCard } from '@components/SessionCard';
 import { ISession } from '@modules/session/session.typeDefs';
 import SessionService from '@modules/session/session.service';
 
-export default function Session({ navigation }: { navigation: any }) {
+export default function Session({ navigation, route }: { navigation: any; route: any }) {
   const [userSession, setUserSession] = useState<ISession[]>([]);
   const navigateToAddSession = () => {
     navigation.navigate('AddSessionStack');
@@ -28,6 +28,10 @@ export default function Session({ navigation }: { navigation: any }) {
     };
     fetchData();
   }, []);
+
+  const navigateToSessionDetail = (session: ISession) => {
+    navigation.navigate('SessionDetailStack', { session });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -70,8 +74,10 @@ export default function Session({ navigation }: { navigation: any }) {
       </View>
       <View style={styles.sessionCardWrapper}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {userSession.map((session, index) => (
-            <SessionCard key={index} session={session} />
+          {userSession.map((session: ISession, index) => (
+            <TouchableOpacity key={index} onPress={() => navigateToSessionDetail(session)}>
+              <SessionCard session={session} />
+            </TouchableOpacity>
           ))}
         </ScrollView>
       </View>

@@ -10,14 +10,14 @@ async function getUserWallet(): Promise<IUserWallet> {
 
 async function transferNFT(
   transactionHash: string,
-  toUserId: string,
+  toUserEmail: string,
   amount: number,
 ): Promise<string> {
   const response = await axiosConfig.post(
     process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/userWallet/wallet/transfer',
     {
       transactionHash,
-      toUserId,
+      toUserEmail,
       amount,
     },
   );

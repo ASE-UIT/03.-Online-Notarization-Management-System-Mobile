@@ -12,7 +12,7 @@ import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
 import { Other, Policy, Profile, Wallet } from '@views/Other';
-import { AddSession, Session } from '@views/Session';
+import { AddSession, Session, SessionDetail } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
 import { useDocumentSlice } from '@modules/document';
@@ -205,6 +205,14 @@ export function SessionStackNavigator() {
         name="AddSessionStack"
         options={{
           headerTitle: 'Tạo phiên công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={SessionDetail}
+        name="SessionDetailStack"
+        options={{
+          headerTitle: 'Chi tiết phiên công chứng',
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
