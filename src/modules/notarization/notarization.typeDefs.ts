@@ -6,7 +6,7 @@ export interface INotarization {
   notarizationService: INotarizationService;
   files: IFile[];
   notarizationField: INotarizationField;
-  requestInfo: {
+  requesterInfo: {
     fullName: string;
     citizenId: string;
     phoneNumber: string;

@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Entypo } from '@expo/vector-icons';
+import { useUserSlice } from '@modules/user';
+import { fonts } from '@theme';
 
 export default function Profile({ navigation }: { navigation: any }) {
+  const { user } = useUserSlice();
+  const [name, setName] = useState(user?.name);
+  const [email, setEmail] = useState(user?.email);
+  const [phoneNumber, setPhoneNumber] = useState(user?.phoneNumber);
+  const [citizenId, setCitizenId] = useState(user?.citizenId);
   const [isEditingPersonal, setIsEditingPersonal] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false); // Để điều khiển hiển thị dropdown
+
   const [personalInfo, setPersonalInfo] = useState({
     name: 'Nguyễn Quốc Thắng',
     phone: '+84 123456789',
@@ -113,8 +121,8 @@ export default function Profile({ navigation }: { navigation: any }) {
                 <View style={styles.inputContainerEditing}>
                   <TextInput
                     style={[styles.inputEditing, styles.inputBold]}
-                    value={personalInfo.name}
-                    onChangeText={text => setPersonalInfo(prev => ({ ...prev, name: text }))}
+                    value={name}
+                    onChangeText={text => setName(text)}
                   />
                   <TouchableOpacity
                     style={styles.iconBackground}
@@ -148,16 +156,16 @@ export default function Profile({ navigation }: { navigation: any }) {
           ) : (
             <View>
               <Text style={styles.text}>
-                Họ và tên: <Text style={styles.bold}>{personalInfo.name}</Text>
+                Họ và tên: <Text style={styles.bold}>{name}</Text>
               </Text>
               <Text style={styles.text}>
-                Email: <Text style={styles.bold}>{personalInfo.email}</Text>
+                Email: <Text style={styles.bold}>{email}</Text>
               </Text>
               <Text style={styles.text}>
-                Số điện thoại: <Text style={styles.bold}>{personalInfo.phone}</Text>
+                Số điện thoại: <Text style={styles.bold}>{phoneNumber}</Text>
               </Text>
               <Text style={styles.text}>
-                CCCD/CMND: <Text style={styles.bold}>{personalInfo.id}</Text>
+                CCCD/CMND: <Text style={styles.bold}>{citizenId}</Text>
               </Text>
             </View>
           )}
@@ -344,6 +352,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 14,
+    fontFamily: fonts.beVietnamPro.bold,
     marginBottom: 10,
   },
   bold: {

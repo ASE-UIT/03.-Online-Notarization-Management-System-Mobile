@@ -11,7 +11,15 @@ import { Home, QRCodeScreen } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
-import { Other, Policy, Profile, Wallet } from '@views/Other';
+import {
+  NotarizationDetail,
+  NotarizationHistory,
+  Other,
+  Policy,
+  Profile,
+  SignScreen,
+  Wallet,
+} from '@views/Other';
 import { AddSession, Session, SessionDetail } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
@@ -257,6 +265,30 @@ export function OtherStackNavigator() {
         name="WalletStack"
         options={{
           headerTitle: 'Ví của tôi',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={NotarizationHistory}
+        name="NotarizationHistoryStack"
+        options={{
+          headerTitle: 'Lịch sử công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={NotarizationDetail}
+        name="NotarizationDetailStack"
+        options={{
+          headerTitle: 'Chi tiết công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={SignScreen as React.ComponentType<any>}
+        name="SignScreenStack"
+        options={{
+          headerTitle: 'Ký số',
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />

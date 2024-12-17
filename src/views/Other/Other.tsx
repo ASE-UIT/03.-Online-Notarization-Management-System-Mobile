@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { AntDesign, MaterialIcons, Entypo, Feather } from '@expo/vector-icons';
 import { colors, fonts } from '@theme'; // Thay thế nếu bạn có theme riêng
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UserService from '@modules/user/user.service';
 import * as Updates from 'expo-updates';
+import { useUserSlice } from '@modules/user';
 export default function Other({ navigation }: { navigation: any }) {
+  const { user } = useUserSlice();
+
   const handleLogout = async () => {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     UserService.logout(refreshToken as string);
-
     await AsyncStorage.clear();
     Updates.reloadAsync();
   };
@@ -18,10 +20,9 @@ export default function Other({ navigation }: { navigation: any }) {
       {/* Header */}
       <View style={styles.headerWrapper}>
         <View style={styles.header}>
-          <Image source={require('../Other/assets/Avatar.png')} style={styles.avatar} />
           <View style={styles.userInfo}>
-            <Text style={styles.userName}>Nguyễn Quốc Thắng 👋</Text>
-            <Text style={styles.userEmail}>test@gmail.com</Text>
+            <Text style={styles.userName}>{user?.name} 👋</Text>
+            <Text style={styles.userEmail}>{user?.email}</Text>
           </View>
         </View>
       </View>
@@ -38,7 +39,9 @@ export default function Other({ navigation }: { navigation: any }) {
         </TouchableOpacity>
 
         {/* Menu Item 2 */}
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('NotarizationHistoryStack')}>
           <MaterialIcons name="history" size={24} color={colors.black} />
           <Text style={styles.menuText}>Lịch sử công chứng</Text>
           <Entypo name="chevron-right" size={24} color={colors.gray[500]} style={styles.menuIcon} />

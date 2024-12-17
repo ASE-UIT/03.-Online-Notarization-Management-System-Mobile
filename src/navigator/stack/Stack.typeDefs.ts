@@ -10,6 +10,9 @@ export type StackParamList = {
   QRCodeStack: undefined;
   TabNavigator: undefined;
   SessionDetailStack: { session: ISession };
+  NotarizationHistoryStack: undefined;
+  NotarizationDetailStack: { notarization: any };
+  SignScreenStack: { text: string; onOK: (signature: string) => void };
   // add more screen props...
 
   SignInStack: undefined;
