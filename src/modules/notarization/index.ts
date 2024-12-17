@@ -1,0 +1,1 @@
+export * from './notarazation.service';
