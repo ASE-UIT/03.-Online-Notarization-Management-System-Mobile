@@ -16,6 +16,7 @@ import { AddSession, Session } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
 import { useDocumentSlice } from '@modules/document';
+import TabNavigator from '@navigator/tab/Tab';
 
 const Stack = createNativeStackNavigator<StackParamList>();
 
@@ -52,8 +53,8 @@ export function AuthStackNavigator() {
         }}
       />
       <Stack.Screen
-        component={Home}
-        name="HomeStack"
+        component={TabNavigator}
+        name="TabNavigator"
         options={{
           headerShown: false,
         }}

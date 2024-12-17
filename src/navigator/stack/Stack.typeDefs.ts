@@ -7,6 +7,7 @@ export type StackParamList = {
   PolicyStack: undefined;
   WalletStack: undefined;
   QRCodeStack: undefined;
+  TabNavigator: undefined;
   // add more screen props...
 
   SignInStack: undefined;

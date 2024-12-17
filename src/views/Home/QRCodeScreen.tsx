@@ -8,7 +8,12 @@ export default function QRCodeScreen() {
   const { user } = useUserSlice();
   return (
     <View style={styles.container}>
-      <QRCode value={user?.id} size={200} />
+      <QRCode
+        value={user?.id}
+        size={200}
+        logo={require('@assets/images/logo-sm.png')}
+        logoSize={20}
+      />
     </View>
   );
 }
