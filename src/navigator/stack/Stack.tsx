@@ -1,13 +1,13 @@
 import React, { useLayoutEffect } from 'react';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StackParamList, StackProps } from './Stack.typeDefs';
+import { StackParamList } from './Stack.typeDefs';
 import { StyleSheet } from 'react-native';
 import { StackHeaderLeft } from './components';
 import { colors, fonts } from '@theme';
 
 // views
-import { Home, QRCodeScreen } from '@views/Home';
+import { Home, QRCodeScreen, Service, ServiceDetail } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
@@ -19,17 +19,6 @@ import { useDocumentSlice } from '@modules/document';
 import TabNavigator from '@navigator/tab/Tab';
 
 const Stack = createNativeStackNavigator<StackParamList>();
-
-const navigationProps = {
-  headerTintColor: colors.white,
-  headerStyle: { backgroundColor: '#fff', alignItems: 'center' },
-  headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
-};
-
-const qrNavigationProps = {
-  headerStyle: { backgroundColor: 'transparent', alignItems: 'center' },
-  headerTitleStyle: { fontSize: 20, fontFamily: fonts.beVietnamPro.bold },
-};
 
 const renderHeaderLeft = (isCreateScreen: boolean, onConfirm?: () => void) => {
   return <StackHeaderLeft isCreateScreen={isCreateScreen} onConfirm={onConfirm} />;
@@ -74,6 +63,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
       'ProvideInformation',
       'ConfirmInformation',
       'QRCodeStack',
+      'Service',
+      'ServiceDetail',
     ];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
@@ -150,6 +141,26 @@ export function HomeStackNavigator({ navigation, route }: any) {
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
+      <Stack.Screen
+        component={Service}
+        name="Service"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Toàn bộ dịch vụ',
+          headerTitleStyle: styles.headerTitle,
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
+      <Stack.Screen
+        component={ServiceDetail}
+        name="ServiceDetail"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Chi tiết dịch vụ',
+          headerTitleStyle: styles.headerTitle,
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -198,7 +209,7 @@ export function SearchStackNavigator({ navigation, route }: any) {
 
 export function SessionStackNavigator() {
   return (
-    <Stack.Navigator screenOptions={navigationProps}>
+    <Stack.Navigator>
       <Stack.Screen
         component={Session}
         name="SessionStack"
@@ -228,7 +239,7 @@ export function SessionStackNavigator() {
 
 export function OtherStackNavigator() {
   return (
-    <Stack.Navigator screenOptions={navigationProps}>
+    <Stack.Navigator>
       <Stack.Screen
         component={Other}
         name="OtherStack"
@@ -264,7 +275,7 @@ export function OtherStackNavigator() {
   );
 }
 
-export function QRScanStackNavigator({ navigation, route }) {
+export function QRScanStackNavigator({ navigation, route }: any) {
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'QRScanStack';
 
@@ -321,7 +332,7 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   headerTitle: {
-    fontSize: 20,
-    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 18,
+    fontFamily: fonts.beVietnamPro.semiBold,
   },
 });

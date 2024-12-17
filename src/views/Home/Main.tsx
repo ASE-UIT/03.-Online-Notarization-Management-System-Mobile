@@ -9,40 +9,48 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated-carousel';
+import { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSharedValue } from 'react-native-reanimated';
-import { colors } from '@theme';
+import { colors, fonts } from '@theme';
 import CarouselComponent from '@components/CarouselComponent';
 import { StackProps } from '@navigator';
+import { FontAwesome, Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const services = [
-  { id: 1, name: 'Vay - Mượn Tài sản' },
-  { id: 2, name: 'Vay - Mượn Tài sản' },
-  { id: 3, name: 'Vay - Mượn Tài sản' },
-  { id: 4, name: 'Vay - Mượn Tài sản' },
-];
-
-const information = [
   {
-    id: 1,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '1',
+    name: 'Công chứng hợp đồng vay tài sản',
+    description: 'Cung cấp giải pháp chiến lược để phát triển bền vững.',
   },
   {
-    id: 2,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '2',
+    name: 'Công chứng hợp đồng bảo lãnh',
+    description: 'Phát triển các giải pháp phần mềm theo yêu cầu.',
   },
   {
-    id: 3,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '3',
+    name: 'Công chứng hợp đồng tín chấp',
+    description: 'Giúp doanh nghiệp cải thiện hiệu quả vận hành.',
+  },
+  {
+    id: '4',
+    name: 'Công chứng hợp đồng góp vốn bằng tài sản doanh nghiệp',
+    description: 'Chương trình đào tạo nhân viên chuyên nghiệp.',
+  },
+  {
+    id: '5',
+    name: 'Công chứng văn bản nhận thừa kế',
+    description: 'Đồng hành trong việc tích hợp trí tuệ nhân tạo.',
+  },
+  {
+    id: '6',
+    name: 'Công chứng văn bản khai nhận di sản thừa kế',
+    description: 'Xây dựng website chuyên nghiệp và thân thiện.',
+  },
+  {
+    id: '7',
+    name: 'Công chứng hợp đồng chuyển nhượng quyền sử dụng đất nông nghiệp',
+    description: 'Chiến lược quảng cáo tối ưu trên các nền tảng.',
   },
 ];
 
@@ -61,35 +69,64 @@ export default function Main({ navigation }: StackProps) {
   const progress = useSharedValue<number>(0);
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
-      /**
-       * Calculate the difference between the current index and the target index
-       * to ensure that the carousel scrolls to the nearest index
-       */
       count: index - progress.value,
       animated: true,
     });
   };
+
   const handleCreateDocument = () => {
     navigation.navigate('CreateServiceAndField');
   };
+
+  const handleViewMore = () => {
+    navigation.navigate('Service');
+    console.log('Xem thêm các dịch vụ khác');
+  };
+
+  const renderServices = (services: { id: string; name: string; description: string }[]) => {
+    const processName = (name: string) => {
+      if (name.startsWith('Công chứng ')) {
+        const newName = name.replace('Công chứng ', '');
+        return newName.charAt(0).toUpperCase() + newName.slice(1);
+      }
+      return name;
+    };
+
+    const rows = [];
+    for (let i = 0; i < services.length; i += 4) {
+      rows.push(services.slice(i, i + 4));
+    }
+
+    if (rows.length > 0 && rows[rows.length - 1].length < 8) {
+      rows[rows.length - 1].push({ id: 'more', name: 'Xem thêm', description: '' });
+    } else {
+      rows.push([{ id: 'more', name: 'Xem thêm', description: '' }]);
+    }
+
+    return rows.map((row, rowIndex) => (
+      <View key={rowIndex} style={styles.row}>
+        {row.map(service => (
+          <TouchableOpacity
+            key={service.id}
+            style={styles.serviceItem}
+            onPress={service.id === 'more' ? handleViewMore : handleCreateDocument}>
+            {service.id === 'more' ? (
+              <Foundation name="indent-more" size={30} color={colors.primary[500]} />
+            ) : (
+              <Ionicons name="document-text" size={30} color={colors.primary[500]} />
+            )}
+            <Text style={styles.serviceText}>{processName(service.name)}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    ));
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Các loại dịch vụ */}
-      <Text style={styles.section}>Các loại dịch vụ</Text>
-      <SafeAreaView>
-        {/* ScrollView ngang cho các dịch vụ */}
-        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-          {services.map(service => (
-            <View key={service.id} style={styles.serviceItem}>
-              <TouchableOpacity onPress={handleCreateDocument}>
-                <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
-              </TouchableOpacity>
-              <Text style={styles.serviceText}>{service.name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-      {/* Tại sao nên sử dụng dịch vụ */}
+      <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
+      <SafeAreaView>{renderServices(services)}</SafeAreaView>
+
       <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
       <View>
         <CarouselComponent
@@ -102,16 +139,6 @@ export default function Main({ navigation }: StackProps) {
           onPressPagination={onPressPagination}
         />
       </View>
-      {/* Thông tin */}
-      <Text style={styles.sectionTitle}>Thông tin</Text>
-      {information.map(info => (
-        <View key={info.id} style={styles.infoCard}>
-          <Text style={styles.infoTitle}>{info.title}</Text>
-          <Text style={styles.infoDetails}>
-            Ban hành: {info.issued} | Cập nhật: {info.updated}
-          </Text>
-        </View>
-      ))}
     </ScrollView>
   );
 }
@@ -119,29 +146,27 @@ export default function Main({ navigation }: StackProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 12,
-    backgroundColor: '#FFF',
-    paddingHorizontal: 16,
+    backgroundColor: colors.white[50],
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    marginTop: 8,
-  },
-  section: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: -10,
+    marginTop: '2%',
+    paddingHorizontal: '3%',
+    paddingTop: '1%',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontFamily: fonts.beVietnamPro.bold,
+    marginVertical: '2%',
   },
-  scrollView: {
-    marginBottom: 10,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: '2%',
+    marginHorizontal: '2%',
   },
   serviceItem: {
     alignItems: 'center',
-    marginRight: 16, // Khoảng cách giữa các item
+    width: '22%',
   },
   serviceIcon: {
     width: 50,
@@ -150,29 +175,8 @@ const styles = StyleSheet.create({
   },
   serviceText: {
     fontSize: 14,
-    color: '#333',
-    width: 90,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    color: colors.black,
     textAlign: 'center',
-  },
-  infoCard: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-    marginHorizontal: 4,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  infoDetails: {
-    fontSize: 12,
-    color: '#6C757D',
   },
 });

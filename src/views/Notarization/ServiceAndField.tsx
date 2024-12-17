@@ -134,11 +134,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.white[50],
-    paddingTop: '23%',
   },
   main: {
     flex: 1,
-    paddingTop: '3%',
+    paddingTop: '26%',
     paddingHorizontal: '3%',
     alignContent: 'center',
     backgroundColor: colors.white[100],

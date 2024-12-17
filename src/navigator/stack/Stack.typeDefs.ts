@@ -28,6 +28,9 @@ export type StackParamList = {
   ConfirmInformation: undefined;
 
   DetailDocument: { documentId: string };
+
+  ServiceScreen: undefined;
+  ServiceDetail: { serviceId: string };
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;
