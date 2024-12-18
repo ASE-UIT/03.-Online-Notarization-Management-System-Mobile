@@ -13,6 +13,7 @@ export type StackParamList = {
   NotarizationHistoryStack: undefined;
   NotarizationDetailStack: { notarization: any };
   SignScreenStack: { text: string; onOK: (signature: string) => void };
+  ForgetPasswordStack: undefined;
   // add more screen props...
 
   SignInStack: undefined;
