@@ -11,17 +11,17 @@ const Header = ({ username, onPress }: { username: string; onPress: () => void }
       <View style={styles.topSection}>
         <View style={styles.leftSection}>
           <Image source={require('./assets/header/logo.png')} style={styles.logo} />
-          <Text style={styles.title}>CongChungOnline</Text>
+          <Text style={styles.title}>ASE - Công chứng Online</Text>
         </View>
       </View>
-      {/* User Info */}
+
       <View style={styles.userSection}>
         <View style={styles.userInforWrapper}>
           <Text style={styles.username}>{username}</Text>
           <MaterialIcons name="verified" size={24} color={colors.gray[500]} />
         </View>
         <TouchableOpacity onPress={onPress} style={styles.qrContainer}>
-          <Ionicons name="qr-code-outline" size={32} color={colors.primary[300]} />
+          <Ionicons name="qr-code-outline" size={28} color={colors.primary[400]} />
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -31,13 +31,13 @@ const Header = ({ username, onPress }: { username: string; onPress: () => void }
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
-    padding: 16,
+    padding: '3%',
   },
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignContent: 'center',
-    marginVertical: 16,
+    marginVertical: '3%',
     paddingTop: 8,
   },
   leftSection: {
@@ -47,42 +47,26 @@ const styles = StyleSheet.create({
   logo: {
     width: 34,
     height: 34,
-    marginRight: 8,
+    marginRight: '2%',
   },
   title: {
     fontFamily: fonts.beVietnamPro.bold,
-    fontSize: 16,
+    fontSize: 18,
     color: colors.white[50],
-  },
-  icon: {
-    width: 36,
-    height: 36,
-    marginLeft: 4,
-    resizeMode: 'contain',
   },
   iconQR: {
     width: 36,
     height: 36,
-    // position: 'absolute',
-    // top: -17,
-    // left: 120,
     resizeMode: 'contain',
-  },
-  notificationContainer: {
-    backgroundColor: colors.yellow[50], // Màu vàng nhạt cho background
-    borderRadius: 50, // Tạo hình tròn cho background
-    padding: 12, // Khoảng cách giữa icon và viền background
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   userInforWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   qrContainer: {
-    backgroundColor: '#E0E0E0',
-    borderRadius: 50, // Tạo hình tròn cho background
-    padding: 8, // Khoảng cách giữa icon và viền background
+    backgroundColor: colors.gray[50],
+    borderRadius: 50,
+    padding: '3%',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -90,25 +74,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: colors.white[50],
     borderRadius: 16,
-    padding: 16,
+    padding: '5%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 3,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 20,
-    marginRight: 8,
+    elevation: 5,
   },
   username: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#333',
+    fontSize: 15,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    color: colors.black,
     marginRight: 8,
   },
 });

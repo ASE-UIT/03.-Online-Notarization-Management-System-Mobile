@@ -1,48 +1,42 @@
-import React, { useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Carousel, { ICarouselInstance, Pagination } from 'react-native-reanimated-carousel';
+import { ICarouselInstance } from 'react-native-reanimated-carousel';
 import { useSharedValue } from 'react-native-reanimated';
-import { colors } from '@theme';
+import { colors, fonts } from '@theme';
 import CarouselComponent from '@components/CarouselComponent';
 import { StackProps } from '@navigator';
+import { Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const services = [
-  { id: 1, name: 'Vay - Mượn Tài sản' },
-  { id: 2, name: 'Vay - Mượn Tài sản' },
-  { id: 3, name: 'Vay - Mượn Tài sản' },
-  { id: 4, name: 'Vay - Mượn Tài sản' },
-];
-
-const information = [
   {
-    id: 1,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '6746f2dbcc390609e20d08dc',
+    name: 'Công chứng hợp đồng vay tài sản',
   },
   {
-    id: 2,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '6746f41fcc390609e20d08eb',
+    name: 'Công chứng văn bản nhận thừa kế',
   },
   {
-    id: 3,
-    title:
-      'Nghị định 147/2024/NĐ-CP quản lý, cung cấp, sử dụng dịch vụ Internet và thông tin trên mạng',
-    issued: '09/11/2024',
-    updated: '11/11/2024',
+    id: '6746f53dcc390609e20d08ff',
+    name: 'Công chứng hợp đồng thế chấp tài sản',
+  },
+  {
+    id: '6746f53dcc390609e20d08fe',
+    name: 'Công chứng hợp đồng cầm cố tài sản',
+  },
+  {
+    id: '6746f604cc390609e20d0912',
+    name: 'Công chứng hợp đồng ủy quyền',
+  },
+  {
+    id: '6746f6b2cc390609e20d0929',
+    name: 'Công chứng hợp đồng thuê nhà ở xã hội',
+  },
+  {
+    id: '6746f63acc390609e20d091a',
+    name: 'Công chứng hợp đồng đặt cọc',
+    description: 'Chiến lược quảng cáo tối ưu trên các nền tảng.',
   },
 ];
 
@@ -56,40 +50,100 @@ const data = [
 ];
 const windowWidth = Dimensions.get('window').width;
 
-export default function Main({ navigation }: StackProps) {
+export default function Main({ navigation }: Readonly<StackProps>) {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const onPressPagination = (index: number) => {
     ref.current?.scrollTo({
-      /**
-       * Calculate the difference between the current index and the target index
-       * to ensure that the carousel scrolls to the nearest index
-       */
       count: index - progress.value,
       animated: true,
     });
   };
+
   const handleCreateDocument = () => {
     navigation.navigate('CreateServiceAndField');
   };
+
+  const handleSendNft = () => {
+    navigation.navigate('SendNFT');
+  };
+
+  const handleViewMore = () => {
+    navigation.navigate('Service');
+  };
+
+  const handleDetailService = (serviceId: string) => {
+    navigation.navigate('ServiceDetail', { serviceId });
+  };
+
+  const renderServices = (services: { id: string; name: string }[]) => {
+    const processName = (name: string) => {
+      if (name.startsWith('Công chứng ')) {
+        const newName = name.replace('Công chứng ', '');
+        return newName.charAt(0).toUpperCase() + newName.slice(1);
+      }
+      return name;
+    };
+
+    const rows = [];
+    for (let i = 0; i < services.length; i += 4) {
+      rows.push(services.slice(i, i + 4));
+    }
+
+    if (rows.length > 0 && rows[rows.length - 1].length < 8) {
+      rows[rows.length - 1].push({ id: 'more', name: 'Xem thêm' });
+    } else {
+      rows.push([{ id: 'more', name: 'Xem thêm', description: '' }]);
+    }
+
+    return rows.map((row, rowIndex) => (
+      <View key={row.map(service => service.id).join('-')} style={styles.row}>
+        {row.map(service => (
+          <TouchableOpacity
+            key={service.id}
+            style={styles.serviceItem}
+            onPress={
+              service.id === 'more' ? handleViewMore : () => handleDetailService(service.id)
+            }>
+            {service.id === 'more' ? (
+              <Foundation name="indent-more" size={30} color={colors.gray[300]} />
+            ) : (
+              <Ionicons name="document-text" size={30} color={colors.primary[500]} />
+            )}
+            <Text style={styles.serviceText}>{processName(service.name)}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+    ));
+  };
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Các loại dịch vụ */}
-      <Text style={styles.section}>Các loại dịch vụ</Text>
-      <SafeAreaView>
-        {/* ScrollView ngang cho các dịch vụ */}
-        <ScrollView horizontal style={styles.scrollView} showsHorizontalScrollIndicator={false}>
-          {services.map(service => (
-            <View key={service.id} style={styles.serviceItem}>
-              <TouchableOpacity onPress={handleCreateDocument}>
-                <Image source={require('./assets/main/Icon.png')} style={styles.serviceIcon} />
-              </TouchableOpacity>
-              <Text style={styles.serviceText}>{service.name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-      {/* Tại sao nên sử dụng dịch vụ */}
+      <Text style={styles.sectionTitle}>Tính năng nổi bật</Text>
+      <View style={styles.redSectionContainer}>
+        <Text style={styles.redSectionText}>Tạo hồ sơ công chứng của bạn</Text>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity style={styles.createDocumentButton} onPress={handleCreateDocument}>
+            <Text style={styles.createButtonText}>Tạo hồ sơ</Text>
+            <MaterialIcons name="create-new-folder" size={22} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <Text style={styles.orText}>---- hoặc ----</Text>
+      <View style={styles.redSectionContainer}>
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity style={styles.createDocumentButton} onPress={handleSendNft}>
+            <Text style={styles.createButtonText}>Gửi tài liệu</Text>
+            <Ionicons name="send" size={18} color={colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+        <Text style={[styles.redSectionText, { flex: 1.3, marginLeft: '5%' }]}>
+          Gửi tài liệu công chứng cho người khác
+        </Text>
+      </View>
+      <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
+      <SafeAreaView>{renderServices(services)}</SafeAreaView>
+
       <Text style={styles.sectionTitle}>Tại sao nên sử dụng dịch vụ của chúng tôi</Text>
       <View>
         <CarouselComponent
@@ -102,16 +156,6 @@ export default function Main({ navigation }: StackProps) {
           onPressPagination={onPressPagination}
         />
       </View>
-      {/* Thông tin */}
-      <Text style={styles.sectionTitle}>Thông tin</Text>
-      {information.map(info => (
-        <View key={info.id} style={styles.infoCard}>
-          <Text style={styles.infoTitle}>{info.title}</Text>
-          <Text style={styles.infoDetails}>
-            Ban hành: {info.issued} | Cập nhật: {info.updated}
-          </Text>
-        </View>
-      ))}
     </ScrollView>
   );
 }
@@ -119,29 +163,27 @@ export default function Main({ navigation }: StackProps) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 12,
-    backgroundColor: '#FFF',
-    paddingHorizontal: 16,
+    backgroundColor: colors.white[50],
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
-    marginTop: 8,
-  },
-  section: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: -10,
+    marginTop: '2%',
+    paddingHorizontal: '3%',
+    paddingTop: '1%',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 16,
+    fontFamily: fonts.beVietnamPro.bold,
+    marginVertical: '1.5%',
   },
-  scrollView: {
-    marginBottom: 10,
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: '2%',
+    marginHorizontal: '2%',
   },
   serviceItem: {
     alignItems: 'center',
-    marginRight: 16, // Khoảng cách giữa các item
+    width: '22%',
   },
   serviceIcon: {
     width: 50,
@@ -150,29 +192,62 @@ const styles = StyleSheet.create({
   },
   serviceText: {
     fontSize: 14,
-    color: '#333',
-    width: 90,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    color: colors.black,
     textAlign: 'center',
   },
-  infoCard: {
-    backgroundColor: '#F9F9F9',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-    marginHorizontal: 4,
+  redSectionContainer: {
+    backgroundColor: colors.primary[500],
+    flexDirection: 'row',
+    padding: '6%',
+    borderRadius: 10,
+    marginVertical: '2%',
   },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
+  redSectionText: {
+    color: colors.white[50],
+    flex: 1.5,
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
   },
-  infoDetails: {
-    fontSize: 12,
-    color: '#6C757D',
+  createDocumentButton: {
+    backgroundColor: colors.white[50],
+    padding: '5%',
+    paddingVertical: '8%',
+    borderRadius: 10,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  createButtonText: {
+    color: colors.primary[500],
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
+    marginRight: '3%',
+  },
+  orText: {
+    color: colors.primary[400],
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  searchBox: {
+    width: '100%',
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
   },
 });

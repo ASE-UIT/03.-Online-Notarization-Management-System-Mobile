@@ -55,11 +55,18 @@ async function refreshAccessToken(refreshToken: string): Promise<IRefreshTokenRe
   }
 }
 
-async function searchUserByEmail(email: string): Promise<IUser[]> {
-  const response = await axiosConfig.get<IUser[]>(
-    process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/users/search-user-by-email/' + email,
-  );
-  return response.data;
+async function searchUserByEmail(email: string): Promise<IUser[] | string> {
+  try {
+    const response = await axiosConfig.get<IUser[]>(
+      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/users/search-user-by-email/' + email,
+    );
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 async function forgotPassword(email: string): Promise<void> {

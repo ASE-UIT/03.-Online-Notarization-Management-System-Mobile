@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: '5%',
     paddingVertical: '5%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     borderTopWidth: 1,
     borderTopColor: colors.gray[300],
   },
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   actionsText: {
-    color: colors.white[100],
+    color: colors.white[50],
     fontFamily: fonts.beVietnamPro.regular,
     fontSize: 16,
   },
