@@ -34,6 +34,7 @@ export type StackParamList = {
 
   Service: undefined;
   ServiceDetail: { serviceId: string };
+  SendNFT: undefined;
 };
 
 export type StackProps = NativeStackScreenProps<StackParamList, keyof StackParamList>;

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ICarouselInstance } from 'react-native-reanimated-carousel';
@@ -56,7 +56,7 @@ const data = [
 ];
 const windowWidth = Dimensions.get('window').width;
 
-export default function Main({ navigation }: StackProps) {
+export default function Main({ navigation }: Readonly<StackProps>) {
   const ref = useRef<ICarouselInstance>(null);
   const progress = useSharedValue<number>(0);
   const onPressPagination = (index: number) => {
@@ -68,6 +68,10 @@ export default function Main({ navigation }: StackProps) {
 
   const handleCreateDocument = () => {
     navigation.navigate('CreateServiceAndField');
+  };
+
+  const handleSendNft = () => {
+    navigation.navigate('SendNFT');
   };
 
   const handleViewMore = () => {
@@ -95,7 +99,7 @@ export default function Main({ navigation }: StackProps) {
     }
 
     return rows.map((row, rowIndex) => (
-      <View key={rowIndex} style={styles.row}>
+      <View key={row.map(service => service.id).join('-')} style={styles.row}>
         {row.map(service => (
           <TouchableOpacity
             key={service.id}
@@ -115,6 +119,7 @@ export default function Main({ navigation }: StackProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <Text style={styles.sectionTitle}>Tổng quan các chứng năng</Text>
       <View style={styles.redSectionContainer}>
         <Text style={styles.redSectionText}>Tạo hồ sơ công chứng của bạn</Text>
         <View style={{ flex: 1 }}>
@@ -124,15 +129,16 @@ export default function Main({ navigation }: StackProps) {
           </TouchableOpacity>
         </View>
       </View>
+      <Text style={styles.orText}>---- hoặc ----</Text>
       <View style={styles.redSectionContainer}>
         <View style={{ flex: 1 }}>
-          <TouchableOpacity style={styles.createDocumentButton} onPress={handleCreateDocument}>
+          <TouchableOpacity style={styles.createDocumentButton} onPress={handleSendNft}>
             <Text style={styles.createButtonText}>Gửi tài liệu</Text>
             <Ionicons name="send" size={18} color={colors.primary[500]} />
           </TouchableOpacity>
         </View>
         <Text style={[styles.redSectionText, { flex: 1.3, marginLeft: '5%' }]}>
-          Gửi tại liệu công chứng cho người khác
+          Gửi tài liệu công chứng cho người khác
         </Text>
       </View>
       <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
@@ -167,7 +173,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: fonts.beVietnamPro.bold,
-    marginVertical: '2%',
+    marginVertical: '1.5%',
   },
   row: {
     flexDirection: 'row',
@@ -217,5 +223,31 @@ const styles = StyleSheet.create({
     fontFamily: fonts.beVietnamPro.bold,
     fontSize: 15,
     marginRight: '3%',
+  },
+  orText: {
+    color: colors.primary[400],
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 15,
+    textAlign: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  searchBox: {
+    width: '100%',
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
   },
 });

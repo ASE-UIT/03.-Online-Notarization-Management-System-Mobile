@@ -7,7 +7,7 @@ import { StackHeaderLeft } from './components';
 import { colors, fonts } from '@theme';
 
 // views
-import { Home, QRCodeScreen, Service, ServiceDetail } from '@views/Home';
+import { Home, QRCodeScreen, Service, ServiceDetail, SendNFT } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
@@ -73,6 +73,7 @@ export function HomeStackNavigator({ navigation, route }: any) {
       'QRCodeStack',
       'Service',
       'ServiceDetail',
+      'SendNFT',
     ];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
@@ -166,6 +167,17 @@ export function HomeStackNavigator({ navigation, route }: any) {
           headerStyle: styles.headerBackground,
           headerTitle: 'Chi tiết dịch vụ',
           headerTitleStyle: styles.headerTitle,
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
+      <Stack.Screen
+        component={SendNFT}
+        name="SendNFT"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Chuyển tài liệu số',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           headerLeft: () => renderHeaderLeft(false),
         }}
       />
