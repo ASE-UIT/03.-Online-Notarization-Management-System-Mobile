@@ -106,7 +106,7 @@ export default function Main({ navigation }: Readonly<StackProps>) {
             style={styles.serviceItem}
             onPress={service.id === 'more' ? handleViewMore : handleCreateDocument}>
             {service.id === 'more' ? (
-              <Foundation name="indent-more" size={30} color={colors.primary[500]} />
+              <Foundation name="indent-more" size={30} color={colors.gray[300]} />
             ) : (
               <Ionicons name="document-text" size={30} color={colors.primary[500]} />
             )}
@@ -119,7 +119,7 @@ export default function Main({ navigation }: Readonly<StackProps>) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Tổng quan các chứng năng</Text>
+      <Text style={styles.sectionTitle}>Tính năng nổi bật</Text>
       <View style={styles.redSectionContainer}>
         <Text style={styles.redSectionText}>Tạo hồ sơ công chứng của bạn</Text>
         <View style={{ flex: 1 }}>

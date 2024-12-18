@@ -296,42 +296,44 @@ export default function SendNFT({ navigation, route }: Readonly<StackProps>) {
                 backgroundColor: colors.white[100],
               }}>
               <BottomSheetView style={styles.contentContainer}>
-                <Text style={styles.textTitle}>Nhập số lượng: </Text>
-                <View
-                  style={{
-                    paddingVertical: '4%',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  <TouchableOpacity onPress={() => setAmount(prev => prev + 1)}>
-                    <AntDesign name="pluscircleo" size={40} color={colors.primary[500]} />
-                  </TouchableOpacity>
-
-                  <TextInput
+                <View style={styles.formWrapper}>
+                  <Text style={styles.textTitle}>Nhập số lượng: </Text>
+                  <View
                     style={{
-                      marginHorizontal: 12,
-                      fontFamily: fonts.beVietnamPro.bold,
-                      fontSize: 20,
-                      width: 50,
-                      textAlign: 'center',
-                      borderWidth: 1,
-                      borderColor: colors.gray[300],
-                      borderRadius: 8,
-                      padding: 4,
-                    }}
-                    keyboardType="numeric"
-                    value={String(amount)}
-                    onChangeText={text => {
-                      const parsedAmount = parseInt(text, 10);
-                      setAmount(isNaN(parsedAmount) ? 0 : parsedAmount);
-                    }}
-                  />
+                      paddingVertical: '4%',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      paddingLeft: '4%',
+                    }}>
+                    <TouchableOpacity onPress={() => setAmount(prev => prev + 1)}>
+                      <AntDesign name="pluscircleo" size={40} color={colors.primary[500]} />
+                    </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => setAmount(prev => Math.max(prev - 1, 0))}>
-                    <AntDesign name="minuscircleo" size={40} color={colors.primary[500]} />
-                  </TouchableOpacity>
+                    <TextInput
+                      style={{
+                        marginHorizontal: 12,
+                        fontFamily: fonts.beVietnamPro.bold,
+                        fontSize: 20,
+                        width: 50,
+                        textAlign: 'center',
+                        borderWidth: 1,
+                        borderColor: colors.gray[300],
+                        borderRadius: 8,
+                        padding: 4,
+                      }}
+                      keyboardType="numeric"
+                      value={String(amount)}
+                      onChangeText={text => {
+                        const parsedAmount = parseInt(text, 10);
+                        setAmount(isNaN(parsedAmount) ? 0 : parsedAmount);
+                      }}
+                    />
+
+                    <TouchableOpacity onPress={() => setAmount(prev => Math.max(prev - 1, 0))}>
+                      <AntDesign name="minuscircleo" size={40} color={colors.primary[500]} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-
                 <TouchableOpacity
                   style={[styles.transferButton, { width: '100%' }]}
                   onPress={handleSendNFT}>
@@ -378,6 +380,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white[100],
     padding: '4%',
+    alignItems: 'center',
+  },
+  formWrapper: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    marginBottom: '3%',
+    paddingHorizontal: '4%',
+    width: '100%',
+    elevation: 5,
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   transferButton: {

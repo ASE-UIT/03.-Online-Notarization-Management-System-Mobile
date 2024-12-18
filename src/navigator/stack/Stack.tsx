@@ -157,6 +157,7 @@ export function HomeStackNavigator({ navigation, route }: any) {
           headerStyle: styles.headerBackground,
           headerTitle: 'Toàn bộ dịch vụ',
           headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           headerLeft: () => renderHeaderLeft(false),
         }}
       />
