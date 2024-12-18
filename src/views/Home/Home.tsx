@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, ScrollView, ImageBackground, SafeAreaView } from 'react-native';
+import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
 import Header from './Header'; // Import Header component
 import Main from './Main'; // Import Main component
 import { useUserSlice } from '@modules/user';
@@ -8,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation, route }: StackProps) => {
   const [username, setUsername] = useState('');
-  const { user, setUser } = useUserSlice();
-  console.log('user at Home', user);
+  const { user, setUser, dispatch } = useUserSlice();
   const handleNavigateToQRCode = () => {
     navigation.navigate('QRCodeStack');
   };
@@ -17,7 +16,7 @@ const Home = ({ navigation, route }: StackProps) => {
     const fetchUser = async () => {
       const userString = await AsyncStorage.getItem('user');
       const user = userString ? JSON.parse(userString) : null;
-      setUser(user);
+      dispatch(setUser(user));
       setUsername(user?.name || '');
     };
     fetchUser();
@@ -25,13 +24,8 @@ const Home = ({ navigation, route }: StackProps) => {
   const stackProps = { navigation, route };
   return (
     <SafeAreaView style={styles.container}>
-      <ImageBackground
-        source={require('./assets/background.png')} // Đường dẫn ảnh nền
-        style={styles.backgroundImage}>
-        {/* Header */}
+      <ImageBackground source={require('./assets/background.png')} style={styles.backgroundImage}>
         <Header username={username} onPress={() => handleNavigateToQRCode()} />
-
-        {/* Main */}
         <Main {...stackProps} />
       </ImageBackground>
     </SafeAreaView>
@@ -44,7 +38,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
-  container: {},
+  container: {
+    paddingBottom: '20%',
+  },
 });
 
 export default Home;

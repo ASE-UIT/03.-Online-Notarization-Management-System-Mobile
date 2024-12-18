@@ -1,24 +1,18 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '@theme';
+import { colors, fonts } from '@theme';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 const Header = ({ username, onPress }: { username: string; onPress: () => void }) => {
   return (
     <ImageBackground
       style={styles.container}
       source={require('@assets/images/background_header.png')}>
-      {/* Top Section */}
       <View style={styles.topSection}>
-        {/* App Logo */}
         <View style={styles.leftSection}>
           <Image source={require('./assets/header/logo.png')} style={styles.logo} />
           <Text style={styles.title}>CongChungOnline</Text>
         </View>
-        {/* Notification Button */}
-        <TouchableOpacity style={styles.notificationContainer}>
-          <Ionicons name="notifications" size={24} color={colors.yellow[500]} />
-        </TouchableOpacity>
       </View>
       {/* User Info */}
       <View style={styles.userSection}>
@@ -56,9 +50,9 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   title: {
+    fontFamily: fonts.beVietnamPro.bold,
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFF',
+    color: colors.white[50],
   },
   icon: {
     width: 36,

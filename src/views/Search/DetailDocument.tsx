@@ -214,12 +214,13 @@ const DetailDocument: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     padding: '3%',
   },
   main: {
     flex: 1,
     alignContent: 'center',
+    backgroundColor: colors.white[50],
   },
   contentContainer: {
     flex: 1,
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
   header: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.bold,
-    fontSize: 20,
+    fontSize: 18,
   },
   sectionContainer: {
     marginVertical: '3%',
@@ -236,8 +237,8 @@ const styles = StyleSheet.create({
     padding: '2%',
     borderRadius: 10,
     borderColor: colors.gray[300],
-    backgroundColor: colors.white[100],
-    elevation: 3,
+    backgroundColor: colors.white[50],
+    elevation: 5,
   },
   sectionHeader: {
     color: colors.black,
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
   },
   informationContainer: {
     padding: '2%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
   },
   fileContainer: {
     padding: '2%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     justifyContent: 'flex-start',
   },
   loadingContainer: {

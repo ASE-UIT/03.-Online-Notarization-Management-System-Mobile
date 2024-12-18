@@ -1,6 +1,6 @@
 import { CreateProgressBar, ForwardStepBar } from '@components/Bar';
 import React, { useState, useCallback, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, BackHandler } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, BackHandler, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
 import { StackProps } from '@navigator';
@@ -10,7 +10,6 @@ import { DocumentTypeCode, getDocumentNameByCode } from '@utils/constants';
 import { INotarizationService } from '@modules/notarizationService';
 import { INotarizationField } from '@modules/notarizationField';
 import FormData from 'form-data';
-import Spinner from 'react-native-loading-spinner-overlay';
 
 const ConfirmInformation = ({ navigation }: StackProps) => {
   const {
@@ -129,7 +128,12 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
 
   return (
     <View style={styles.container}>
-      <Spinner visible={loading} textContent="Đang tải..." textStyle={{ color: '#fff' }} />
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary[400]} />
+          <Text style={styles.loadingText}>Đang gửi yêu cầu...</Text>
+        </View>
+      )}
       <View style={styles.main}>
         <CreateProgressBar currentPage={step} setCurrentPage={setStep} />
         <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
@@ -190,13 +194,15 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white[100],
+    paddingTop: '23%',
+    backgroundColor: colors.white[50],
   },
   main: {
+    flex: 1,
     paddingTop: '3%',
     paddingHorizontal: '3%',
-    flex: 1,
     alignContent: 'center',
+    backgroundColor: colors.white[100],
   },
   contentContainer: {
     flex: 1,
@@ -213,7 +219,7 @@ const styles = StyleSheet.create({
     padding: '2%',
     borderRadius: 10,
     borderColor: colors.gray[300],
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     elevation: 3,
   },
   sectionHeader: {
@@ -223,7 +229,7 @@ const styles = StyleSheet.create({
   },
   informationContainer: {
     padding: '2%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },
@@ -244,8 +250,25 @@ const styles = StyleSheet.create({
   },
   fileContainer: {
     padding: '2%',
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
     justifyContent: 'flex-start',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.backgroundBlack,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    fontFamily: fonts.beVietnamPro.bold,
+    color: colors.red[500],
   },
 });
 

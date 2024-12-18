@@ -11,7 +11,15 @@ import { Home, QRCodeScreen } from '@views/Home';
 import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
-import { Other, Policy, Profile, Wallet } from '@views/Other';
+import {
+  NotarizationDetail,
+  NotarizationHistory,
+  Other,
+  Policy,
+  Profile,
+  SignScreen,
+  Wallet,
+} from '@views/Other';
 import { AddSession, Session, SessionDetail } from '@views/Session';
 
 import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
@@ -111,6 +119,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           headerLeft: () => renderHeaderLeft(false),
         }}
       />
@@ -120,6 +130,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           animation: 'none',
           headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
@@ -130,6 +142,8 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Tạo hồ sơ công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
           animation: 'none',
           headerLeft: () => renderHeaderLeft(true, handleConfirmBack),
         }}
@@ -254,6 +268,30 @@ export function OtherStackNavigator() {
           headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
         }}
       />
+      <Stack.Screen
+        component={NotarizationHistory}
+        name="NotarizationHistoryStack"
+        options={{
+          headerTitle: 'Lịch sử công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={NotarizationDetail}
+        name="NotarizationDetailStack"
+        options={{
+          headerTitle: 'Chi tiết công chứng',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
+      <Stack.Screen
+        component={SignScreen as React.ComponentType<any>}
+        name="SignScreenStack"
+        options={{
+          headerTitle: 'Ký số',
+          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -311,6 +349,11 @@ export function QRScanStackNavigator({ navigation, route }) {
 
 const styles = StyleSheet.create({
   headerBackground: {
-    backgroundColor: colors.white[100],
+    backgroundColor: colors.white[50],
+    elevation: 5,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontFamily: fonts.beVietnamPro.bold,
   },
 });
