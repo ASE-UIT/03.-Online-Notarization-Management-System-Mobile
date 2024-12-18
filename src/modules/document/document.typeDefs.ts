@@ -77,6 +77,26 @@ export interface IUploadDocumentResponse {
   id: string;
 }
 
+export interface ISignatureApprovalStatus {
+  notary: {
+    approved: boolean;
+    approvedAt: Date | null;
+  };
+  user: {
+    approved: boolean;
+    approvedAt: Date;
+  };
+}
+
+export interface ISignature {
+  _id: string;
+  approvalStatus: ISignatureApprovalStatus;
+  documentId: string;
+  signatureImage: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface IDocumentHistoryStatus {
   _id: string;
   files: {
@@ -110,6 +130,7 @@ export interface IDocumentHistoryStatus {
     transactionHash: string;
     uploadedAt: Date;
   }[];
+  signature: ISignature;
 }
 
 export type IDocumentHistoryStatusResponse = IDocumentHistoryStatus[];

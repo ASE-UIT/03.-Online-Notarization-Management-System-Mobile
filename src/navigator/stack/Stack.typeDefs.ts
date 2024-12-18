@@ -1,3 +1,4 @@
+import { IDocumentHistoryStatus } from '@modules/document';
 import { ISession } from '@modules/session/session.typeDefs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
@@ -31,7 +32,8 @@ export type StackParamList = {
   ProvideInformation: undefined;
   ConfirmInformation: undefined;
 
-  DetailDocument: { documentId: string };
+  DetailDocument: { document: IDocumentHistoryStatus };
+  Signature: { documentId: string };
 
   Service: undefined;
   ServiceDetail: { serviceId: string };

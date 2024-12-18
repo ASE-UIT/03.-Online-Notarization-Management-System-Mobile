@@ -9,7 +9,7 @@ import { colors, fonts } from '@theme';
 // views
 import { ForgetPassword, SignIn, SignUp } from '@views/Auth';
 import { Home, QRCodeScreen, Service, ServiceDetail, SendNFT } from '@views/Home';
-import { Search, DetailDocument } from '@views/Search';
+import { Search, DetailDocument, Signature } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
 import {
   NotarizationDetail,
@@ -197,7 +197,7 @@ export function SearchStackNavigator({ navigation, route }: any) {
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route) ?? 'SearchStack';
 
-    const hiddenScreens = ['DetailDocument'];
+    const hiddenScreens = ['DetailDocument', 'Signature'];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
         tabBarStyle: { display: 'none' },
@@ -228,6 +228,15 @@ export function SearchStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Chi tiết hồ sơ công chứng',
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
+      <Stack.Screen
+        component={Signature}
+        name="Signature"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Kí số',
           headerLeft: () => renderHeaderLeft(false),
         }}
       />

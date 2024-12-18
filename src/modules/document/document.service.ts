@@ -48,10 +48,29 @@ async function getDocumentDetail(documentId: string): Promise<IDocumentHistorySt
   }
 }
 
+async function approveSignatureByUser(data: FormData): Promise<string> {
+  try {
+    const response = await axiosConfig.post<string>(
+      process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/notarization/approve-signature-by-user',
+      data,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Failed to approve signature by user:', error);
+    throw new Error('Failed to approve signature by user');
+  }
+}
+
 const DocumentService = {
   uploadDocument,
   getDocumentHistoryWithStatus,
   getDocumentDetail,
+  approveSignatureByUser,
 };
 
 export default DocumentService;
