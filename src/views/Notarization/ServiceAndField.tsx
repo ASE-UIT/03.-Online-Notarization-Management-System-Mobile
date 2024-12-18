@@ -102,6 +102,7 @@ const ServiceAndField = ({ navigation }: StackProps) => {
               placeholder="Chọn lĩnh vực công chứng"
               placeholderStyle={{ color: colors.gray[300] }}
               onChange={item => setSelectedField(item.value)}
+              value={selectedField}
             />
 
             <Text style={styles.sectionHeader}>Dịch vụ Công Chứng</Text>
@@ -118,6 +119,7 @@ const ServiceAndField = ({ navigation }: StackProps) => {
                 placeholder="Chọn dịch vụ công chứng"
                 placeholderStyle={{ color: colors.gray[300] }}
                 onChange={item => setSelectedService(item.value)}
+                value={selectedService}
               />
             ) : (
               <Text style={styles.placeHolder}>Vui lòng chọn lĩnh vực công chứng trước</Text>

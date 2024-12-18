@@ -10,38 +10,32 @@ import { Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const services = [
   {
-    id: '1',
+    id: '6746f2dbcc390609e20d08dc',
     name: 'Công chứng hợp đồng vay tài sản',
-    description: 'Cung cấp giải pháp chiến lược để phát triển bền vững.',
   },
   {
-    id: '2',
-    name: 'Công chứng hợp đồng bảo lãnh',
-    description: 'Phát triển các giải pháp phần mềm theo yêu cầu.',
-  },
-  {
-    id: '3',
-    name: 'Công chứng hợp đồng tín chấp',
-    description: 'Giúp doanh nghiệp cải thiện hiệu quả vận hành.',
-  },
-  {
-    id: '4',
-    name: 'Công chứng hợp đồng góp vốn bằng tài sản doanh nghiệp',
-    description: 'Chương trình đào tạo nhân viên chuyên nghiệp.',
-  },
-  {
-    id: '5',
+    id: '6746f41fcc390609e20d08eb',
     name: 'Công chứng văn bản nhận thừa kế',
-    description: 'Đồng hành trong việc tích hợp trí tuệ nhân tạo.',
   },
   {
-    id: '6',
-    name: 'Công chứng văn bản khai nhận di sản thừa kế',
-    description: 'Xây dựng website chuyên nghiệp và thân thiện.',
+    id: '6746f53dcc390609e20d08ff',
+    name: 'Công chứng hợp đồng thế chấp tài sản',
   },
   {
-    id: '7',
-    name: 'Công chứng hợp đồng chuyển nhượng quyền sử dụng đất nông nghiệp',
+    id: '6746f53dcc390609e20d08fe',
+    name: 'Công chứng hợp đồng cầm cố tài sản',
+  },
+  {
+    id: '6746f604cc390609e20d0912',
+    name: 'Công chứng hợp đồng ủy quyền',
+  },
+  {
+    id: '6746f6b2cc390609e20d0929',
+    name: 'Công chứng hợp đồng thuê nhà ở xã hội',
+  },
+  {
+    id: '6746f63acc390609e20d091a',
+    name: 'Công chứng hợp đồng đặt cọc',
     description: 'Chiến lược quảng cáo tối ưu trên các nền tảng.',
   },
 ];
@@ -78,7 +72,11 @@ export default function Main({ navigation }: Readonly<StackProps>) {
     navigation.navigate('Service');
   };
 
-  const renderServices = (services: { id: string; name: string; description: string }[]) => {
+  const handleDetailService = (serviceId: string) => {
+    navigation.navigate('ServiceDetail', { serviceId });
+  };
+
+  const renderServices = (services: { id: string; name: string }[]) => {
     const processName = (name: string) => {
       if (name.startsWith('Công chứng ')) {
         const newName = name.replace('Công chứng ', '');
@@ -93,7 +91,7 @@ export default function Main({ navigation }: Readonly<StackProps>) {
     }
 
     if (rows.length > 0 && rows[rows.length - 1].length < 8) {
-      rows[rows.length - 1].push({ id: 'more', name: 'Xem thêm', description: '' });
+      rows[rows.length - 1].push({ id: 'more', name: 'Xem thêm' });
     } else {
       rows.push([{ id: 'more', name: 'Xem thêm', description: '' }]);
     }
@@ -104,7 +102,9 @@ export default function Main({ navigation }: Readonly<StackProps>) {
           <TouchableOpacity
             key={service.id}
             style={styles.serviceItem}
-            onPress={service.id === 'more' ? handleViewMore : handleCreateDocument}>
+            onPress={
+              service.id === 'more' ? handleViewMore : () => handleDetailService(service.id)
+            }>
             {service.id === 'more' ? (
               <Foundation name="indent-more" size={30} color={colors.gray[300]} />
             ) : (
