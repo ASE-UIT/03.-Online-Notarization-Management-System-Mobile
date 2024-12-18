@@ -8,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = ({ navigation, route }: StackProps) => {
   const [username, setUsername] = useState('');
-  const { user, setUser } = useUserSlice();
-  console.log('user at Home', user);
+  const { user, setUser, dispatch } = useUserSlice();
   const handleNavigateToQRCode = () => {
     navigation.navigate('QRCodeStack');
   };
@@ -17,7 +16,7 @@ const Home = ({ navigation, route }: StackProps) => {
     const fetchUser = async () => {
       const userString = await AsyncStorage.getItem('user');
       const user = userString ? JSON.parse(userString) : null;
-      setUser(user);
+      dispatch(setUser(user));
       setUsername(user?.name || '');
     };
     fetchUser();
