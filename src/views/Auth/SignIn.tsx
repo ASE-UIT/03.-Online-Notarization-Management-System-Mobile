@@ -44,6 +44,9 @@ const SignIn = ({ navigation }: StackProps) => {
   const moveToSignUp = () => {
     navigation.navigate('SignUpStack');
   };
+  const moveToForgetPassword = () => {
+    navigation.navigate('ForgetPasswordStack');
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.container}>
@@ -75,7 +78,9 @@ const SignIn = ({ navigation }: StackProps) => {
             <Text style={styles.rememberText}>Ghi nhớ đăng nhập</Text>
           </View>
           <TouchableOpacity>
-            <Text style={styles.forgotText}>Quên mật khẩu?</Text>
+            <Text style={styles.forgotText} onPress={() => moveToForgetPassword()}>
+              Quên mật khẩu?
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -143,7 +148,7 @@ const SocialLoginButton = ({ iconSource, text }: { iconSource: any; text: string
 );
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1 },
+  safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { paddingHorizontal: 20, justifyContent: 'center' },
   logo: { width: 100, height: 100, alignSelf: 'center', marginVertical: 24 },
   title: {

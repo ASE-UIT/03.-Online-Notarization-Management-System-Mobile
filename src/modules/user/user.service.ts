@@ -69,12 +69,19 @@ async function searchUserByEmail(email: string): Promise<IUser[] | string> {
   }
 }
 
+async function forgotPassword(email: string): Promise<void> {
+  await axios.post(process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/auth/forgot-password', {
+    email,
+  });
+}
+
 const UserService = {
   login,
   logout,
   refreshAccessToken,
   register,
   searchUserByEmail,
+  forgotPassword,
 };
 
 export default UserService;

@@ -7,8 +7,8 @@ import { StackHeaderLeft } from './components';
 import { colors, fonts } from '@theme';
 
 // views
+import { ForgetPassword, SignIn, SignUp } from '@views/Auth';
 import { Home, QRCodeScreen, Service, ServiceDetail, SendNFT } from '@views/Home';
-import { SignIn, SignUp } from '@views/Auth';
 import { Search, DetailDocument } from '@views/Search';
 import { QRScan, TransferNFT } from '@views/QRScan';
 import {
@@ -52,6 +52,13 @@ export function AuthStackNavigator() {
       <Stack.Screen
         component={TabNavigator}
         name="TabNavigator"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        component={ForgetPassword}
+        name="ForgetPasswordStack"
         options={{
           headerShown: false,
         }}
