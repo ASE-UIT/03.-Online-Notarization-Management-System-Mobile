@@ -59,3 +59,10 @@ export interface IAddress {
   town: string;
   street: string;
 }
+
+export interface IUpdateUserRequest {
+  name?: string;
+  citizenId?: string;
+  phoneNumber?: string;
+  address?: IAddress;
+}
