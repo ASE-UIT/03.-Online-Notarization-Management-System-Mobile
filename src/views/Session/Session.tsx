@@ -36,18 +36,8 @@ export default function Session({ navigation, route }: { navigation: any; route:
   return (
     <View style={styles.container}>
       <View>
-        <Text style={{ fontSize: 24, fontFamily: fonts.beVietnamPro.bold, marginBottom: 8 }}>
-          Phiên công chứng
-        </Text>
-        <Text
-          style={{
-            textDecorationLine: 'underline',
-            color: colors.primary[400],
-            fontSize: 14,
-            fontFamily: fonts.beVietnamPro.regular,
-          }}>
-          Toàn bộ phiên công chứng của bạn sẽ hiển thị ở đây
-        </Text>
+        <Text style={styles.title}>Phiên công chứng</Text>
+        <Text style={styles.subTitle}>Toàn bộ phiên công chứng của bạn sẽ hiển thị ở đây</Text>
       </View>
       <View style={styles.searchBox}>
         <AntDesign name="search1" size={28} color="black" />
@@ -89,9 +79,9 @@ export default function Session({ navigation, route }: { navigation: any; route:
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 40,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white[50],
+    paddingHorizontal: '4%',
+    paddingTop: '8%',
   },
   searchBox: {
     flexDirection: 'row',
@@ -117,5 +107,16 @@ const styles = StyleSheet.create({
   },
   sessionCardWrapper: {
     flex: 1,
+  },
+  title: {
+    fontSize: 24,
+    fontFamily: fonts.beVietnamPro.bold,
+    color: colors.black,
+  },
+  subTitle: {
+    textDecorationLine: 'underline',
+    color: colors.primary[400],
+    fontSize: 14,
+    fontFamily: fonts.beVietnamPro.regular,
   },
 });

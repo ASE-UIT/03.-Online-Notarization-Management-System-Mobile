@@ -7,6 +7,7 @@ import {
   Linking,
   Pressable,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
@@ -18,12 +19,11 @@ import {
   getDocumentNameByCode,
   getDocumentStatusByCode,
 } from '@utils/constants';
+import { StackProps } from '@navigator';
 
-const DetailDocument: React.FC = () => {
+const DetailDocument = ({ navigation }: StackProps) => {
   const route = useRoute();
-  const [document, setDocument] = useState<IDocumentHistoryStatus | undefined>(undefined);
-  const { documentId } = route.params as { documentId: string };
-  const [loading, setLoading] = useState<boolean>(true);
+  const { document } = route.params as { document: IDocumentHistoryStatus };
 
   const STATUS_COLORS: { [key in DocumentStatusCode]: string } = {
     digitalSignature: colors.blue[500],
@@ -32,23 +32,6 @@ const DetailDocument: React.FC = () => {
     rejected: colors.red[500],
     pending: colors.gray[400],
   };
-
-  useEffect(() => {
-    const fetchDocumentDetail = async () => {
-      try {
-        setLoading(true);
-        const document = await DocumentService.getDocumentDetail(documentId);
-        console.log('document', document);
-        setDocument(document);
-      } catch (error) {
-        console.error('Error fetching document detail', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDocumentDetail();
-  }, [documentId]);
 
   const handleUrlPress = (url: string) => {
     Linking.openURL(url).catch(err => console.error('Không thể mở URL:', err));
@@ -74,6 +57,10 @@ const DetailDocument: React.FC = () => {
     );
   };
 
+  const handleSignature = (documentId: string) => {
+    navigation.navigate('Signature', { documentId });
+  };
+
   const renderOutputFiles = () => {
     if (!document || !Array.isArray(document.output) || document.output.length === 0) {
       return <Text style={styles.info}>Không có tài liệu phản hồi.</Text>;
@@ -94,20 +81,11 @@ const DetailDocument: React.FC = () => {
     );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary[400]} />
-        <Text style={styles.loadingText}>Đang tải dữ liệu...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.main}>
         <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
-          <Text style={styles.header}>Mã số: #{documentId}</Text>
+          <Text style={styles.header}>Mã số: #{document._id}</Text>
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>Thông tin hồ sơ</Text>
             <View style={styles.informationContainer}>
@@ -120,7 +98,6 @@ const DetailDocument: React.FC = () => {
                       STATUS_COLORS[document?.status.status as DocumentStatusCode] || colors.black,
                     fontFamily: fonts.beVietnamPro.semiBold,
                   },
-                  {},
                 ]}>
                 {getDocumentStatusByCode(document?.status.status as DocumentStatusCode)}
               </Text>
@@ -159,6 +136,31 @@ const DetailDocument: React.FC = () => {
             <Text style={styles.sectionHeader}>Tài liệu phản hồi</Text>
             {renderOutputFiles()}
           </View>
+
+          {(document?.status.status === 'digitalSignature' ||
+            document?.status.status === 'completed') && (
+            <View style={[styles.sectionContainer, { width: '100%' }]}>
+              <Text style={styles.sectionHeader}>Chữ kí điện tử của bạn</Text>
+              <View style={styles.informationContainer}>
+                {!!document?.signature?.signatureImage && (
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={{ uri: document?.signature?.signatureImage }}
+                      style={styles.image}
+                      resizeMode="contain"
+                    />
+                  </View>
+                )}
+                {!document?.signature?.signatureImage && (
+                  <Pressable
+                    style={styles.signatureButton}
+                    onPress={() => handleSignature(document._id)}>
+                    <Text style={styles.signatureButtonText}>Kí ngay!</Text>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+          )}
 
           <View style={styles.sectionContainer}>
             <Text style={styles.sectionHeader}>Thông tin công chứng</Text>
@@ -249,7 +251,7 @@ const styles = StyleSheet.create({
     padding: '2%',
     backgroundColor: colors.white[50],
     flexDirection: 'row',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
   },
   title: {
     color: colors.black,
@@ -287,6 +289,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: fonts.beVietnamPro.regular,
     color: colors.black,
+  },
+  imageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signatureButton: {
+    backgroundColor: colors.primary[500],
+    padding: '3%',
+    borderRadius: 5,
+    elevation: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signatureButtonText: {
+    color: colors.white[50],
+    fontFamily: fonts.beVietnamPro.semiBold,
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  image: {
+    width: 200,
+    height: 200,
+    borderRadius: 10,
+    flex: 1,
   },
 });
 

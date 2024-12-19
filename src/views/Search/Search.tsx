@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   StatusBar,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { FlatList } from 'react-native-gesture-handler';
@@ -16,12 +17,14 @@ import { getDocumentStatusByCode, DocumentStatusCode } from '@utils/constants';
 import { DocumentService, IDocumentHistoryStatus } from '@modules/document';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StackProps } from '@navigator';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Search({ navigation }: Readonly<StackProps>) {
   const [searching, setSearching] = useState(false);
   const [fileId, setFileId] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const [initialResults, setInitialResults] = useState<any[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<DocumentStatusCode | null>(null);
 
   const STATUS_COLORS: { [key in DocumentStatusCode]: string } = {
     digitalSignature: colors.blue[500],
@@ -31,13 +34,24 @@ export default function Search({ navigation }: Readonly<StackProps>) {
     pending: colors.gray[400],
   };
 
-  useEffect(() => {
-    fetchDocumentHistory();
-  }, []);
+  const STATUS_OPTIONS: { label: string; value: DocumentStatusCode | null }[] = [
+    { label: 'Tất cả', value: null },
+    { label: 'Chờ xử lý', value: 'pending' },
+    { label: 'Đang xử lý', value: 'processing' },
+    { label: 'Chờ ký số', value: 'digitalSignature' },
+    { label: 'Đã hoàn thành', value: 'completed' },
+    { label: 'Bị từ chối', value: 'rejected' },
+  ];
 
-  const handleGetDocumentDetail = async (documentId: string) => {
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchDocumentHistory();
+    }, []),
+  );
+
+  const handleGetDocumentDetail = async (document: IDocumentHistoryStatus) => {
     try {
-      navigation.navigate('DetailDocument', { documentId });
+      navigation.navigate('DetailDocument', { document });
     } catch (error) {
       console.error('Error fetching document detail', error);
     }
@@ -47,8 +61,8 @@ export default function Search({ navigation }: Readonly<StackProps>) {
     try {
       setSearching(true);
       const response = await DocumentService.getDocumentHistoryWithStatus();
-      setResults(response);
       setInitialResults(response);
+      filterResults(response);
     } catch (error) {
       console.error('Error fetching document history', error);
     } finally {
@@ -56,13 +70,24 @@ export default function Search({ navigation }: Readonly<StackProps>) {
     }
   };
 
+  const filterResults = (data: any[]) => {
+    const filteredData = selectedStatus
+      ? data.filter(item => item.status.status === selectedStatus)
+      : data;
+    setResults(filteredData);
+  };
+
   const handleSearch = async () => {
     try {
       setSearching(true);
       if (fileId.trim() === '') {
-        await fetchDocumentHistory();
+        filterResults(initialResults);
       } else {
-        const filteredData = initialResults.filter(item => item._id.includes(fileId));
+        const filteredData = initialResults.filter(
+          item =>
+            item._id.includes(fileId) &&
+            (selectedStatus ? item.status.status === selectedStatus : true),
+        );
         setResults(filteredData);
       }
     } catch (error) {
@@ -70,6 +95,14 @@ export default function Search({ navigation }: Readonly<StackProps>) {
     } finally {
       setSearching(false);
     }
+  };
+
+  useEffect(() => {
+    filterResults(initialResults);
+  }, [selectedStatus, initialResults]);
+
+  const handleStatusSelect = (status: DocumentStatusCode | null) => {
+    setSelectedStatus(status);
   };
 
   const renderItem = ({ item }: { item: IDocumentHistoryStatus }) => (
@@ -97,7 +130,7 @@ export default function Search({ navigation }: Readonly<StackProps>) {
         <TouchableOpacity
           style={styles.detailButton}
           onPress={() => {
-            handleGetDocumentDetail(item._id);
+            handleGetDocumentDetail(item);
           }}>
           <Text style={styles.detailButtonText}>Chi tiết</Text>
           <Ionicons name="play-forward-circle" size={24} color={colors.white[100]} />
@@ -119,7 +152,7 @@ export default function Search({ navigation }: Readonly<StackProps>) {
           onChangeText={text => {
             setFileId(text);
             if (text.trim() === '') {
-              fetchDocumentHistory();
+              filterResults(initialResults); // Apply filter based on fileId change
             }
           }}
         />
@@ -127,6 +160,28 @@ export default function Search({ navigation }: Readonly<StackProps>) {
           <FontAwesome name="search" size={20} color={colors.primary[400]} />
           <Text style={styles.searchButtonText}>Tìm kiếm</Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.filterContainer}>
+        <Text style={styles.filterLabel}>Lọc theo trạng thái:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {STATUS_OPTIONS.map(option => (
+            <TouchableOpacity
+              key={option.value}
+              style={[
+                styles.filterButton,
+                selectedStatus === option.value && styles.filterButtonActive,
+              ]}
+              onPress={() => handleStatusSelect(option.value)}>
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  selectedStatus === option.value && styles.filterButtonTextActive,
+                ]}>
+                {option.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'flex-end', width: '100%' }}>
         <Text style={styles.redSubTitle}>Tổng số tài liệu tìm thấy: {results.length}</Text>
@@ -164,9 +219,10 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   subTitle: {
-    fontSize: 15,
-    fontFamily: fonts.beVietnamPro.bold,
-    color: colors.gray[400],
+    textDecorationLine: 'underline',
+    color: colors.primary[400],
+    fontSize: 14,
+    fontFamily: fonts.beVietnamPro.regular,
   },
   redSubTitle: {
     marginVertical: '2%',
@@ -263,5 +319,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: fonts.beVietnamPro.regular,
     marginTop: '5%',
+  },
+  filterContainer: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  filterLabel: {
+    fontSize: 14,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    marginBottom: 5,
+  },
+  filterButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.gray[300],
+    marginRight: 8,
+  },
+  filterButtonActive: {
+    backgroundColor: colors.primary[400],
+    borderColor: colors.primary[400],
+  },
+  filterButtonText: {
+    fontSize: 12,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    color: colors.gray[600],
+  },
+  filterButtonTextActive: {
+    color: colors.white[50],
   },
 });
