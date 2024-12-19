@@ -15,6 +15,8 @@ const initialState: IDocumentState = {
     email: undefined,
   },
   files: [],
+  fileIds: [],
+  customFileNames: [],
   amount: 0,
 };
 
@@ -46,11 +48,27 @@ const documentSlice = createSlice({
       state.requesterInfo.phoneNumber = payload.phoneNumber;
       state.requesterInfo.email = payload.email;
       state.amount = payload.amount;
-
-      console.log('Requester Info:', state.requesterInfo, state.amount);
     },
     addFile: (state, { payload }: PayloadAction<any>) => {
+      if (!state.files) {
+        state.files = [];
+      }
       state.files.push(payload);
+    },
+    addFileFromWallet: (
+      state,
+      { payload }: PayloadAction<{ fileIds: string[]; customFileNames: string[] }>,
+    ) => {
+      if (!state.fileIds) {
+        state.fileIds = [];
+      }
+      if (!state.customFileNames) {
+        state.customFileNames = [];
+      }
+      state.fileIds = payload.fileIds;
+      state.customFileNames = payload.customFileNames;
+
+      console.log('FileIds:', state.fileIds, 'CustomFileNames:', state.customFileNames);
     },
     resetDocumentState: () => {
       console.log('Resetting state to initialState', initialState);

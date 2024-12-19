@@ -17,3 +17,8 @@ export interface INFTItem {
   mintedAt: Date;
   selected?: boolean;
 }
+
+export interface ISendingDocumentFromWallet {
+  filename: string;
+  _id: string;
+}

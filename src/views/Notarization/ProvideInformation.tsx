@@ -9,6 +9,8 @@ import Toast from 'react-native-toast-message';
 import { useDocumentSlice } from '@modules/document';
 import { getDocumentNameByCode, DocumentTypeCode } from '@utils/constants';
 import { Feather } from '@expo/vector-icons';
+import { SelectUploadFile } from '@components/Modal';
+import { INFTItem } from '@modules/userWallet';
 
 type FileType = {
   name: string;
@@ -17,10 +19,17 @@ type FileType = {
   mimeType: string;
 };
 
-const ProvideInformation = ({ navigation }: StackProps) => {
-  const { dispatch, setRequesterInfo, notarizationService, addFile } = useDocumentSlice();
+const ProvideInformation = ({ navigation, route }: StackProps) => {
+  const { dispatch, setRequesterInfo, notarizationService, addFile, addFileFromWallet } =
+    useDocumentSlice();
   const [step, setStep] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<{ [key: string]: any }>({});
+  const [selectedNFT, setSelectedNFT] = useState<INFTItem>();
+  const [currentDocument, setCurrentDocument] = useState<string | null>(null);
+
+  const [fileIdFromWallet, setFileIdFromWallet] = useState<string[]>([]);
+  const [customFileNames, setCustomFileNames] = useState<string[]>([]);
 
   const [fullName, setFullName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -61,9 +70,13 @@ const ProvideInformation = ({ navigation }: StackProps) => {
     }
 
     const missingDocuments =
-      notarizationService?.required_documents.filter(
-        document => !selectedFiles[document] || selectedFiles[document].length === 0,
-      ) ?? [];
+      notarizationService?.required_documents.filter(document => {
+        const hasFileInSelectedFiles =
+          selectedFiles[document] && selectedFiles[document].length > 0;
+        const hasFileInCustomNames = customFileNames.some(name => name.startsWith(document));
+
+        return !hasFileInSelectedFiles && !hasFileInCustomNames;
+      }) ?? [];
 
     if (missingDocuments.length > 0) {
       const missingDocNames = missingDocuments
@@ -85,6 +98,7 @@ const ProvideInformation = ({ navigation }: StackProps) => {
     );
 
     dispatch(addFile(selectedFiles));
+    dispatch(addFileFromWallet({ fileIds: fileIdFromWallet, customFileNames }));
     navigation.navigate('ConfirmInformation');
   };
 
@@ -152,53 +166,116 @@ const ProvideInformation = ({ navigation }: StackProps) => {
     }
   };
 
-  const deleteFile = (document: string, fileIndex: number) => {
-    setSelectedFiles(prevState => {
-      const updatedFiles = [...(prevState[document] || [])];
-      updatedFiles.splice(fileIndex, 1);
+  const deleteFile = (
+    document: string,
+    fileIndex: number,
+    source: 'selectedFiles' | 'customFileNames',
+  ) => {
+    if (source === 'selectedFiles') {
+      setSelectedFiles(prevState => {
+        const updatedFiles = [...(prevState[document] || [])];
+        updatedFiles.splice(fileIndex, 1);
 
-      if (updatedFiles.length === 0) {
-        const { [document]: _, ...rest } = prevState;
-        return rest;
-      }
+        if (updatedFiles.length === 0) {
+          const { [document]: _, ...rest } = prevState;
+          return rest;
+        }
 
-      return {
-        ...prevState,
-        [document]: updatedFiles,
-      };
-    });
+        return {
+          ...prevState,
+          [document]: updatedFiles,
+        };
+      });
+    } else if (source === 'customFileNames') {
+      setCustomFileNames(prevState => {
+        const updatedNames = prevState.filter(
+          (name, index) => !(index === fileIndex && name.startsWith(document)),
+        );
+        return updatedNames;
+      });
+
+      setFileIdFromWallet(prevState => {
+        const updatedFileIds = [...prevState];
+        updatedFileIds.splice(fileIndex, 1);
+        return updatedFileIds;
+      });
+    }
   };
 
-  const renderFieldsToUpload = () => {
-    return notarizationService?.required_documents.map((document: string, index: number) => (
-      <View key={document} style={{ marginVertical: '2%' }}>
-        <View style={styles.uploadFileHeaderContainer}>
-          <Text style={[styles.sectionHeader, { flex: 1 }]}>
-            {getDocumentNameByCode(document as DocumentTypeCode)}{' '}
-            {selectedFiles[document]?.length > 0 && `(${selectedFiles[document].length} tệp)`}
-          </Text>
-          <Pressable style={styles.uploadFileButton} onPress={() => pickFile(document)}>
-            <Text style={styles.addText}>Thêm tệp</Text>
-          </Pressable>
-          <View />
-        </View>
+  const handleUploadFile = async (document: string) => {
+    setCurrentDocument(document);
+    setShowModal(true);
+  };
 
-        {selectedFiles[document] && selectedFiles[document].length > 0 && (
+  const handleUploadFileFromWallet = async () => {
+    navigation.navigate('GetWalletDocument', { onGoBack: handleWalletData });
+  };
+
+  const handleWalletData = (data: INFTItem) => {
+    setSelectedNFT(data);
+
+    if (fileIdFromWallet.includes(data._id)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Tài liệu không hợp lệ',
+        text2: 'File ID đã tồn tại trong ví!',
+        visibilityTime: 2000,
+        position: 'bottom',
+      });
+      return;
+    }
+
+    const timestamp = new Date().getTime();
+    fileIdFromWallet.push(data._id);
+    const fileExtension = data.filename.split('.').pop();
+    customFileNames.push(`${currentDocument}_${timestamp}.${fileExtension}`);
+
+    console.log('FileId:', fileIdFromWallet, 'CustomFileName:', customFileNames);
+  };
+
+  const handleUploadFileFromLibrary = async (document: string) => {
+    pickFile(document);
+    setShowModal(false);
+  };
+  const renderFieldsToUpload = () => {
+    return notarizationService?.required_documents.map((document: string, index: number) => {
+      const allFiles = [
+        ...(selectedFiles[document] || []).map((file: { name: any }) => ({
+          name: file.name,
+          source: 'selectedFiles',
+        })),
+        ...customFileNames
+          .filter(name => name.startsWith(document))
+          .map(name => ({ name, source: 'customFileNames' })),
+      ];
+
+      return (
+        <View key={document} style={{ marginVertical: '2%' }}>
+          <View style={styles.uploadFileHeaderContainer}>
+            <Text style={[styles.sectionHeader, { flex: 1 }]}>
+              {getDocumentNameByCode(document as DocumentTypeCode)}{' '}
+              {allFiles.length > 0 && `(${allFiles.length} tệp)`}
+            </Text>
+            <Pressable style={styles.uploadFileButton} onPress={() => handleUploadFile(document)}>
+              <Text style={styles.addText}>Thêm tệp</Text>
+            </Pressable>
+          </View>
+
           <View style={styles.filesUploadedContainer}>
-            {selectedFiles[document].map((file: FileType, fileIndex: number) => (
-              <View key={`${document}_${fileIndex}`} style={styles.fileRow}>
+            {allFiles.map((file, fileIndex) => (
+              <View key={`${document}_${file.source}_${fileIndex}`} style={styles.fileRow}>
                 <Text style={styles.filesText}>{file.name}</Text>
                 <Pressable
                   style={styles.deleteFileButton}
-                  onPress={() => deleteFile(document, fileIndex)}>
+                  onPress={() => deleteFile(document, fileIndex, file.source)}>
                   <Feather name="x-circle" size={24} color={colors.gray[600]} />
                 </Pressable>
               </View>
             ))}
           </View>
-        )}
-      </View>
-    ));
+        </View>
+      );
+    });
   };
 
   return (
@@ -259,6 +336,12 @@ const ProvideInformation = ({ navigation }: StackProps) => {
         </ScrollView>
       </View>
       <ForwardStepBar step={2} totalStep={3} onBack={handleBack} onNext={handleNextStep} />
+      <SelectUploadFile
+        visible={showModal}
+        onClose={() => setShowModal(false)}
+        onSelectLibrary={() => handleUploadFileFromLibrary(currentDocument || '')}
+        onSelectWallet={() => handleUploadFileFromWallet()}
+      />
     </View>
   );
 };

@@ -141,7 +141,6 @@ export default function Search({ navigation }: Readonly<StackProps>) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar />
       <Text style={styles.title}>Tra cứu hồ sơ công chứng</Text>
       <Text style={styles.subTitle}>Lịch sử công chứng của bạn sẽ hiển thị ở đây</Text>
       <View style={styles.inputContainer}>
@@ -152,7 +151,7 @@ export default function Search({ navigation }: Readonly<StackProps>) {
           onChangeText={text => {
             setFileId(text);
             if (text.trim() === '') {
-              filterResults(initialResults); // Apply filter based on fileId change
+              filterResults(initialResults);
             }
           }}
         />
@@ -275,11 +274,11 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white[50],
     borderWidth: 1,
-    borderColor: colors.gray[300],
+    borderColor: colors.gray[200],
     borderRadius: 5,
     padding: '3%',
     marginBottom: 10,
-    elevation: 5,
+    elevation: 8,
   },
   cardTitle: {
     fontSize: 17,

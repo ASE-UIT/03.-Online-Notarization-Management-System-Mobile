@@ -258,7 +258,7 @@ export default function SendNFT({ navigation, route }: Readonly<StackProps>) {
             Chọn tài liệu bạn muốn gửi đi
           </Text>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
+          <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
             {userWallet?.nftItems.map((item, index) => (
               <Pressable
                 key={item._id}
@@ -274,7 +274,6 @@ export default function SendNFT({ navigation, route }: Readonly<StackProps>) {
                   borderWidth: item.selected ? 2 : 0,
                   borderColor: item.selected ? colors.primary[400] : 'transparent',
                   borderRadius: 8,
-                  padding: item.selected ? 8 : 0,
                 }}>
                 <UserWalletCard item={item} />
               </Pressable>
