@@ -1,207 +1,265 @@
-import { View, Text, ScrollView, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
+import React, { useEffect, useState } from 'react';
 import { colors, fonts } from '@theme';
 import { ISession } from '@modules/session/session.typeDefs';
-import { CustomDropdown } from '@components/CustomDropdown';
-import { INotarizationField } from '@modules/notarizationField';
-import { INotarizationService } from '@modules/notarizationService';
-import { DateTimeWrapper } from '@components/DateTimeWrapper';
 import { formatDate } from '@utils/helper';
+import { useUserSlice } from '@modules/user';
+import UserService from '@modules/user/user.service';
+import { DocumentStatusCode, getDocumentStatusByCode } from '@utils/constants';
+import Toast from 'react-native-toast-message';
+import SessionService from '@modules/session/session.service';
+import { Feather } from '@expo/vector-icons';
 
-export default function SessionDetail({ navigation, route }: { navigation: any; route: any }) {
-  const [session, setSession] = useState<ISession | null>(route.params.session);
-  const [userEmail, setUserEmail] = useState('');
-  const [selected, setSelected] = useState<{ email: string }[]>([]);
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
+export default function SessionDetail({
+  navigation,
+  route,
+}: Readonly<{ navigation: any; route: any }>) {
+  const { session } = route.params as { session: ISession };
+  const [userEmailList, setUserEmailList] = useState<string[]>([]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [isManualSelection, setIsManualSelection] = useState(false);
+
+  const debouncedSearchQuery = useDebounce(searchQuery, 150);
+
+  const { user } = useUserSlice();
+
+  const renderUserEmail = () => {
+    if (!session || !Array.isArray(session.users) || session.users.length === 0) {
+      return <Text style={styles.info}>Không có người nào được mời.</Text>;
+    }
+    return (
+      <View>
+        {userEmailList.map((email, index) => (
+          <View key={email} style={styles.fileRow}>
+            <Text style={styles.email}>{`• ${email}`}</Text>
+            {user?.id === session?.creator._id && (
+              <Pressable onPress={() => handleDeleteUser(email)}>
+                <Feather name="x-circle" size={24} color={colors.gray[600]} />
+              </Pressable>
+            )}
+          </View>
+        ))}
+      </View>
+    );
+  };
+
+  const fetchUserEmailList = async () => {
+    try {
+      const emails = session.users.map(user => user.email);
+      setUserEmailList(emails);
+    } catch (error) {
+      console.error('Error fetching user email list:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserEmailList();
+  }, []);
+
+  const handleSearchInput = (text: string) => {
+    setSearchQuery(text);
+    setIsManualSelection(false);
+  };
+
+  const handleSelectUser = (user: any) => {
+    setIsManualSelection(true);
+    setSearchQuery(user.email);
+    setSuggestions([]);
+  };
+
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (debouncedSearchQuery.trim() === '' || isManualSelection) {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        const response = await UserService.searchUserByEmail(debouncedSearchQuery.trim());
+        setSuggestions(Array.isArray(response) ? response : []);
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    };
+
+    fetchSuggestions();
+  }, [debouncedSearchQuery, isManualSelection]);
+
+  const handleDeleteUser = async (email: string) => {
+    try {
+      console.log(email);
+      await SessionService.deleteUserFromSession(session._id, email);
+      setUserEmailList(userEmailList.filter(userEmail => userEmail !== email));
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Đã xảy ra lỗi, vui lòng thử lại',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+    }
+  };
+
+  const handleAddUser = async () => {
+    if (!searchQuery.trim()) {
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Vui lòng nhập email',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+      return;
+    }
+
+    try {
+      let userToConfirm;
+      if (isManualSelection) {
+        userToConfirm = suggestions.find(
+          user => user.email.toLowerCase() === searchQuery.trim().toLowerCase(),
+        );
+      }
+
+      if (!userToConfirm) {
+        const response = await UserService.searchUserByEmail(searchQuery.trim());
+        userToConfirm = Array.isArray(response)
+          ? response.find(user => user.email.toLowerCase() === searchQuery.trim().toLowerCase())
+          : null;
+      }
+
+      if (userToConfirm) {
+        await SessionService.addUserToSession(session._id, [userToConfirm.email]);
+        userEmailList.push(userToConfirm.email);
+        setSuggestions([]);
+        setSearchQuery('');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Không tìm thấy người dùng phù hợp trong hệ thống',
+          visibilityTime: 2000,
+          autoHide: true,
+          position: 'bottom',
+        });
+      }
+    } catch (error) {
+      console.error('Error confirming user:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Lỗi',
+        text2: 'Đã xảy ra lỗi, vui lòng thử lại',
+        visibilityTime: 2000,
+        autoHide: true,
+        position: 'bottom',
+      });
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <ScrollView style={{ flex: 1, padding: 20 }}>
-        <View style={styles.formWrapper}>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.textTitle}>Tên phiên công chứng</Text>
-            <View style={styles.textHolder}>
-              <Text style={styles.textValue}>{session?.sessionName}</Text>
-            </View>
+      <ScrollView style={styles.contentContainer} showsVerticalScrollIndicator={false}>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionHeader}>Thông tin phiên công chứng</Text>
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Tên phiên công chứng:</Text>
+            <Text style={styles.info}>{session?.sessionName}</Text>
           </View>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.textTitle}>Lĩnh vực công chứng</Text>
-            <View style={styles.textHolder}>
-              <Text style={styles.textValue}>{session?.notaryField.name}</Text>
-            </View>
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Trạng thái:</Text>
+            <Text style={styles.info}>
+              {getDocumentStatusByCode(session?.status.status as DocumentStatusCode)}
+            </Text>
           </View>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.textTitle}>Dịch vụ công chứng</Text>
-            <View style={styles.textHolder}>
-              <Text style={styles.textValue}>{session?.notaryService.name}</Text>
-            </View>
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Người tạo phiên:</Text>
+            <Text style={styles.info}>{session?.creator.name}</Text>
           </View>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.textTitle}>Thêm khách mời</Text>
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Lĩnh vực công chứng:</Text>
+            <Text style={styles.info}>{session?.notaryField.name}</Text>
+          </View>
+
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Thời gian bắt đầu:</Text>
+            <Text style={styles.info}>
+              {session?.startTime?.toLocaleString()} {formatDate(session?.startDate)}
+            </Text>
+          </View>
+
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Thời gian kết thúc:</Text>
+            <Text style={styles.info}>
+              {session?.endTime?.toLocaleString()} {formatDate(session?.endDate)}
+            </Text>
+          </View>
+
+          <View style={styles.informationContainer}>
+            <Text style={styles.title}>Số lượng bản sao:</Text>
+            <Text style={styles.info}>{session?.amount}</Text>
+          </View>
+        </View>
+
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionHeader}>Thông tin khách mời</Text>
+          {user?.id === session?.creator._id && (
             <View style={styles.emailWrapper}>
               <TextInput
-                style={{ width: '80%', fontFamily: fonts.beVietnamPro.regular }}
+                style={{ marginTop: '2%', width: '80%', fontFamily: fonts.beVietnamPro.regular }}
                 placeholder="Nhập email"
-                value={userEmail}
-                onChangeText={setUserEmail}
+                value={searchQuery}
+                onChangeText={handleSearchInput}
               />
-              <TouchableOpacity
-                style={styles.addEmailButton}
-                onPress={() => {
-                  setSelected([...selected, { email: userEmail }]);
-                  setUserEmail('');
-                }}>
+              <TouchableOpacity style={styles.addEmailButton} onPress={handleAddUser}>
                 <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>Thêm</Text>
               </TouchableOpacity>
             </View>
-            {/* {userList.length > 0 && (
-              <ScrollView
-                style={{
-                  maxHeight: 100,
-                  marginTop: 8,
-                  backgroundColor: colors.gray[50],
-                  borderRadius: 8,
-                }}
-                nestedScrollEnabled={true}>
-                {userList.map(user => {
-                  if (!selected.some(selectedUser => selectedUser.email === user.email)) {
-                    return (
-                      <TouchableOpacity
-                        style={{ padding: 8 }}
-                        key={user.email}
-                        onPress={() => {
-                          setUserEmail(user.email);
-                        }}>
-                        <Text style={{ fontFamily: fonts.beVietnamPro.semiBold, fontSize: 18 }}>
-                          {user.email}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  } else {
-                    return (
-                      <TouchableOpacity
-                        key={user.email}
-                        style={{ backgroundColor: 'red', padding: 8 }}
-                        onPress={() => {
-                          setSelected(
-                            selected.filter(selectedUser => selectedUser.email !== user.email),
-                          );
-                        }}>
-                        <Text style={{ fontFamily: fonts.beVietnamPro.semiBold, fontSize: 18 }}>
-                          {user.email}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  }
-                })}
-              </ScrollView>
-            )} */}
-            {/* <View style={{ flexDirection: 'row', marginTop: 8 }}>
-              {(selected ?? []).map((user, index) =>
-                index < 6 ? (
-                  <View>
-                    <View
-                      style={{
-                        width: 60,
-                        height: 60,
-                        borderRadius: 50,
-                        backgroundColor: Object.values(COLORS)[index],
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        marginRight: 4,
-                        borderWidth: 1,
-                      }}
-                      key={index}>
-                      <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
-                        {user.email.charAt(0)}
-                      </Text>
-                    </View>
-                    <TouchableOpacity
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: 0,
-                        zIndex: 999,
-                        backgroundColor: 'white',
-                        borderRadius: 50,
-                      }}
-                      onPress={() => {
-                        setSelected(
-                          selected.filter(selectedUser => selectedUser.email !== user.email),
-                        );
-                      }}>
-                      <AntDesign name="closecircle" size={24} color="black" />
-                    </TouchableOpacity>
-                  </View>
-                ) : index === 6 ? (
-                  <View
-                    style={{
-                      width: 60,
-                      height: 60,
-                      borderRadius: 50,
-                      backgroundColor: colors.gray[100],
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      marginRight: 4,
-                      borderWidth: 1,
-                    }}
-                    key={index}>
-                    <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
-                      +{(selected?.length ?? 0) - 6}
-                    </Text>
-                  </View>
-                ) : null,
-              )}
-            </View> */}
-          </View>
-          <View style={{ marginBottom: 8 }}>
-            <Text style={styles.textTitle}>Thời gian bắt đầu</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={[styles.textHolder, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.textValue}>{session?.startTime?.toLocaleString()}</Text>
-              </View>
-              <View style={[styles.textHolder, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.textValue}>{formatDate(session?.startDate)}</Text>
-              </View>
-            </View>
-          </View>
-          <View style={{ marginBottom: 12 }}>
-            <Text style={styles.textTitle}>Thời gian kết thúc</Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <View style={[styles.textHolder, { flex: 1, marginRight: 8 }]}>
-                <Text style={styles.textValue}>{session?.endTime?.toLocaleString()}</Text>
-              </View>
-              <View style={[styles.textHolder, { flex: 1, marginLeft: 8 }]}>
-                <Text style={styles.textValue}>{formatDate(session?.endDate)}</Text>
-              </View>
-            </View>
-          </View>
-          <View>
-            <Text style={styles.textTitle}>Nhập số lượng</Text>
-            <View style={[styles.textHolder, { flex: 1 }]}>
-              <Text style={styles.textValue}>{session?.amount}</Text>
-            </View>
-          </View>
+          )}
+          <ScrollView style={styles.suggestionsContainer}>
+            {suggestions.map(user => (
+              <TouchableOpacity
+                key={user.email}
+                onPress={() => handleSelectUser(user)}
+                style={styles.suggestionItem}>
+                <Text style={styles.suggestionText}>
+                  {user.email} - {user.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+          {renderUserEmail()}
         </View>
-        <View style={{ marginTop: 12, flexDirection: 'row', alignSelf: 'flex-end' }}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: colors.green[100],
-              padding: 12,
-              borderRadius: 8,
-              alignItems: 'center',
-              marginTop: 20,
-              paddingHorizontal: 20,
-            }}
-            // onPress={() => handleCreateSession()}
-          >
-            <Text
-              style={{
-                color: colors.green[800],
-                fontFamily: fonts.beVietnamPro.bold,
-                fontSize: 16,
-              }}>
-              Lưu
-            </Text>
-          </TouchableOpacity>
+
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionHeader}>Thông tin phiên công chứng</Text>
         </View>
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -212,7 +270,8 @@ export default function SessionDetail({ navigation, route }: { navigation: any; 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white[50],
+    padding: '3%',
   },
   formWrapper: {
     margin: 4,
@@ -252,6 +311,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 8,
     paddingRight: 24,
+    marginTop: '3%',
   },
   addEmailButton: {
     backgroundColor: '#fff',
@@ -266,5 +326,67 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
     elevation: 7,
+  },
+  contentContainer: {
+    flex: 1,
+    paddingVertical: '2%',
+    paddingBottom: '5%',
+  },
+  sectionContainer: {
+    marginVertical: '3%',
+    marginHorizontal: '1%',
+    padding: '2%',
+    borderRadius: 10,
+    borderColor: colors.gray[300],
+    backgroundColor: colors.white[50],
+    elevation: 5,
+  },
+  sectionHeader: {
+    color: colors.black,
+    fontFamily: fonts.beVietnamPro.bold,
+    fontSize: 16,
+  },
+  informationContainer: {
+    padding: '2%',
+    backgroundColor: colors.white[50],
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  title: {
+    color: colors.black,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    fontSize: 14,
+    flex: 1,
+  },
+  info: {
+    color: colors.black,
+    fontFamily: fonts.beVietnamPro.regular,
+    fontSize: 14,
+    flex: 1,
+  },
+  email: {
+    color: colors.black,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    fontSize: 14,
+    flex: 1,
+    marginVertical: '2%',
+  },
+  suggestionsContainer: {
+    marginTop: 8,
+  },
+  suggestionItem: {
+    padding: '2%',
+    backgroundColor: colors.white[100],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray[200],
+  },
+  suggestionText: {
+    fontFamily: fonts.beVietnamPro.regular,
+    fontSize: 16,
+  },
+  fileRow: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+    marginTop: '3%',
   },
 });

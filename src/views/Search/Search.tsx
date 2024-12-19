@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  StatusBar,
   SafeAreaView,
   ScrollView,
 } from 'react-native';
@@ -32,6 +31,7 @@ export default function Search({ navigation }: Readonly<StackProps>) {
     completed: colors.green[500],
     rejected: colors.red[500],
     pending: colors.gray[400],
+    unknown: colors.gray[400],
   };
 
   const STATUS_OPTIONS: { label: string; value: DocumentStatusCode | null }[] = [
@@ -161,8 +161,7 @@ export default function Search({ navigation }: Readonly<StackProps>) {
         </TouchableOpacity>
       </View>
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Lọc theo trạng thái:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+        <ScrollView style={{ width: '100%' }} horizontal showsHorizontalScrollIndicator={false}>
           {STATUS_OPTIONS.map(option => (
             <TouchableOpacity
               key={option.value}
@@ -209,7 +208,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white[50],
     paddingHorizontal: '4%',
-    paddingTop: '8%',
+    paddingTop: '13%',
     paddingBottom: '20%',
   },
   title: {
@@ -277,8 +276,8 @@ const styles = StyleSheet.create({
     borderColor: colors.gray[200],
     borderRadius: 5,
     padding: '3%',
-    marginBottom: 10,
-    elevation: 8,
+    marginBottom: '3%',
+    elevation: 5,
   },
   cardTitle: {
     fontSize: 17,
@@ -320,17 +319,16 @@ const styles = StyleSheet.create({
     marginTop: '5%',
   },
   filterContainer: {
-    marginTop: 10,
-    marginBottom: 10,
+    marginVertical: '4%',
   },
   filterLabel: {
     fontSize: 14,
     fontFamily: fonts.beVietnamPro.semiBold,
-    marginBottom: 5,
+    marginBottom: '2%',
   },
   filterButton: {
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.gray[300],
@@ -341,7 +339,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary[400],
   },
   filterButtonText: {
-    fontSize: 12,
+    fontSize: 13,
     fontFamily: fonts.beVietnamPro.semiBold,
     color: colors.gray[600],
   },

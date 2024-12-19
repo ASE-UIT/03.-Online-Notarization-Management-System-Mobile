@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.bold,
-    fontSize: 15,
+    fontSize: 16,
   },
   informationContainer: {
     padding: '2%',

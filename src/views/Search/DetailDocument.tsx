@@ -1,17 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  Linking,
-  Pressable,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
+import React from 'react';
+import { View, Text, ScrollView, StyleSheet, Linking, Pressable, Image } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { colors, fonts } from '@theme';
-import { DocumentService, IDocumentHistoryStatus } from '@modules/document';
+import { IDocumentHistoryStatus } from '@modules/document';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import {
   DocumentStatusCode,
@@ -31,6 +22,7 @@ const DetailDocument = ({ navigation }: StackProps) => {
     completed: colors.green[500],
     rejected: colors.red[500],
     pending: colors.gray[400],
+    unknown: colors.gray[400],
   };
 
   const handleUrlPress = (url: string) => {
@@ -245,7 +237,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     color: colors.black,
     fontFamily: fonts.beVietnamPro.bold,
-    fontSize: 15,
+    fontSize: 16,
   },
   informationContainer: {
     padding: '2%',

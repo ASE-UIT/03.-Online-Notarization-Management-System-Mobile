@@ -87,6 +87,7 @@ export function HomeStackNavigator({ navigation, route }: any) {
       'ServiceDetail',
       'SendNFT',
       'GetWalletDocument',
+      'AddSessionStack',
     ];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
@@ -206,6 +207,16 @@ export function HomeStackNavigator({ navigation, route }: any) {
           headerLeft: () => renderHeaderLeft(false),
         }}
       />
+      <Stack.Screen
+        component={AddSession}
+        name="AddSessionStack"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Tạo phiên công chứng',
+          headerTitleStyle: styles.headerTitle,
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -261,7 +272,26 @@ export function SearchStackNavigator({ navigation, route }: any) {
   );
 }
 
-export function SessionStackNavigator() {
+export function SessionStackNavigator({ navigation, route }: any) {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route) ?? 'SessionStack';
+
+    const hiddenScreens = ['SessionDetailStack'];
+    if (hiddenScreens.includes(routeName)) {
+      navigation.setOptions({
+        tabBarStyle: { display: 'none' },
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {
+          height: 85,
+          backgroundColor: 'transparent',
+          elevation: 0,
+          position: 'absolute',
+        },
+      });
+    }
+  }, [navigation, route]);
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -272,19 +302,11 @@ export function SessionStackNavigator() {
         }}
       />
       <Stack.Screen
-        component={AddSession}
-        name="AddSessionStack"
-        options={{
-          headerTitle: 'Tạo phiên công chứng',
-          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
-        }}
-      />
-      <Stack.Screen
         component={SessionDetail}
         name="SessionDetailStack"
         options={{
           headerTitle: 'Chi tiết phiên công chứng',
-          headerLeft: () => <StackHeaderLeft isCreateScreen={false} />,
+          headerLeft: () => renderHeaderLeft(false),
         }}
       />
     </Stack.Navigator>

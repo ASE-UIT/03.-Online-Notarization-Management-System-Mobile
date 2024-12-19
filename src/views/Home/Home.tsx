@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, ImageBackground, SafeAreaView } from 'react-native';
-import Header from './Header'; // Import Header component
-import Main from './Main'; // Import Main component
+import Header from './Header';
+import Main from './Main';
 import { useUserSlice } from '@modules/user';
 import { StackProps } from '@navigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';

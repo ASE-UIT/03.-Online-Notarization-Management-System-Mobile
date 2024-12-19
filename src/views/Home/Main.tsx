@@ -6,7 +6,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import { colors, fonts } from '@theme';
 import CarouselComponent from '@components/CarouselComponent';
 import { StackProps } from '@navigator';
-import { Foundation, Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Foundation, Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const services = [
   {
@@ -76,6 +76,10 @@ export default function Main({ navigation }: Readonly<StackProps>) {
     navigation.navigate('ServiceDetail', { serviceId });
   };
 
+  const navigateToAddSession = () => {
+    navigation.navigate('AddSessionStack');
+  };
+
   const renderServices = (services: { id: string; name: string }[]) => {
     const processName = (name: string) => {
       if (name.startsWith('Công chứng ')) {
@@ -108,7 +112,7 @@ export default function Main({ navigation }: Readonly<StackProps>) {
             {service.id === 'more' ? (
               <Foundation name="indent-more" size={30} color={colors.gray[300]} />
             ) : (
-              <Ionicons name="document-text" size={30} color={colors.primary[500]} />
+              <Ionicons name="document-text" size={30} color={colors.yellow[700]} />
             )}
             <Text style={styles.serviceText}>{processName(service.name)}</Text>
           </TouchableOpacity>
@@ -129,18 +133,21 @@ export default function Main({ navigation }: Readonly<StackProps>) {
           </TouchableOpacity>
         </View>
       </View>
+
       <Text style={styles.orText}>---- hoặc ----</Text>
-      <View style={styles.redSectionContainer}>
-        <View style={{ flex: 1 }}>
-          <TouchableOpacity style={styles.createDocumentButton} onPress={handleSendNft}>
-            <Text style={styles.createButtonText}>Gửi tài liệu</Text>
-            <Ionicons name="send" size={18} color={colors.primary[500]} />
-          </TouchableOpacity>
-        </View>
-        <Text style={[styles.redSectionText, { flex: 1.3, marginLeft: '5%' }]}>
-          Gửi tài liệu công chứng cho người khác
-        </Text>
+
+      <View style={{ flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+        <TouchableOpacity style={styles.redButton} onPress={handleSendNft}>
+          <MaterialCommunityIcons name="file-send" size={28} color={colors.white[50]} />
+          <Text style={styles.redButtonText}>Gửi tài liệu</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.redButton]} onPress={navigateToAddSession}>
+          <Ionicons name="create" size={28} color={colors.white[50]} />
+          <Text style={styles.redButtonText}>Tạo phiên</Text>
+        </TouchableOpacity>
       </View>
+
       <Text style={styles.sectionTitle}>Các loại dịch vụ</Text>
       <SafeAreaView>{renderServices(services)}</SafeAreaView>
 
@@ -208,6 +215,22 @@ const styles = StyleSheet.create({
     flex: 1.5,
     fontFamily: fonts.beVietnamPro.bold,
     fontSize: 15,
+  },
+  redButton: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary[500],
+    paddingVertical: '3%',
+    paddingHorizontal: '6%',
+    borderRadius: 10,
+    marginVertical: '2%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  redButtonText: {
+    color: colors.white[50],
+    fontFamily: fonts.beVietnamPro.semiBold,
+    fontSize: 14,
+    marginLeft: '8%',
   },
   createDocumentButton: {
     backgroundColor: colors.white[50],
