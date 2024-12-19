@@ -20,6 +20,8 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     requesterInfo,
     amount,
     files,
+    fileIds,
+    customFileNames,
     clearFiles,
   } = useDocumentSlice();
   const [step, setStep] = useState(0);
@@ -40,7 +42,7 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
   }, []);
 
   const handleNextStep = async () => {
-    const extractedFiles = Object.values(files[0]).flatMap(fileGroup => fileGroup);
+    const extractedFiles = files ? Object.values(files[0]).flatMap(fileGroup => fileGroup) : [];
     console.log(extractedFiles);
     const requestPayload: IUploadDocumentRequest = {
       notarizationService: notarizationService as INotarizationService,
@@ -52,6 +54,8 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
         type: (file as any).mimeType,
       })),
       amount,
+      fileIds,
+      customFileNames,
     };
 
     const formData = new FormData();
@@ -60,10 +64,13 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
     formData.append('notarizationField', JSON.stringify(requestPayload.notarizationField));
     formData.append('requesterInfo', JSON.stringify(requestPayload.requesterInfo));
     formData.append('amount', requestPayload.amount);
-    console.log(requestPayload.files);
-    requestPayload.files.forEach(file => {
+
+    requestPayload.files?.forEach(file => {
       formData.append('files', file);
     });
+
+    formData.append('fileIds', JSON.stringify(requestPayload.fileIds));
+    formData.append('customFileNames', JSON.stringify(requestPayload.customFileNames));
 
     setLoading(true);
 
@@ -95,35 +102,47 @@ const ConfirmInformation = ({ navigation }: StackProps) => {
   );
 
   const renderFiles = () => {
-    if (!Array.isArray(files)) {
-      console.log('Expected files to be an array');
+    if (!Array.isArray(files) || !Array.isArray(customFileNames)) {
+      console.log('Expected files and customFileNames to be arrays');
       return null;
     }
 
-    console.log(files);
+    console.log(files, customFileNames);
 
-    return files.map((fileObj, index) => {
-      if (fileObj && typeof fileObj === 'object') {
-        return Object.entries(fileObj).map(([document, fileArray]) => {
-          if (Array.isArray(fileArray)) {
-            return (
-              <View key={`${document}-${index}`} style={styles.fileContainer}>
-                <Text style={styles.title}>
-                  {getDocumentNameByCode(document as DocumentTypeCode)}
-                </Text>
-                {fileArray.map((file, fileIndex) => (
-                  <Text key={`${file.uri}-${fileIndex}`} style={styles.info}>
-                    • {file.name}
-                  </Text>
-                ))}
-              </View>
-            );
+    return (
+      <>
+        {/* Render files */}
+        {files.map((fileObj, index) => {
+          if (fileObj && typeof fileObj === 'object') {
+            return Object.entries(fileObj).map(([document, fileArray]) => {
+              if (Array.isArray(fileArray)) {
+                return (
+                  <View key={`file-${document}-${index}`} style={styles.fileContainer}>
+                    <Text style={styles.title}>Tài liệu nhập từ máy</Text>
+                    {fileArray.map((file, fileIndex) => (
+                      <Text key={`file-${file.uri}-${fileIndex}`} style={styles.info}>
+                        • {file.name}
+                      </Text>
+                    ))}
+                  </View>
+                );
+              }
+              return null;
+            });
           }
           return null;
-        });
-      }
-      return null;
-    });
+        })}
+
+        <View style={styles.fileContainer}>
+          <Text style={styles.title}>Tài liệu từ ví của bạn</Text>
+          {customFileNames.map((fileName, index) => (
+            <Text key={`customFileName-${index}`} style={styles.info}>
+              • {fileName}
+            </Text>
+          ))}
+        </View>
+      </>
+    );
   };
 
   return (

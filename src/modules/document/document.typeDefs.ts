@@ -29,18 +29,20 @@ export interface IDocumentState {
     phoneNumber: string | undefined;
     email: string | undefined;
   };
-  files: {
+  files?: {
     name: string;
     uri: string;
     size: number;
     mimeType: string;
   }[];
+  fileIds?: string[];
+  customFileNames?: string[];
   amount: number;
 }
 
 export interface IUploadDocumentRequest {
   notarizationService: INotarizationService;
-  files: {
+  files?: {
     name: string | number;
     uri: string;
     type: string;
@@ -53,6 +55,8 @@ export interface IUploadDocumentRequest {
     email: string | undefined;
   };
   amount: number;
+  fileIds?: string[];
+  customFileNames?: string[];
 }
 
 export interface IUploadDocumentResponse {

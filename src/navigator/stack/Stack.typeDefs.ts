@@ -1,5 +1,6 @@
 import { IDocumentHistoryStatus } from '@modules/document';
 import { ISession } from '@modules/session/session.typeDefs';
+import { ISendingDocumentFromWallet } from '@modules/userWallet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type StackParamList = {
@@ -29,8 +30,9 @@ export type StackParamList = {
   TransferNFTStack: undefined;
 
   CreateServiceAndField: undefined;
-  ProvideInformation: undefined;
+  ProvideInformation: { returnedObject: ISendingDocumentFromWallet } | undefined;
   ConfirmInformation: undefined;
+  GetWalletDocument: { onGoBack: (data: any) => void };
 
   DetailDocument: { document: IDocumentHistoryStatus };
   Signature: { documentId: string };

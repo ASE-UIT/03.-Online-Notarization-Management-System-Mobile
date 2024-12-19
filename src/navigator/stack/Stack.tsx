@@ -22,7 +22,12 @@ import {
 } from '@views/Other';
 import { AddSession, Session, SessionDetail } from '@views/Session';
 
-import { ServiceAndField, ProvideInformation, ConfirmInformation } from '@views/Notarization';
+import {
+  ServiceAndField,
+  ProvideInformation,
+  ConfirmInformation,
+  GetWalletDocument,
+} from '@views/Notarization';
 import { useDocumentSlice } from '@modules/document';
 import TabNavigator from '@navigator/tab/Tab';
 
@@ -81,6 +86,7 @@ export function HomeStackNavigator({ navigation, route }: any) {
       'Service',
       'ServiceDetail',
       'SendNFT',
+      'GetWalletDocument',
     ];
     if (hiddenScreens.includes(routeName)) {
       navigation.setOptions({
@@ -184,6 +190,17 @@ export function HomeStackNavigator({ navigation, route }: any) {
         options={{
           headerStyle: styles.headerBackground,
           headerTitle: 'Chuyển tài liệu số',
+          headerTitleStyle: styles.headerTitle,
+          headerTransparent: true,
+          headerLeft: () => renderHeaderLeft(false),
+        }}
+      />
+      <Stack.Screen
+        component={GetWalletDocument}
+        name="GetWalletDocument"
+        options={{
+          headerStyle: styles.headerBackground,
+          headerTitle: 'Ví của bạn',
           headerTitleStyle: styles.headerTitle,
           headerTransparent: true,
           headerLeft: () => renderHeaderLeft(false),
