@@ -26,6 +26,7 @@ const SignIn = ({ navigation }: StackProps) => {
         type: 'error',
         text1: 'Có lỗi xảy ra',
         text2: 'Email hoặc mật khẩu không hợp lệ',
+        position: 'bottom',
       });
       return;
     }

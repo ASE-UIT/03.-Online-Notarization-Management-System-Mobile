@@ -5,12 +5,7 @@ async function getUserWallet(): Promise<IUserWallet> {
   const response = await axiosConfig.get<IUserWallet>(
     process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/userWallet/wallet',
   );
-  const filteredNFTItems = response.data.nftItems.filter(item => item.amount !== 0);
-
-  return {
-    ...response.data,
-    nftItems: filteredNFTItems,
-  };
+  return response.data;
 }
 
 async function transferNFT(

@@ -58,11 +58,12 @@ export default function SessionDetail({
         {userEmailList.map((email, index) => (
           <View key={email} style={styles.fileRow}>
             <Text style={styles.email}>{`• ${email}`}</Text>
-            {user?.id === session?.creator._id && (
-              <Pressable onPress={() => handleDeleteUser(email)}>
-                <Feather name="x-circle" size={24} color={colors.gray[600]} />
-              </Pressable>
-            )}
+            {user?.id === session?.creator._id ||
+              (session?.status.status === 'unknown' && (
+                <Pressable onPress={() => handleDeleteUser(email)}>
+                  <Feather name="x-circle" size={24} color={colors.gray[600]} />
+                </Pressable>
+              ))}
           </View>
         ))}
       </View>
@@ -230,19 +231,20 @@ export default function SessionDetail({
 
         <View style={styles.sectionContainer}>
           <Text style={styles.sectionHeader}>Thông tin khách mời</Text>
-          {user?.id === session?.creator._id && (
-            <View style={styles.emailWrapper}>
-              <TextInput
-                style={{ marginTop: '2%', width: '80%', fontFamily: fonts.beVietnamPro.regular }}
-                placeholder="Nhập email"
-                value={searchQuery}
-                onChangeText={handleSearchInput}
-              />
-              <TouchableOpacity style={styles.addEmailButton} onPress={handleAddUser}>
-                <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>Thêm</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          {user?.id === session?.creator._id ||
+            (session?.status.status === 'unknown' && (
+              <View style={styles.emailWrapper}>
+                <TextInput
+                  style={{ marginTop: '2%', width: '80%', fontFamily: fonts.beVietnamPro.regular }}
+                  placeholder="Nhập email"
+                  value={searchQuery}
+                  onChangeText={handleSearchInput}
+                />
+                <TouchableOpacity style={styles.addEmailButton} onPress={handleAddUser}>
+                  <Text style={{ fontFamily: fonts.beVietnamPro.bold }}>Thêm</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
           <ScrollView style={styles.suggestionsContainer}>
             {suggestions.map(user => (
               <TouchableOpacity

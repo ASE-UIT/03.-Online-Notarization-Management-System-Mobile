@@ -6,7 +6,16 @@ async function getSessionByUserId(): Promise<ISession[]> {
   const response = await axiosConfig.get<{ results: ISession[] }>(
     process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/session/getSessionsByUserId',
   );
-  return response.data.results;
+  const sessions = response.data.results;
+
+  const uniqueSessionsMap = new Map<string, ISession>();
+  sessions.forEach(session => {
+    if (!uniqueSessionsMap.has(session._id)) {
+      uniqueSessionsMap.set(session._id, session);
+    }
+  });
+
+  return Array.from(uniqueSessionsMap.values());
 }
 
 async function createSession(input: ICreateSessionRequest): Promise<ICreateSessionResponse> {
