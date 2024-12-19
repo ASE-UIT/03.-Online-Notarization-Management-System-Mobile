@@ -38,6 +38,7 @@ export default function Session({ navigation }: Readonly<StackProps>) {
     try {
       setSearching(true);
       const fetchedSessions = await SessionService.getSessionByUserId();
+      console.log(fetchedSessions);
       setSessions(fetchedSessions);
     } catch (error) {
       console.log('Error fetching session', error);
@@ -79,7 +80,9 @@ export default function Session({ navigation }: Readonly<StackProps>) {
 
   const renderSessionCards = useCallback(() => {
     return filteredSessions.map((session: ISession) => (
-      <Pressable key={session._id} onPress={() => navigateToSessionDetail(session)}>
+      <Pressable
+        key={`${session._id}-${session.sessionName}`}
+        onPress={() => navigateToSessionDetail(session)}>
         <SessionCard session={session} />
       </Pressable>
     ));
