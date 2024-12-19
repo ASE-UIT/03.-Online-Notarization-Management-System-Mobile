@@ -108,7 +108,7 @@ const Service = ({ navigation }: StackProps) => {
               key={service.id}
               style={styles.serviceItem}
               onPress={() => handleCreateDocument(service.id)}>
-              <Ionicons name="document-text" size={30} color={colors.primary[500]} />
+              <Ionicons name="document-text" size={30} color={colors.yellow[700]} />
               <Text style={styles.serviceText}>{processName(service.name)}</Text>
             </Pressable>
           ) : (

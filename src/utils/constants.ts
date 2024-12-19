@@ -33,6 +33,7 @@ export const DOCUMENT_STATUS_LABELS = {
   digitalSignature: 'Sẵn sàng ký số',
   completed: 'Hoàn tất',
   rejected: 'Không hợp lệ',
+  unknown: 'Không xác định',
 };
 
 export type DocumentTypeCode = keyof typeof DOCUMENT_TYPE_LABELS;

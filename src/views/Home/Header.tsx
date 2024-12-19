@@ -32,6 +32,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: 'transparent',
     padding: '3%',
+    paddingTop: '10%',
   },
   topSection: {
     flexDirection: 'row',

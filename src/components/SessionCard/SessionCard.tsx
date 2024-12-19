@@ -1,159 +1,157 @@
-import { colors, fonts } from '@theme';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Entypo from '@expo/vector-icons/Entypo';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import Feather from '@expo/vector-icons/Feather';
 import { ISession } from '@modules/session/session.typeDefs';
-import { COLORS } from 'src/constants';
+import { colors, fonts } from '@theme';
+import { DocumentStatusCode, getDocumentStatusByCode } from '@utils/constants';
 
-function SessionCard({ session }: { session: ISession }) {
-  const dayLeft = () => {
+interface SessionCardProps {
+  session: ISession;
+}
+
+const STATUS_COLORS: { [key in DocumentStatusCode]: string } = {
+  digitalSignature: colors.blue[500],
+  processing: colors.yellow[500],
+  completed: colors.green[500],
+  rejected: colors.red[500],
+  pending: colors.gray[400],
+  unknown: colors.gray[400],
+};
+
+export const SessionCard: React.FC<SessionCardProps> = ({ session }) => {
+  const daysLeft = useMemo(() => {
     const endDate = new Date(session.endDate);
     const currentDate = new Date();
     const timeDiff = endDate.getTime() - currentDate.getTime();
-    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    const days = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    return days > 0 ? `Còn ${days} ngày` : 'Đã kết thúc';
+  }, [session.endDate]);
 
-    return daysLeft > 0 ? `Còn ${daysLeft} ngày` : 'Đã kết thúc';
-  };
   return (
     <View style={styles.cardWrapper}>
       <View style={styles.cardTop}>
         <View>
-          <Text style={{ fontFamily: fonts.beVietnamPro.bold, fontSize: 18 }}>
-            {session.sessionName}
+          <Text style={styles.sessionName}>{session.sessionName}</Text>
+          <Text style={styles.creatorName}>tạo bởi {session.creator.name}</Text>
+        </View>
+      </View>
+      <View style={[styles.divider, { backgroundColor: colors.gray[300] }]} />
+      <View style={styles.infoContainer}>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.cardText}>Số người tham gia: </Text>
+          <Text style={styles.cardText}>
+            {session.users.length + 1} người ({session.users.length} người khác)
           </Text>
+        </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.cardText}>Trạng thái: </Text>
           <Text
-            style={{
-              fontFamily: fonts.beVietnamPro.regular,
-              fontSize: 14,
-              color: colors.gray[300],
-            }}>
-            tạo bởi {session.creator.name}
+            style={[
+              styles.cardText,
+              {
+                color: STATUS_COLORS[session.status as DocumentStatusCode] || colors.black,
+              },
+            ]}>
+            {getDocumentStatusByCode(session.status as DocumentStatusCode)}
           </Text>
         </View>
-        <TouchableOpacity>
-          <Entypo name="dots-three-horizontal" size={24} color={colors.gray[300]} />
-        </TouchableOpacity>
       </View>
-      <View style={{ height: 1, backgroundColor: colors.gray[300], flex: 1 }} />
-      <View style={{ marginTop: 16 }}>
-        <View style={styles.textWrapper}>
-          <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Lĩnh vực: {'  '}</Text>
-          <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text
-              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
-              numberOfLines={2}>
-              {session.notaryField.name}
-            </Text>
-          </View>
-        </View>
-        <View style={styles.textWrapper}>
-          <Text style={{ fontFamily: fonts.beVietnamPro.semiBold }}>Dịch vụ: {'    '}</Text>
-          <View style={{ backgroundColor: colors.gray[100], padding: 4, borderRadius: 4 }}>
-            <Text
-              style={{ fontFamily: fonts.beVietnamPro.semiBold, maxWidth: 270 }}
-              numberOfLines={2}>
-              {session.notaryService.name}
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View style={{ flexDirection: 'row' }}>
-        {(session.users ?? []).map((user, index) =>
-          index < 7 ? (
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 50,
-                backgroundColor: Object.values(COLORS)[index],
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 4,
-                borderWidth: 1,
-              }}
-              key={index}>
-              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
-                {user.email.charAt(0)}
-              </Text>
-            </View>
-          ) : index === 7 ? (
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 50,
-                backgroundColor: colors.gray[100],
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginRight: 4,
-                borderWidth: 1,
-              }}
-              key={index}>
-              <Text style={{ fontFamily: fonts.beVietnamPro.bold, color: '#fff' }}>
-                +{(session.users?.length ?? 0) - 7}
-              </Text>
-            </View>
-          ) : null,
-        )}
-      </View>
-      <View>
-        <View style={styles.timeWrapper}>
-          <Feather name="clock" size={24} color={colors.red[500]} />
-          <Text
-            style={{
-              color: colors.red[500],
-              marginLeft: 8,
+
+      <View
+        style={[
+          styles.timeWrapper,
+          { backgroundColor: daysLeft === 'Đã kết thúc' ? colors.red[50] : colors.green[50] },
+        ]}>
+        <Feather
+          name="clock"
+          size={24}
+          color={daysLeft === 'Đã kết thúc' ? colors.red[500] : colors.green[500]}
+        />
+        <Text
+          style={[
+            styles.timeText,
+            {
               fontFamily: fonts.beVietnamPro.semiBold,
-            }}>
-            {dayLeft()}
-          </Text>
-        </View>
+              color: daysLeft === 'Đã kết thúc' ? colors.red[500] : colors.green[500],
+            },
+          ]}>
+          {daysLeft}
+        </Text>
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   cardWrapper: {
-    flexWrap: 'wrap',
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.gray[100],
+    borderColor: '#f0f0f0',
     marginBottom: 16,
     marginHorizontal: 8,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.29,
     shadowRadius: 4.65,
-
     elevation: 7,
   },
   cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    flex: 1,
+    marginBottom: '2%',
+  },
+  sessionName: {
+    fontSize: 18,
+    fontFamily: fonts.beVietnamPro.bold,
+    color: colors.black,
+  },
+  creatorName: {
+    fontSize: 14,
+    color: colors.gray[300],
+    fontFamily: fonts.beVietnamPro.regular,
+  },
+  divider: {
+    height: 1,
+    marginBottom: '2%',
+  },
+  infoContainer: {
+    marginBottom: '3%',
+  },
+  avatarContainer: {
+    flexDirection: 'row',
     marginBottom: 16,
   },
-  textWrapper: {
-    flexDirection: 'row',
+  extraUsersAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    marginRight: 4,
+    borderWidth: 1,
+  },
+  extraUsersText: {
+    color: '#fff',
   },
   timeWrapper: {
     flexDirection: 'row',
     padding: 8,
     alignItems: 'center',
-    marginTop: 16,
     borderRadius: 10,
-    backgroundColor: colors.primary[50],
     alignSelf: 'flex-start',
+  },
+  timeText: {
+    color: '#ff0000',
+    marginLeft: 8,
+  },
+  cardText: {
+    fontSize: 14,
+    fontFamily: fonts.beVietnamPro.semiBold,
+    color: colors.gray[600],
+    marginTop: '2%',
   },
 });
 
