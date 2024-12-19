@@ -29,9 +29,21 @@ async function transferNFT(
   return response.data;
 }
 
+async function buyNFT(itemId: string, amount: number): Promise<string> {
+  const response = await axiosConfig.post(
+    process.env.EXPO_PUBLIC_BACKEND_URL + 'v1/userWallet/wallet/purchase',
+    {
+      itemId,
+      amount,
+    },
+  );
+  return response.data;
+}
+
 const UserWalletService = {
   getUserWallet,
   transferNFT,
+  buyNFT,
 };
 
 export default UserWalletService;

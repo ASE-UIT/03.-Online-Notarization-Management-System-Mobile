@@ -20,8 +20,11 @@ export default function Wallet() {
   return (
     <View style={styles.container}>
       <ScrollView>
-        {userWallet?.nftItems.map((item, index) => <UserWalletCard key={index} item={item} />)}
+        {userWallet?.nftItems.map((item, index) => (
+          <UserWalletCard key={index} item={item} showBuyButton={true} />
+        ))}
         <View style={{ marginBottom: 32 }} />
+        <View style={{ height: 100 }} />
       </ScrollView>
     </View>
   );
