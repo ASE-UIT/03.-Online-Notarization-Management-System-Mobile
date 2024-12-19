@@ -5,6 +5,7 @@ import {
   IRefreshTokenResponse,
   IRegisterRequest,
   IRegisterResponse,
+  IUpdateUserRequest,
   IUser,
 } from './user.typeDefs';
 import axiosConfig from '@utils/axiosConfig';
@@ -75,6 +76,14 @@ async function forgotPassword(email: string): Promise<void> {
   });
 }
 
+async function updateUser(user: IUpdateUserRequest, id: string): Promise<IUser> {
+  const response = await axiosConfig.patch<IUser>(
+    process.env.EXPO_PUBLIC_BACKEND_URL + `v1/users/${id}`,
+    user,
+  );
+  return response.data;
+}
+
 const UserService = {
   login,
   logout,
@@ -82,6 +91,7 @@ const UserService = {
   register,
   searchUserByEmail,
   forgotPassword,
+  updateUser,
 };
 
 export default UserService;
