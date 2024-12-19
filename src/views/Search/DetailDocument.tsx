@@ -24,7 +24,6 @@ import { StackProps } from '@navigator';
 const DetailDocument = ({ navigation }: StackProps) => {
   const route = useRoute();
   const { document } = route.params as { document: IDocumentHistoryStatus };
-  const [signatureImage, setSignatureImage] = useState(null);
 
   const STATUS_COLORS: { [key in DocumentStatusCode]: string } = {
     digitalSignature: colors.blue[500],
@@ -33,10 +32,6 @@ const DetailDocument = ({ navigation }: StackProps) => {
     rejected: colors.red[500],
     pending: colors.gray[400],
   };
-
-  useEffect(() => {
-    console.log(document.signature.signatureImage);
-  });
 
   const handleUrlPress = (url: string) => {
     Linking.openURL(url).catch(err => console.error('Không thể mở URL:', err));
@@ -147,16 +142,16 @@ const DetailDocument = ({ navigation }: StackProps) => {
             <View style={[styles.sectionContainer, { width: '100%' }]}>
               <Text style={styles.sectionHeader}>Chữ kí điện tử của bạn</Text>
               <View style={styles.informationContainer}>
-                {!!document.signature.signatureImage && (
+                {!!document?.signature?.signatureImage && (
                   <View style={styles.imageContainer}>
                     <Image
-                      source={{ uri: document.signature.signatureImage }}
+                      source={{ uri: document?.signature?.signatureImage }}
                       style={styles.image}
                       resizeMode="contain"
                     />
                   </View>
                 )}
-                {!document.signature.signatureImage && (
+                {!document?.signature?.signatureImage && (
                   <Pressable
                     style={styles.signatureButton}
                     onPress={() => handleSignature(document._id)}>

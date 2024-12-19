@@ -219,9 +219,10 @@ const styles = StyleSheet.create({
     color: colors.black,
   },
   subTitle: {
-    fontSize: 15,
-    fontFamily: fonts.beVietnamPro.bold,
-    color: colors.gray[400],
+    textDecorationLine: 'underline',
+    color: colors.primary[400],
+    fontSize: 14,
+    fontFamily: fonts.beVietnamPro.regular,
   },
   redSubTitle: {
     marginVertical: '2%',
