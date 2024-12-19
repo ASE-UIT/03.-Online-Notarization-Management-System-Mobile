@@ -1,10 +1,29 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity, Linking } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import { colors, fonts } from '@theme';
 import Feather from '@expo/vector-icons/Feather';
 import { INFTItem } from '@modules/userWallet';
+import Dialog from 'react-native-dialog';
+import UserWalletService from '@modules/userWallet/userWallet.service';
 
-export default function UserWalletCard({ item }: { item: INFTItem }) {
+export default function UserWalletCard({
+  item,
+  showBuyButton = false,
+}: {
+  item: INFTItem;
+  showBuyButton?: boolean;
+}) {
+  const [currentAmount, setCurrentAmount] = useState(item.amount);
+  const [visible, setVisible] = useState(false);
+  const [amount, setAmount] = useState(0);
+  const handleCancel = () => {
+    setVisible(false);
+  };
+  const handleDelete = () => {
+    const response = UserWalletService.buyNFT(item._id, amount);
+    setCurrentAmount(currentAmount + amount);
+    setVisible(false);
+  };
   return (
     <View style={styles.cardWrapper}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -25,16 +44,29 @@ export default function UserWalletCard({ item }: { item: INFTItem }) {
             justifyContent: 'space-between',
             flex: 1,
           }}>
-          <View style={styles.amountWrapper}>
-            <Text
-              style={{
-                color: colors.white[50],
-                fontSize: 14,
-                fontFamily: fonts.beVietnamPro.regular,
-              }}>
-              {item.amount}
-            </Text>
-          </View>
+          {item.amount > 0 ? (
+            <View style={[styles.amountWrapper, { backgroundColor: 'black' }]}>
+              <Text
+                style={{
+                  color: colors.white[50],
+                  fontSize: 14,
+                  fontFamily: fonts.beVietnamPro.regular,
+                }}>
+                {currentAmount}
+              </Text>
+            </View>
+          ) : (
+            <View style={[styles.amountWrapper, { backgroundColor: colors.red[500] }]}>
+              <Text
+                style={{
+                  color: colors.white[50],
+                  fontSize: 14,
+                  fontFamily: fonts.beVietnamPro.regular,
+                }}>
+                {item.amount}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
       <View style={{ height: 1, flex: 1, backgroundColor: colors.gray[200], marginVertical: 16 }} />
@@ -77,6 +109,26 @@ export default function UserWalletCard({ item }: { item: INFTItem }) {
           <Feather name="alert-circle" size={24} color={colors.white[50]} />
         </TouchableOpacity>
       </View>
+      {showBuyButton && (
+        <View>
+          <TouchableOpacity style={styles.buyButton} onPress={() => setVisible(true)}>
+            <Text style={{ color: 'white', fontFamily: fonts.beVietnamPro.semiBold }}>
+              Mua thêm
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      <Dialog.Container visible={visible} contentStyle={{ borderRadius: 10 }}>
+        <Dialog.Title>Account delete</Dialog.Title>
+        <Dialog.Input
+          keyboardType="number-pad"
+          placeholder="Nhập số lượng cần mua thêm"
+          value={amount.toString()}
+          onChangeText={text => setAmount(Number(text))}
+        />
+        <Dialog.Button label="Huỷ" onPress={handleCancel} />
+        <Dialog.Button label="Xác nhận" onPress={handleDelete} />
+      </Dialog.Container>
     </View>
   );
 }
@@ -103,7 +155,6 @@ const styles = StyleSheet.create({
     width: 200,
   },
   amountWrapper: {
-    backgroundColor: colors.black,
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
@@ -126,5 +177,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginRight: 16,
     fontFamily: fonts.beVietnamPro.bold,
+  },
+  buyButton: {
+    backgroundColor: colors.red[500],
+    borderRadius: 8,
+    padding: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
   },
 });
